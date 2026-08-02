@@ -1,0 +1,66 @@
+name: Deploy dev to GCP
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+
+      - name: Build WAR
+        run: mvn -B clean package -DskipTests
+
+      - name: Prepare SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GCP_SSH_KEY }}
+          GCP_HOST: ${{ secrets.GCP_HOST }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$GCP_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload WAR
+        env:
+          GCP_HOST: ${{ secrets.GCP_HOST }}
+          GCP_USER: ${{ secrets.GCP_USER }}
+        run: |
+          scp \
+            -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            target/hexagon_project.war \
+            "$GCP_USER@$GCP_HOST:/home/deploy/upload/hexagon_project.war.tmp"
+
+      - name: Deploy to Tomcat
+        env:
+          GCP_HOST: ${{ secrets.GCP_HOST }}
+          GCP_USER: ${{ secrets.GCP_USER }}
+        run: |
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            "$GCP_USER@$GCP_HOST" \
+            'mv /home/deploy/upload/hexagon_project.war.tmp /home/deploy/upload/hexagon_project.war && sudo -n /usr/local/bin/deploy-hexagon'
