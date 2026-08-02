@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xsi:schemaLocation="
+        http://xmlns.jcp.org/xml/ns/javaee
+        http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+    id="WebApp_ID"
+    version="4.0">
+
+    <!-- 웹 애플리케이션 이름 -->
+    <display-name>hexagon_project</display-name>
+
+
+    <!--
+        실제 DB 접속정보가 저장된 파일 경로
+
+        실제 파일:
+        /WEB-INF/db.properties
+
+        Git 업로드용 예시 파일:
+        /WEB-INF/db.properties.example
+    -->
+    <context-param>
+        <param-name>poolConfigFile</param-name>
+        <param-value>/WEB-INF/db.properties</param-value>
+    </context-param>
+
+
+    <!-- 서버 시작 시 DBCP 커넥션 풀 초기화 -->
+    <listener>
+        <listener-class>jdbc.DBCPInitListener</listener-class>
+    </listener>
+
+
+    <!-- 요청 및 응답 한글 인코딩 처리 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>util.CharacterEncoding</filter-class>
+
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- MVC 공통 컨트롤러 -->
+    <servlet>
+        <servlet-name>ControllerUsingUri</servlet-name>
+        <servlet-class>controller.ControllerUsingUri</servlet-class>
+
+        <!-- URI와 CommandHandler 연결 설정 파일 -->
+        <init-param>
+            <param-name>configFile</param-name>
+            <param-value>/WEB-INF/commandHandlerUri.properties</param-value>
+        </init-param>
+
+        <!-- Tomcat 시작 시 Controller 초기화 -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ControllerUsingUri</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- 기본 시작 페이지 -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+        <welcome-file>default.jsp</welcome-file>
+        <welcome-file>default.html</welcome-file>
+        <welcome-file>default.htm</welcome-file>
+    </welcome-file-list>
+
+</web-app>

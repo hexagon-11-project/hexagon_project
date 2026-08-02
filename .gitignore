@@ -1,0 +1,15 @@
+# 실제 DB 접속정보
+/src/main/webapp/WEB-INF/db.properties
+
+# 빌드 결과물
+/build/
+/bin/
+/target/
+*.class
+
+# 로그
+*.log
+
+# 운영체제 파일
+.DS_Store
+Thumbs.db
