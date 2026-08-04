@@ -1,0 +1,48 @@
+.document-sheet {
+	background: #fff;
+	border: 1px solid var(--line-strong);
+	padding: 28px;
+	max-width: 900px;
+	margin: 0 auto
+}
+
+.document-title {
+	text-align: center;
+	font-size: 24px;
+	letter-spacing: 5px;
+	margin-bottom: 24px
+}
+
+.document-meta {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 14px
+}
+
+.document-table {
+	border: 2px solid #69737d
+}
+
+.document-table th, .document-table td {
+	border: 1px solid #89939c;
+	padding: 9px
+}
+
+.document-table th {
+	background: #f4f5f6
+}
+
+.signature-area {
+	display: grid;
+	grid-template-columns: 1fr 160px;
+	margin-top: 22px;
+	align-items: end
+}
+
+.seal-box {
+	height: 82px;
+	border: 1px dashed #aaa;
+	display: grid;
+	place-items: center;
+	color: #999
+}

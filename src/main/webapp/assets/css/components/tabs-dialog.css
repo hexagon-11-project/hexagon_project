@@ -1,0 +1,73 @@
+.tabs {
+	display: flex;
+	border-bottom: 1px solid var(--line-strong);
+	gap: 2px;
+	margin-bottom: 12px
+}
+
+.tab {
+	border: 1px solid var(--line);
+	border-bottom: 0;
+	background: #f3f5f7;
+	padding: 9px 14px;
+	font-weight: 700;
+	color: #65717e
+}
+
+.tab.active {
+	background: #fff;
+	color: var(--accent);
+	border-top: 2px solid var(--accent);
+	padding-top: 8px
+}
+
+.tab-panel {
+	display: none
+}
+
+.tab-panel.active {
+	display: block
+}
+
+.dialog-backdrop {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 30, 40, .45);
+	z-index: 100;
+	align-items: center;
+	justify-content: center;
+	padding: 20px
+}
+
+.dialog-backdrop.open {
+	display: flex
+}
+
+.dialog {
+	width: min(520px, 100%);
+	background: #fff;
+	border-radius: 5px;
+	box-shadow: 0 18px 50px rgba(0, 0, 0, .25)
+}
+
+.dialog-header, .dialog-footer {
+	padding: 12px 14px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px
+}
+
+.dialog-header {
+	border-bottom: 1px solid var(--line)
+}
+
+.dialog-body {
+	padding: 14px
+}
+
+.dialog-footer {
+	border-top: 1px solid var(--line);
+	justify-content: flex-end
+}

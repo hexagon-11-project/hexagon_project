@@ -1,0 +1,42 @@
+.auth-page {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	background: linear-gradient(135deg, #edf1f4, #dfe6ec);
+	padding: 20px
+}
+
+.login-card {
+	width: min(420px, 100%);
+	background: #fff;
+	border: 1px solid var(--line);
+	box-shadow: 0 14px 40px rgba(27, 44, 60, .15);
+	padding: 38px
+}
+
+.login-brand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 26px;
+	font-size: 22px;
+	font-weight: 800
+}
+
+.login-brand .brand-mark {
+	margin-right: 10px
+}
+
+.login-form {
+	display: grid;
+	gap: 12px
+}
+
+.login-form .input {
+	height: 42px
+}
+
+.login-form .btn {
+	height: 44px;
+	margin-top: 4px
+}

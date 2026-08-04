@@ -1,0 +1,84 @@
+.payroll-layout {
+	display: grid;
+	grid-template-columns: minmax(560px, 1.25fr) minmax(380px, .75fr);
+	gap: 12px
+}
+
+.payroll-editor .data-table {
+	min-width: 0
+}
+
+.payroll-editor .data-table td {
+	padding: 6px
+}
+
+.payroll-total-bar {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	margin-top: 12px
+}
+
+.payroll-total {
+	padding: 12px;
+	color: #fff;
+	border-radius: 4px
+}
+
+.payroll-total:nth-child(1) {
+	background: #66717d
+}
+
+.payroll-total:nth-child(2) {
+	background: #42a6cc
+}
+
+.payroll-total:nth-child(3) {
+	background: #eb747b
+}
+
+.payroll-total:nth-child(4) {
+	background: #505a64
+}
+
+.payroll-total strong {
+	display: block;
+	text-align: right;
+	font-size: 17px;
+	margin-top: 5px
+}
+
+.net-pay {
+	background: #245a79;
+	color: #fff;
+	text-align: center;
+	font-size: 18px;
+	font-weight: 800;
+	padding: 11px
+}
+
+.bank-box {
+	display: grid;
+	grid-template-columns: 170px 1fr;
+	gap: 8px
+}
+
+.bank-box dt, .bank-box dd {
+	padding: 8px;
+	margin: 0;
+	border-bottom: 1px solid var(--line)
+}
+
+.bank-box dt {
+	background: #f5f7f9;
+	font-weight: 700
+}
+
+@media ( max-width :1160px) {
+	.payroll-layout {
+		grid-template-columns: 1fr
+	}
+	.payroll-total-bar {
+		grid-template-columns: repeat(2, 1fr)
+	}
+}

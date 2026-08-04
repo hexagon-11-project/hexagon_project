@@ -1,0 +1,22 @@
+:root {
+	--ink: #263445;
+	--muted: #6f7c8b;
+	--line: #dfe5eb;
+	--line-strong: #cbd4dd;
+	--surface: #fff;
+	--surface-soft: #f6f8fa;
+	--canvas: #eef2f5;
+	--nav: #233345;
+	--nav-deep: #1c2a39;
+	--accent: #e85039;
+	--accent-dark: #c93b27;
+	--blue: #2e86c9;
+	--green: #2d9d6f;
+	--red: #df5b63;
+	--amber: #c88b2a;
+	--radius: 5px;
+	--shadow: 0 2px 8px rgba(24, 39, 55, .08);
+	--sidebar: 244px;
+	--topbar: 58px;
+	--font: "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+}

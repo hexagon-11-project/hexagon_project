@@ -1,0 +1,29 @@
+<div class="app"><%@ include file="sidebar.jspf"%><div
+		class="sidebar-backdrop"></div>
+	<main class="main">
+		<header class="topbar">
+			<div class="topbar-left">
+				<button type="button" class="btn btn-icon menu-toggle"
+					aria-label="메뉴 열기">☰</button>
+				<div class="company-chip">(주)헥사곤아이티</div>
+			</div>
+			<div class="topbar-right">
+				<div class="user-chip">
+					<div class="avatar">송</div>
+					<div>
+						<strong>송지수</strong>
+						<div class="caption">관리자</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="content">
+			<div class="page-heading">
+				<div>
+					<div class="breadcrumb"><%=request.getAttribute("pageSection")%>
+						/
+						<%=request.getAttribute("pageTitle")%></div>
+					<h1 class="page-title"><%=request.getAttribute("pageTitle")%></h1>
+					<p class="page-description"><%=request.getAttribute("pageDescription")%></p>
+				</div>
+			</div>

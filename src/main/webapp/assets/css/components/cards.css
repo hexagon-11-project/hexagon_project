@@ -1,0 +1,140 @@
+.card {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	box-shadow: var(--shadow);
+	border-radius: var(--radius);
+	overflow: hidden
+}
+
+.card-header {
+	min-height: 44px;
+	padding: 9px 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	border-bottom: 1px solid var(--line);
+	background: #fbfcfd
+}
+
+.card-body {
+	padding: 12px
+}
+
+.card.compact .card-body {
+	padding: 0
+}
+
+.summary-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 10px
+}
+
+.summary-box {
+	border: 1px solid var(--line);
+	background: #fff;
+	padding: 13px;
+	border-radius: 4px
+}
+
+.summary-label {
+	font-size: 11px;
+	color: var(--muted);
+	font-weight: 700
+}
+
+.summary-value {
+	margin-top: 6px;
+	font-size: 20px;
+	font-weight: 800;
+	text-align: right
+}
+
+.summary-value small {
+	font-size: 12px;
+	margin-left: 3px
+}
+
+.info-note {
+	border-left: 3px solid var(--blue);
+	background: #f2f8fc;
+	padding: 9px 11px;
+	color: #4d6173;
+	line-height: 1.5
+}
+
+.status {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 20px;
+	padding: 3px 8px;
+	font-size: 11px;
+	font-weight: 700
+}
+
+.status.active {
+	background: #e8f6f0;
+	color: #287a59
+}
+
+.status.off {
+	background: #f0f2f4;
+	color: #707b86
+}
+
+.status.wait {
+	background: #fff4dd;
+	color: #9a6b19
+}
+
+.status.danger {
+	background: #fdecee;
+	color: #b43e48
+}
+
+.employee-summary {
+	display: grid;
+	grid-template-columns: 80px 1fr;
+	gap: 12px;
+	align-items: start
+}
+
+.photo {
+	width: 80px;
+	height: 100px;
+	border: 1px solid var(--line);
+	background: #f3f5f7;
+	display: grid;
+	place-items: center;
+	color: #9aa6b2
+}
+
+.key-value {
+	display: grid;
+	grid-template-columns: 95px 1fr;
+	border-top: 1px solid var(--line)
+}
+
+.key-value dt, .key-value dd {
+	margin: 0;
+	padding: 7px 8px;
+	border-bottom: 1px solid var(--line)
+}
+
+.key-value dt {
+	background: #f5f7f9;
+	font-weight: 700
+}
+
+.empty-state {
+	padding: 36px;
+	text-align: center;
+	color: var(--muted)
+}
+
+@media ( max-width :900px) {
+	.summary-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr))
+	}
+}
