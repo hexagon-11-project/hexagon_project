@@ -1,0 +1,339 @@
+.main-access-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 235px;
+	gap: 14px;
+	margin-bottom: 14px
+}
+
+.main-panel {
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow)
+}
+
+.member-access-panel {
+	display: flex;
+	align-items: center;
+	min-height: 112px;
+	padding: 16px 20px
+}
+
+.member-access-icon {
+	width: 76px;
+	height: 76px;
+	display: grid;
+	place-items: center;
+	margin-right: 18px;
+	border-radius: 50%;
+	background: #eef3f6;
+	color: var(--accent);
+	font-size: 38px;
+	font-weight: 800
+}
+
+.member-access-content {
+	min-width: 0;
+	flex: 1
+}
+
+.member-login-line {
+	margin: 0 0 13px;
+	font-size: 14px
+}
+
+.member-access-info {
+	display: grid;
+	gap: 6px;
+	margin: 0
+}
+
+.member-access-info>div {
+	display: grid;
+	grid-template-columns: 100px minmax(0, 1fr);
+	align-items: center
+}
+
+.member-access-info dt, .member-access-info dd {
+	margin: 0
+}
+
+.member-access-info dt {
+	padding: 6px 10px;
+	background: #d9edf3;
+	text-align: center;
+	font-weight: 700
+}
+
+.member-access-info dd {
+	padding: 6px 11px
+}
+
+.main-today {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow)
+}
+
+.today-label {
+	align-self: flex-start;
+	margin-left: 18px;
+	padding: 4px 14px;
+	background: #b51f2e;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 800
+}
+
+.main-today strong {
+	margin-top: 12px;
+	font-size: 27px;
+	letter-spacing: .5px
+}
+
+.main-today>span:last-child {
+	margin-top: 3px;
+	color: var(--muted);
+	font-weight: 700
+}
+
+.main-dashboard-grid {
+	display: grid;
+	gap: 14px;
+	margin-bottom: 14px
+}
+
+.main-dashboard-grid-top {
+	grid-template-columns: 1fr 1fr
+}
+
+.main-dashboard-grid-middle {
+	grid-template-columns: minmax(0, 1.55fr) minmax(270px, .65fr)
+}
+
+.main-panel-header {
+	min-height: 45px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 9px 13px;
+	border-bottom: 1px solid var(--line)
+}
+
+.main-panel-header h2 {
+	margin: 0;
+	font-size: 15px
+}
+
+.notice-list {
+	padding: 9px 13px 12px
+}
+
+.notice-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 7px 0;
+	border-bottom: 1px dashed #e3e7eb
+}
+
+.notice-row:last-child {
+	border-bottom: 0
+}
+
+.notice-row span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.notice-row time {
+	flex: none;
+	color: var(--muted);
+	font-size: 11px
+}
+
+.consult-box {
+	min-height: 132px;
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	padding: 18px 24px
+}
+
+.consult-mark {
+	font-size: 37px;
+	font-weight: 900;
+	letter-spacing: -4px;
+	transform: rotate(-8deg);
+	color: #263445;
+	text-shadow: 3px 2px 0 #d8edf7
+}
+
+.consult-box p {
+	margin: 0 0 10px;
+	color: #2e6daa;
+	font-weight: 700
+}
+
+.company-overview {
+	display: grid;
+	grid-template-columns: 150px minmax(0, 1fr);
+	gap: 14px;
+	padding: 12px
+}
+
+.company-logo-box {
+	min-height: 166px;
+	display: grid;
+	place-content: center;
+	text-align: center;
+	border: 1px solid var(--line);
+	background: #fafafa;
+	font-size: 19px;
+	line-height: 1.3
+}
+
+.company-logo-box strong {
+	font-size: 30px;
+	color: var(--accent)
+}
+
+.company-info-wrap {
+	min-width: 0
+}
+
+.main-info-table, .employment-table {
+	width: 100%;
+	border-collapse: collapse
+}
+
+.main-info-table th, .main-info-table td, .employment-table th,
+	.employment-table td {
+	border: 1px solid var(--line);
+	padding: 8px 9px
+}
+
+.main-info-table th {
+	width: 92px;
+	background: #f1f6f8;
+	text-align: center;
+	font-size: 11px
+}
+
+.main-info-table td {
+	background: #fff
+}
+
+.main-panel-actions {
+	display: flex;
+	justify-content: flex-end;
+	padding: 9px 12px
+}
+
+.employment-table {
+	margin: 12px;
+	width: calc(100% - 24px)
+}
+
+.employment-table th {
+	width: 62%;
+	background: #f1f6f8;
+	text-align: center
+}
+
+.employment-table td {
+	text-align: center
+}
+
+.employment-total th, .employment-total td {
+	background: #fffbdc;
+	color: var(--accent);
+	font-weight: 800
+}
+
+.main-year-select {
+	width: 92px;
+	height: 30px
+}
+
+.payroll-status-panel {
+	margin-bottom: 20px
+}
+
+.payroll-status-panel .table-wrap {
+	border: 0;
+	border-top: 1px solid var(--line)
+}
+
+.payroll-status-table {
+	min-width: 940px
+}
+
+.amount-pay {
+	color: #1f55c7;
+	font-weight: 700
+}
+
+.amount-deduction {
+	color: #d44156;
+	font-weight: 700
+}
+
+@media ( max-width :1080px) {
+	.main-access-row, .main-dashboard-grid-top, .main-dashboard-grid-middle
+		{
+		grid-template-columns: 1fr
+	}
+	.main-today {
+		min-height: 105px
+	}
+	.company-overview {
+		grid-template-columns: 120px minmax(0, 1fr)
+	}
+}
+
+@media ( max-width :650px) {
+	.member-access-panel {
+		align-items: flex-start;
+		padding: 14px
+	}
+	.member-access-icon {
+		width: 54px;
+		height: 54px;
+		font-size: 28px;
+		margin-right: 12px
+	}
+	.member-access-info>div {
+		grid-template-columns: 1fr
+	}
+	.member-access-info dd {
+		padding-left: 0
+	}
+	.company-overview {
+		grid-template-columns: 1fr
+	}
+	.company-logo-box {
+		min-height: 100px
+	}
+	.main-info-table th, .main-info-table td {
+		display: block;
+		width: 100%
+	}
+	.main-info-table th {
+		text-align: left
+	}
+	.notice-row {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 4px
+	}
+	.consult-box {
+		padding: 16px
+	}
+}

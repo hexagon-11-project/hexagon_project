@@ -1,0 +1,97 @@
+.table-wrap {
+	overflow: auto;
+	border: 1px solid var(--line)
+}
+
+.data-table {
+	min-width: 720px;
+	background: #fff
+}
+
+.data-table th, .data-table td {
+	border-right: 1px solid #edf0f3;
+	border-bottom: 1px solid var(--line);
+	padding: 8px 9px;
+	white-space: nowrap
+}
+
+.data-table th {
+	background: #f4f6f8;
+	color: #536171;
+	font-size: 11px;
+	text-align: center;
+	font-weight: 700
+}
+
+.data-table tbody tr:hover {
+	background: #eef7fc
+}
+
+.data-table tbody tr.selected {
+	background: #e4f3fb
+}
+
+.data-table td.center, .data-table th.center {
+	text-align: center
+}
+
+.data-table td.right, .data-table th.right {
+	text-align: right
+}
+
+.data-table .total-row td {
+	background: #f6f8fa;
+	font-weight: 700
+}
+
+.table-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px
+}
+
+.table-count {
+	font-weight: 700
+}
+
+.editable-table input, .editable-table select {
+	width: 100%;
+	min-width: 90px;
+	border: 1px solid var(--line-strong);
+	height: 28px;
+	padding: 3px 6px
+}
+
+.list-table {
+	min-width: 0
+}
+
+.list-table tbody tr {
+	cursor: pointer
+}
+
+.list-table td {
+	white-space: normal
+}
+
+.mini-table {
+	min-width: 480px
+}
+
+.tfoot-summary {
+	display: flex;
+	justify-content: flex-end;
+	gap: 20px;
+	padding: 10px;
+	background: #f5f7f9;
+	border: 1px solid var(--line);
+	border-top: 0;
+	font-weight: 700
+}
+
+.scroll-y {
+	max-height: 510px;
+	overflow: auto
+}

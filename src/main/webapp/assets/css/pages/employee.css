@@ -1,0 +1,34 @@
+.employee-layout {
+	display: grid;
+	grid-template-columns: minmax(480px, 1.5fr) minmax(300px, .8fr);
+	gap: 12px
+}
+
+.quick-card {
+	border-top: 3px solid var(--blue)
+}
+
+.employee-register-nav {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 12px
+}
+
+.employee-register-nav a {
+	padding: 9px 13px;
+	border: 1px solid var(--line);
+	background: #f4f6f8;
+	font-weight: 700
+}
+
+.employee-register-nav a.active {
+	background: #fff;
+	border-top: 2px solid var(--accent);
+	color: var(--accent)
+}
+
+@media ( max-width :1050px) {
+	.employee-layout {
+		grid-template-columns: 1fr
+	}
+}

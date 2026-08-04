@@ -1,0 +1,12 @@
+</div>
+</main>
+</div>
+<script src="<%=ctx%>/assets/js/common.js"></script>
+<%
+String pageJs = (String) request.getAttribute("pageJs");
+if (pageJs != null) {
+%><script src="<%=ctx%>/assets/js/pages/<%=pageJs%>"></script>
+<%
+}
+%></body>
+</html>

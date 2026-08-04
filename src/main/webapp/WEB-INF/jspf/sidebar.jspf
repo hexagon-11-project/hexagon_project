@@ -1,0 +1,124 @@
+<%@ page pageEncoding="UTF-8"%>
+
+<aside class="sidebar">
+	<a class="brand" href="<%=ctx%>/pages/main.jsp"><span
+		class="brand-mark">H</span><span>HEXAGON PAY</span></a>
+	<div class="nav-group nav-main-group">
+		<a class="nav-item <%="main".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/main.jsp"><span class="nav-icon">□</span><span>메인</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">기본환경</div>
+		<a class="nav-item <%="user-info".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/environment/user-info.jsp"><span
+			class="nav-icon">□</span><span>사용자 정보</span></a><a
+			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/environment/employee-register1.jsp"><span
+			class="nav-icon">□</span><span>사원 등록1</span></a><a
+			class="nav-item <%="employee-register2".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/environment/employee-register2.jsp"><span
+			class="nav-icon">□</span><span>사원 등록2</span></a><a
+			class="nav-item <%="leave-settings".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/environment/leave-settings.jsp"><span
+			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
+			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/environment/pay-item-settings.jsp"><span
+			class="nav-icon">□</span><span>급여항목 설정</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">인사관리</div>
+		<a
+			class="nav-item <%="employee-list".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/hr/employee-list.jsp"><span class="nav-icon">□</span><span>사원현황/관리</span></a><a
+			class="nav-item <%="personnel-card".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/hr/personnel-card.jsp"><span
+			class="nav-icon">□</span><span>인사기록 카드</span></a><a
+			class="nav-item <%="certificate-issue".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/hr/certificate-issue.jsp"><span
+			class="nav-icon">□</span><span>제 증명서 발급</span></a><a
+			class="nav-item <%="certificate-ledger".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/hr/certificate-ledger.jsp"><span
+			class="nav-icon">□</span><span>제 증명서 발급 대장</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">근태관리</div>
+		<a
+			class="nav-item <%="attendance-manage".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/attendance/attendance-manage.jsp"><span
+			class="nav-icon">□</span><span>근태기록/관리</span></a><a
+			class="nav-item <%="attendance-search".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/attendance/attendance-search.jsp"><span
+			class="nav-icon">□</span><span>근태조회</span></a><a
+			class="nav-item <%="leave-search".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/attendance/leave-search.jsp"><span
+			class="nav-icon">□</span><span>휴가조회</span></a><a
+			class="nav-item <%="daily-work-manage".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/attendance/daily-work-manage.jsp"><span
+			class="nav-icon">□</span><span>일용직 근무기록/관리</span></a><a
+			class="nav-item <%="daily-work-search".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/attendance/daily-work-search.jsp"><span
+			class="nav-icon">□</span><span>일용직 근무 조회</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">급여관리</div>
+		<a
+			class="nav-item <%="payroll-manage".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/payroll-manage.jsp"><span
+			class="nav-icon">□</span><span>급여입력/관리</span></a><a
+			class="nav-item <%="daily-payroll".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/daily-payroll.jsp"><span
+			class="nav-icon">□</span><span>급여입력/관리(일용직)</span></a><a
+			class="nav-item <%="payroll-ledger".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/payroll-ledger.jsp"><span
+			class="nav-icon">□</span><span>급여대장</span></a><a
+			class="nav-item <%="pay-slip".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/pay-slip.jsp"><span class="nav-icon">□</span><span>급여명세</span></a><a
+			class="nav-item <%="employee-pay-history".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/employee-pay-history.jsp"><span
+			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
+			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/transfer-request.jsp"><span
+			class="nav-icon">□</span><span>급여이체 신청</span></a><a
+			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/transfer-result.jsp"><span
+			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
+			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/item-ledger.jsp"><span
+			class="nav-icon">□</span><span>항목별 대장</span></a><a
+			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/payroll/insurance-deduction.jsp"><span
+			class="nav-icon">□</span><span>4대보험 공제내역</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">급여통계</div>
+		<a
+			class="nav-item <%="annual-personal".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/statistics/annual-personal.jsp"><span
+			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
+			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
+			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
+			class="nav-item <%="annual-total".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/statistics/annual-total.jsp"><span
+			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
+			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/statistics/monthly-total.jsp"><span
+			class="nav-icon">□</span><span>월별 전체급여 통계</span></a><a
+			class="nav-item <%="item-composition".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/statistics/item-composition.jsp"><span
+			class="nav-icon">□</span><span>급여항목 구성 통계</span></a>
+	</div>
+	<div class="nav-group">
+		<div class="nav-label">퇴직관리</div>
+		<a
+			class="nav-item <%="retirement-process".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/retirement/retirement-process.jsp"><span
+			class="nav-icon">□</span><span>사원 퇴직처리</span></a><a
+			class="nav-item <%="retirement-pay".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/retirement/retirement-pay.jsp"><span
+			class="nav-icon">□</span><span>퇴직급여 입력/관리</span></a><a
+			class="nav-item <%="retirement-slip".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/pages/retirement/retirement-slip.jsp"><span
+			class="nav-icon">□</span><span>퇴직급여 명세서</span></a>
+	</div>
+</aside>

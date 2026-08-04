@@ -1,0 +1,46 @@
+.logo-upload {
+	height: 110px;
+	border: 1px dashed var(--line-strong);
+	display: grid;
+	place-items: center;
+	background: #fafbfc;
+	color: var(--muted)
+}
+
+.setting-group {
+	border-top: 2px solid #5c7186
+}
+
+.setting-row {
+	display: grid;
+	grid-template-columns: 34px 180px minmax(200px, 1fr) 140px;
+	align-items: center;
+	border-bottom: 1px solid var(--line);
+	min-height: 42px
+}
+
+.setting-row>* {
+	padding: 6px 8px
+}
+
+.setting-row .setting-name {
+	font-weight: 700
+}
+
+.item-editor {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px
+}
+
+@media ( max-width :900px) {
+	.setting-row {
+		grid-template-columns: 30px 1fr
+	}
+	.setting-row>*:nth-child(n+3) {
+		grid-column: 2
+	}
+	.item-editor {
+		grid-template-columns: 1fr
+	}
+}
