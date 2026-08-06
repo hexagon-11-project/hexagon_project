@@ -1,4 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List"%>
+<%@ page import="config.payitemset.model.PayItemModel"%>
+<%
+List<PayItemModel> payItemList = (List<PayItemModel>) request.getAttribute("payItemList");
+PayItemModel selected = (PayItemModel) request.getAttribute("selectedPayItem");
+boolean hasSelected = selected != null;
+%>
+
 <%
 request.setAttribute("pageTitle", "급여항목 설정");
 request.setAttribute("pageSection", "기본환경");
@@ -7,6 +15,7 @@ request.setAttribute("activeKey", "pay-item-settings");
 request.setAttribute("pageCss", "environment.css");
 request.setAttribute("pageJs", null);
 %>
+
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
 <section class="source-config-block">
@@ -25,108 +34,139 @@ request.setAttribute("pageJs", null);
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>기본급</td>
-						<td>전체과세</td>
-						<td></td>
-						<td>없음</td>
-						<td></td>
-						<td>사용</td>
+					<%
+					if (payItemList != null) {
+						for (PayItemModel item : payItemList) {
+					%>
+					<tr style="cursor: pointer;"
+						onclick="location.href='<%=ctx%>/Config/payitemsetselect.do?payItemId=<%=item.getPayItemId()%>'">
+						<td><%=item.getPayItemName()%></td>
+						<td><%=item.getTaxableLabel()%></td>
+						<td><%=item.getNonPayAmountLabel()%></td>
+						<td><%=item.getTruncationLabel()%></td>
+						<td><%=item.getAttendancePayRuleLabel()%></td>
+						<td><%=item.getUseLabel()%></td>
 					</tr>
-					<tr>
-						<td>식대</td>
-						<td>비과세</td>
-						<td>100,000</td>
-						<td>없음</td>
-						<td></td>
-						<td>사용</td>
-					</tr>
-					<tr>
-						<td>보육수당</td>
-						<td>전체과세</td>
-						<td></td>
-						<td>없음</td>
-						<td></td>
-						<td>사용</td>
-					</tr>
-					<tr>
-						<td>차량유지비</td>
-						<td>비과세</td>
-						<td>200,000</td>
-						<td>없음</td>
-						<td></td>
-						<td>사용</td>
-					</tr>
-					<tr>
-						<td>시간외수당</td>
-						<td>전체과세</td>
-						<td></td>
-						<td>없음</td>
-						<td>시간외근무</td>
-						<td>사용</td>
-					</tr>
+					<%
+					}
+					}
+					%>
 				</tbody>
 			</table>
 		</div>
 	</div>
 	<div class="source-config-editor">
 		<div class="source-editor-head">지급항목</div>
-		<table class="source-form-table">
-			<tbody>
-				<tr>
-					<th>지급항목</th>
-					<td class="span-3"><input type="text" class="input"
-						placeholder="지급 항목을 입력하세요."></td>
-				</tr>
-				<tr>
-					<th>과세여부</th>
-					<td class="span-3"><div class="check-list">
-							<label><input type="radio" name="taxable" checked>
-								전체과세</label><label><input type="radio" name="taxable">
-								비과세</label>
-						</div></td>
-				</tr>
-				<tr>
-					<th>비과세명</th>
-					<td class="span-3"><input type="text" class="input"></td>
-				</tr>
-				<tr>
-					<th>비과세 한도액</th>
-					<td class="span-3"><div class="money-control">
-							<input type="text" class="input number"><span>원</span>
-						</div></td>
-				</tr>
-				<tr>
-					<th>절사단위</th>
-					<td class="span-3"><select class="select"><option
-								selected>없음</option>
-							<option>1원 단위</option>
-							<option>10원 단위</option>
-							<option>100원 단위</option></select></td>
-				</tr>
-				<tr>
-					<th>근태연결/일괄지급</th>
-					<td class="span-3"><select class="select"><option
-								selected>선택해주세요</option>
-							<option>시간외근무</option>
-							<option>일괄지급</option></select></td>
-				</tr>
-				<tr>
-					<th>사용여부</th>
-					<td class="span-3"><div class="check-list">
-							<label><input type="radio" name="pay-use" checked>
-								사용</label><label><input type="radio" name="pay-use">
-								사용안함</label>
-						</div></td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="source-editor-actions">
-			<button type="button" class="btn btn-primary">추가</button>
-			<button type="button" class="btn btn-blue">수정</button>
-			<button type="button" class="btn">삭제</button>
-			<button type="button" class="btn">내용 지우기</button>
-		</div>
+		<form id="payItemForm" method="post">
+			<input type="hidden" name="payItemId"
+				value="<%=hasSelected ? selected.getPayItemId() : ""%>">
+			<table class="source-form-table">
+				<tbody>
+					<tr>
+						<th>지급항목</th>
+						<td class="span-3"><input type="text" class="input"
+							name="payItemName" placeholder="지급 항목을 입력하세요."
+							value="<%=hasSelected && selected.getPayItemName() != null ? selected.getPayItemName() : ""%>">
+						</td>
+					</tr>
+					<tr>
+						<th>과세여부</th>
+						<td class="span-3">
+							<div class="check-list">
+								<label> <input type="radio" name="taxableYn" value="Y"
+									<%=!hasSelected || !"N".equalsIgnoreCase(selected.getTaxableYn()) ? "checked" : ""%>>
+									전체과세
+								</label> <label> <input type="radio" name="taxableYn" value="N"
+									<%=hasSelected && "N".equalsIgnoreCase(selected.getTaxableYn()) ? "checked" : ""%>>
+									비과세
+								</label>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>비과세명</th>
+						<td class="span-3"><input type="text" class="input"
+							name="nonTaxCategory"
+							value="<%=hasSelected && selected.getNonTaxCategory() != null ? selected.getNonTaxCategory() : ""%>">
+						</td>
+					</tr>
+					<tr>
+						<th>비과세 한도액</th>
+						<td class="span-3">
+							<div class="money-control">
+								<input type="text" class="input number" name="nonPayAmount"
+									value="<%=hasSelected ? selected.getNonPayAmountLabel() : ""%>">
+								<span>원</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>계산방법</th>
+						<td class="span-3"><input type="text" class="input"
+							name="calculationMethod" placeholder="계산방법을 입력하세요."
+							value="<%=hasSelected && selected.getCalculationMethod() != null ? selected.getCalculationMethod() : ""%>">
+						</td>
+					</tr>
+					<tr>
+						<th>절사단위</th>
+						<td class="span-3"><select class="select"
+							name="truncationUnit">
+								<option value="0"
+									<%=!hasSelected || selected.getTruncationUnit() == null || selected.getTruncationUnit() == 0 ? "selected" : ""%>>없음</option>
+								<option value="1"
+									<%=hasSelected && Integer.valueOf(1).equals(selected.getTruncationUnit()) ? "selected" : ""%>>1원
+									단위</option>
+								<option value="10"
+									<%=hasSelected && Integer.valueOf(10).equals(selected.getTruncationUnit()) ? "selected" : ""%>>10원
+									단위</option>
+								<option value="100"
+									<%=hasSelected && Integer.valueOf(100).equals(selected.getTruncationUnit()) ? "selected" : ""%>>100원
+									단위</option>
+						</select></td>
+					</tr>
+					<tr>
+						<th>근태연결/일괄지급</th>
+						<td class="span-3"><select class="select"
+							name="attendancePayRule">
+								<option value=""
+									<%=!hasSelected || selected.getAttendancePayRule() == null || selected.getAttendancePayRule().isBlank()
+		? "selected"
+		: ""%>>선택해주세요</option>
+								<option value="시간외근무"
+									<%=hasSelected && "시간외근무".equals(selected.getAttendancePayRule()) ? "selected" : ""%>>시간외근무</option>
+								<option value="일괄지급"
+									<%=hasSelected && "일괄지급".equals(selected.getAttendancePayRule()) ? "selected" : ""%>>일괄지급</option>
+						</select></td>
+					</tr>
+					<tr>
+						<th>사용여부</th>
+						<td class="span-3">
+							<div class="check-list">
+								<label> <input type="radio" name="useYn" value="Y"
+									<%=!hasSelected || !"N".equalsIgnoreCase(selected.getUseYn()) ? "checked" : ""%>>
+									사용
+								</label> <label> <input type="radio" name="useYn" value="N"
+									<%=hasSelected && "N".equalsIgnoreCase(selected.getUseYn()) ? "checked" : ""%>>
+									사용안함
+								</label>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="source-editor-actions">
+				<button type="submit" class="btn btn-primary"
+					formaction="<%=ctx%>/Config/payitemsetinsert.do">추가</button>
+				<button type="submit" class="btn btn-blue"
+					formaction="<%=ctx%>/Config/payitemsetupdate.do"
+					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('수정할 항목을 리스트에서 선택하세요.'); return false; }">수정</button>
+				<button type="submit" class="btn"
+					formaction="<%=ctx%>/Config/payitemsetdelete.do"
+					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('삭제할 항목을 리스트에서 선택하세요.'); return false; } return confirm('선택한 지급항목을 삭제하시겠습니까?');">삭제</button>
+				<button type="button" class="btn"
+					onclick="location.href='<%=ctx%>/Config/payitemsetclear.do'">내용 지우기</button>
+			</div>
+		</form>
 	</div>
 </section>
 <section class="source-config-block">
