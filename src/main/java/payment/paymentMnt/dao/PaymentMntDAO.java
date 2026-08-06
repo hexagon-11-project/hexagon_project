@@ -1,4 +1,4 @@
-package payroll.dao;
+package payment.paymentMnt.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,15 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import payroll.dto.PayrollDeductionDetailDTO;
-import payroll.dto.PayrollEmployeeDTO;
-import payroll.dto.PayrollPayDetailDTO;
+import payment.paymentMnt.dto.PaymentMntDeductionDetailDTO;
+import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
+import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
 
-public class PayrollDAO {
+public class PaymentMntDAO {
 
     // ★ [추가됨] 컨트롤러에서 호출하는 귀속연월, 급여차수 기반 리스트 조회
-    public List<PayrollEmployeeDTO> getPayrollEmployeeList(Connection conn, String payYearMonth, int paySequence) throws SQLException {
-        List<PayrollEmployeeDTO> list = new ArrayList<>();
+    public List<PaymentMntEmployeeDTO> getPayrollEmployeeList(Connection conn, String payYearMonth, int paySequence) throws SQLException {
+        List<PaymentMntEmployeeDTO> list = new ArrayList<>();
         
         // PAYROLL 테이블(pr)과 조인하여 귀속연월과 급여차수 조건으로 조회합니다.
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, "
@@ -33,7 +33,7 @@ public class PayrollDAO {
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    PayrollEmployeeDTO dto = new PayrollEmployeeDTO();
+                    PaymentMntEmployeeDTO dto = new PaymentMntEmployeeDTO();
                     dto.setPayrollEmployeeId(rs.getLong("payroll_employee_id"));
                     dto.setPayrollId(rs.getLong("payroll_id"));
                     dto.setEmployeeId(rs.getString("employee_id"));
@@ -50,8 +50,8 @@ public class PayrollDAO {
     }
 
     // 1. 좌측 사원별 급여 요약 리스트 조회 (payroll_id만으로 조회 - 기존 유지)
-    public List<PayrollEmployeeDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
-        List<PayrollEmployeeDTO> list = new ArrayList<>();
+    public List<PaymentMntEmployeeDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
+        List<PaymentMntEmployeeDTO> list = new ArrayList<>();
         
         // PAYROLL_EMPLOYEE 테이블과 EMPLOYEE 테이블을 조인하여 이름과 고용형태를 가져옵니다.
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, "
@@ -66,7 +66,7 @@ public class PayrollDAO {
             pstmt.setLong(1, payrollId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    PayrollEmployeeDTO dto = new PayrollEmployeeDTO();
+                    PaymentMntEmployeeDTO dto = new PaymentMntEmployeeDTO();
                     dto.setPayrollEmployeeId(rs.getLong("payroll_employee_id"));
                     dto.setPayrollId(rs.getLong("payroll_id"));
                     dto.setEmployeeId(rs.getString("employee_id"));
@@ -83,8 +83,8 @@ public class PayrollDAO {
     }
 
     // 2. 우측 지급 상세 내역 조회
-    public List<PayrollPayDetailDTO> selectPayDetails(Connection conn, Long payrollEmployeeId) throws SQLException {
-        List<PayrollPayDetailDTO> list = new ArrayList<>();
+    public List<PaymentMntPayDetailDTO> selectPayDetails(Connection conn, Long payrollEmployeeId) throws SQLException {
+        List<PaymentMntPayDetailDTO> list = new ArrayList<>();
         
         // PAYROLL_PAY_DETAIL과 PAY_ITEM을 조인하여 실제 화면에 보일 항목명(item_name)을 가져옵니다.
         String sql = "SELECT d.payroll_pay_detail_id, d.payroll_employee_id, d.pay_item_id, "
@@ -97,7 +97,7 @@ public class PayrollDAO {
             pstmt.setLong(1, payrollEmployeeId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    PayrollPayDetailDTO dto = new PayrollPayDetailDTO();
+                    PaymentMntPayDetailDTO dto = new PaymentMntPayDetailDTO();
                     dto.setPayrollPayDetailId(rs.getLong("payroll_pay_detail_id"));
                     dto.setPayrollEmployeeId(rs.getLong("payroll_employee_id"));
                     dto.setPayItemId(rs.getLong("pay_item_id"));
@@ -111,8 +111,8 @@ public class PayrollDAO {
     }
 
     // 3. 우측 공제 상세 내역 조회
-    public List<PayrollDeductionDetailDTO> selectDeductionDetails(Connection conn, Long payrollEmployeeId) throws SQLException {
-        List<PayrollDeductionDetailDTO> list = new ArrayList<>();
+    public List<PaymentMntDeductionDetailDTO> selectDeductionDetails(Connection conn, Long payrollEmployeeId) throws SQLException {
+        List<PaymentMntDeductionDetailDTO> list = new ArrayList<>();
         
         // PAYROLL_DEDUCTION_DETAIL과 DEDUCTION_ITEM을 조인하여 항목명(item_name)을 가져옵니다.
         String sql = "SELECT d.payroll_deduction_detail_id, d.payroll_employee_id, d.deduction_item_id, "
@@ -125,7 +125,7 @@ public class PayrollDAO {
             pstmt.setLong(1, payrollEmployeeId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    PayrollDeductionDetailDTO dto = new PayrollDeductionDetailDTO();
+                    PaymentMntDeductionDetailDTO dto = new PaymentMntDeductionDetailDTO();
                     dto.setPayrollDeductionDetailId(rs.getLong("payroll_deduction_detail_id"));
                     dto.setPayrollEmployeeId(rs.getLong("payroll_employee_id"));
                     dto.setDeductionItemId(rs.getLong("deduction_item_id"));
@@ -137,20 +137,20 @@ public class PayrollDAO {
         }
         return list;
     }
- // ★ [추가됨] 신규추가 모달창용 사원 목록 조회 (이름 검색 지원)
-    public List<PayrollEmployeeDTO> getModalEmployeeList(Connection conn, String keyword) throws SQLException {
-        List<PayrollEmployeeDTO> list = new ArrayList<>();
+ // ★ [추가됨] // ★ [수정완료] 신규추가 모달창용 사원 목록 조회 (실제 DB 컬럼명 적용)
+    public List<PaymentMntEmployeeDTO> getModalEmployeeList(Connection conn, String keyword) throws SQLException {
+        List<PaymentMntEmployeeDTO> list = new ArrayList<>();
         
-        // PAYROLL_EMPLOYEE가 아닌, 순수 EMPLOYEE(사원) 테이블에서 조회합니다.
-        String sql = "SELECT employee_id, employee_name, employment_type " // (주의: 부서, 직위 등은 DTO에 없어서 임시 생략)
+        // 1. SELECT 쿼리에 부서, 직위, 상태와 함께 'BASE_WAGE_AMOUNT'(기본급)를 추가합니다.
+        String sql = "SELECT employee_id, employee_name, employment_type, " 
+                   + "DEPARTMENT, POSITION, BASE_WAGE_AMOUNT " 
                    + "FROM EMPLOYEE ";
         
-        // 검색어가 넘어왔을 경우 WHERE 조건 추가
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql += "WHERE employee_name LIKE ? ";
         }
         sql += "ORDER BY employee_name";
-                   
+                    
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             if (keyword != null && !keyword.trim().isEmpty()) {
                 pstmt.setString(1, "%" + keyword.trim() + "%");
@@ -158,17 +158,37 @@ public class PayrollDAO {
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    PayrollEmployeeDTO dto = new PayrollEmployeeDTO();
+                    PaymentMntEmployeeDTO dto = new PaymentMntEmployeeDTO();
+                    
+                    // 기존 데이터
                     dto.setEmployeeId(rs.getString("employee_id"));
                     dto.setEmployeeName(rs.getString("employee_name"));
                     dto.setEmploymentType(rs.getString("employment_type"));
                     
-                    // ★ 만약 화면에 부서(department), 직위(position)도 꼭 띄워야 한다면
-                    // 나중에 PayrollEmployeeDTO 파일에 해당 변수들을 추가한 뒤 여기서 rs.getString으로 꺼내 담으시면 됩니다!
+                    // 2. 바구니에 담을 때도 진짜 컬럼명으로 정확하게 꺼냅니다!
+                    dto.setDepartment(rs.getString("DEPARTMENT"));
+                    dto.setPosition(rs.getString("POSITION"));
+                    
+                    // ★ 추가완료: DB에서 기본급 데이터를 꺼내서 DTO에 담아줍니다!
+                    dto.setBaseWageAmount(rs.getLong("BASE_WAGE_AMOUNT"));
+                    
                     list.add(dto);
                 }
             }
         }
         return list;
+    }
+ // 선택된 사원들을 급여 대장에 추가하는 DAO 메서드 예시
+    public void insertPayrollEmployees(Connection conn, Long payrollId, List<String> empIds) throws SQLException {
+        String sql = "INSERT INTO 급여사원테이블명 (payroll_id, emp_id) VALUES (?, ?)";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            for (String empId : empIds) {
+                pstmt.setLong(1, payrollId);
+                pstmt.setString(2, empId);
+                pstmt.addBatch(); // 여러명을 한 번에 처리하기 위해 batch 사용
+            }
+            pstmt.executeBatch(); // 일괄 실행
+        }
     }
 }

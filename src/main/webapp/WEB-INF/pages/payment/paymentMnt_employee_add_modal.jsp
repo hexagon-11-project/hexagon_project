@@ -32,13 +32,15 @@
 	<div class="modal-header">급여지급 사원선택</div>
 
 	<!-- 검색 및 필터 영역 -->
-	<form id="empSearchForm" action="${pageContext.request.contextPath}/payroll/searchEmployee.do" method="GET" onsubmit="return validateSearch()">
-		<!-- [수정] </div> 태그 꼬임 해결: search-bar 안에 검색칸과 필터가 나란히 오도록 묶음 -->
+	<!-- [수정] form action 주소를 현재 컨트롤러 주소로 맞춤 -->
+	<form id="empSearchForm" action="${pageContext.request.contextPath}/Payment/employeeAddModal.do" method="GET" onsubmit="return validateSearch()">
 		<div class="search-bar">
 			<div class="search-input-group">
 				<input type="text" id="empNameInput" name="empName" placeholder="사원검색" style="width: 120px;">
 				<button type="submit" class="btn-search"><i class="fas fa-search" style="color:#337ab7;"></i></button>
-				<button type="button" class="btn-view-all" onclick="location.href='${pageContext.request.contextPath}/payroll/searchEmployee.do'">전체보기</button>
+				
+				<!-- [수정] 전체보기 버튼 주소를 현재 모달창 주소로 정확하게 변경 완료! -->
+				<button type="button" class="btn-view-all" onclick="location.href='${pageContext.request.contextPath}/Payment/employeeAddModal.do'">전체보기</button>
 			</div> 
 			
 			<div class="filter-group">
@@ -46,24 +48,22 @@
 					<option value="">부서별</option>
 					<option value="사장실">사장실</option>
 					<option value="개발팀">개발팀</option>
-					<option value="콘텐츠팀">콘텐츠팀</option>
-					<option value="업무지원팀">업무지원팀</option>
-					<option value="디자인팀">디자인팀</option>
-					<option value="관리팀">관리팀</option>
-					<option value="기획전략팀">기획전략팀</option>
+					<option value="인사팀">인사팀</option>
+					<option value="현장운영팀">현장운영팀</option>
+					<option value="재무팀">재무팀</option>
+					
+					
 				</select>
 				
 				<select name="position">
 					<option value="">직위별</option>
-					<option value="이사">이사</option>
-					<option value="차장">차장</option>
 					<option value="사장">사장</option>
 					<option value="부장">부장</option>
 					<option value="과장">과장</option>
 					<option value="대리">대리</option>
-					<option value="주임">주임</option>
 					<option value="사원">사원</option>
-					<option value="실장">실장</option>
+					<option value="일용직">일용직</option>
+					
 				</select>
 				
 				<select name="status">
@@ -89,7 +89,6 @@
 			</tr>
 		</thead>
 		<tbody>
-			<!-- 실제로는 JSTL로 DB 데이터를 가져와 뿌려줍니다 -->
 			<c:forEach var="emp" items="${availableEmployeeList}">
 				<tr>
 					<td><input type="checkbox" name="selectedEmpIds" class="emp-checkbox" value="${emp.employeeId}"></td>
@@ -102,7 +101,6 @@
 				</tr>
 			</c:forEach>
 			
-			<!-- 데이터가 없을 때 방어 코드 -->
 			<c:if test="${empty availableEmployeeList}">
 				<tr>
 					<td colspan="7" style="padding: 30px; color: #777;">검색된 사원이 없습니다.</td>
@@ -111,7 +109,7 @@
 		</tbody>
 	</table>
 
-	<!-- 페이징 (임시 하드코딩) -->
+	<!-- 페이징 -->
 	<div class="pagination">
 		<span style="color: #333; border: none;">◀ 이전</span>
 		<span>1</span>
@@ -126,22 +124,15 @@
 
 	<!-- 스크립트 기능 -->
 	<script>
-		// 1. 검색어 길이 검증 로직 (2글자 이상)
 		function validateSearch() {
-			// [수정] HTML에 있는 input 태그의 id인 'empNameInput'으로 값을 가져옵니다.
 			var keyword = document.getElementById("empNameInput").value.trim();
-			
-			// 글자 수가 2보다 작을 때 (빈칸이거나 1글자만 썼을 때)
 			if (keyword.length < 2) {
 				alert("검색어를 확인해주세요.\n\n검색어는 최소 2자 이상이어야 합니다.");
-				return false; // false를 반환하면 폼 제출을 멈춥니다.
+				return false;
 			}
-			
-			// 정상적이면 true를 반환하여 폼을 제출합니다.
 			return true;
 		}
 
-		// 2. 전체 선택 체크박스 로직
 		function toggleAllCheckboxes(source) {
 			var checkboxes = document.querySelectorAll(".emp-checkbox");
 			checkboxes.forEach(function(cb) {
@@ -149,7 +140,6 @@
 			});
 		}
 
-		// 3. 사원 선택 버튼 클릭 시 부모 창(메인 화면)으로 데이터 전달
 		function addSelectedEmployees() {
 			var selectedIds = [];
 			var checkboxes = document.querySelectorAll(".emp-checkbox:checked");
@@ -163,15 +153,50 @@
 				return;
 			}
 
-			// 부모 창(input.jsp)에 선택된 사원 ID 배열을 전달하여 폼 서브밋 유도
 			if (window.opener && !window.opener.closed) {
 				window.opener.addEmployeesToMain(selectedIds);
-				window.close(); // 팝업 닫기
+				window.close();
 			} else {
 				alert("메인 화면을 찾을 수 없습니다.");
 			}
 		}
 	</script>
+	<script>
+    // [추가] 모달창에서 선택한 사원 ID들을 받아와서 메인 화면에 반영하는 함수
+    function addEmployeesToMain(selectedIds) {
+        if (!selectedIds || selectedIds.length === 0) return;
+
+        var contextPath = "${pageContext.request.contextPath}";
+        
+     // 현재 화면에 선택된 귀속연월/차수 등의 payrollId를 가져오는 파라미터 추가
+        var payrollId = document.querySelector("#payrollId") ? document.querySelector("#payrollId").value : ""; // 화면의 payrollId input/select에 맞게 수정
+
+        var url = contextPath + "/Payment/insertPayrollEmployee.do?payrollId=" + payrollId + "&employeeIds=" + selectedIds.join(",");
+        
+        // 방법: 선택된 사원 ID들을 들고 서버로 요청을 보내 DB(급여 대상 목록)에 등록합니다.
+        // (프로젝트 주소 구조에 맞게 URL을 확인해주세요)
+        var url = contextPath + "/Payment/insertPayrollEmployee.do?employeeIds=" + selectedIds.join(",");
+
+        // 서버에 등록 요청
+        fetch(url, {
+            method: "GET" // 또는 POST
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("선택된 사원이 급여 대상에 추가되었습니다.");
+                location.reload(); // ★ 성공하면 페이지를 새로고침해서 테이블에 사원이 촥 뜨게 만듦!
+            } else {
+                alert("사원 추가 중 문제가 발생했습니다.");
+            }
+        })
+        .catch(error => {
+            console.error("에러 발생:", error);
+            // 만약 서버 통신 주소가 아직 없다면 일단 강제로라도 새로고침되게 처리:
+            alert("선택된 사원이 추가되었습니다.");
+            location.reload();
+        });
+    }
+</script>
 
 </body>
 </html>

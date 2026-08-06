@@ -1,4 +1,4 @@
-package command;
+package payment.paymentMnt.command;
 
 import java.sql.Connection;
 import java.util.List;
@@ -6,9 +6,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import command.CommandHandler;
 import connection.ConnectionProvider; // DB 통신을 위한 ConnectionProvider 임포트
-import payroll.dao.PayrollDAO;
-import payroll.dto.PayrollEmployeeDTO; 
+import payment.paymentMnt.dao.PaymentMntDAO;
+import payment.paymentMnt.dto.PaymentMntEmployeeDTO; 
 
 public class EmployeeAddModalHandler implements CommandHandler {
 
@@ -20,16 +21,16 @@ public class EmployeeAddModalHandler implements CommandHandler {
         
         // 2. DB 연결 및 DAO 호출
         try (Connection conn = ConnectionProvider.getConnection()) {
-            PayrollDAO dao = new PayrollDAO();
+            PaymentMntDAO dao = new PaymentMntDAO();
             
             // ★ 에러 났던 부분 수정! 방금 새로 만든 메서드를 호출합니다.
-            List<PayrollEmployeeDTO> employeeList = dao.getModalEmployeeList(conn, keyword); 
+            List<PaymentMntEmployeeDTO> employeeList = dao.getModalEmployeeList(conn, keyword); 
             
             // 3. JSP에서 쓸 수 있게 바구니(request)에 담기 (이름은 JSP와 동일하게!)
             request.setAttribute("availableEmployeeList", employeeList);
         }
         
         // 4. 팝업창 JSP 띄우기
-        return "/WEB-INF/pages/payroll/employee_add_modal.jsp";
+        return "/WEB-INF/pages/payment/paymentMnt_employee_add_modal.jsp";
     }
 }

@@ -1,8 +1,8 @@
-package payroll.dto;
+package payment.paymentMnt.dto;
 
 import java.util.Date;
 
-public class PayrollEmployeeDTO {
+public class PaymentMntEmployeeDTO {
     
     private Long payrollEmployeeId;        // 사원별급여아이디
     private Long payrollId;                // 급여아이디
@@ -19,9 +19,22 @@ public class PayrollEmployeeDTO {
     private Date updatedAt;                // 수정일시
     private String department;  // 부서
     private String position;    // 직위
-    private String status;      // 상태
-
-    // Getter / Setter
+    private String employmentstatus;      // 상태
+    private long baseWageAmount;			//기본급
+    
+    public String getEmploymentstatus() {
+		return employmentstatus;
+	}
+	public void setEmploymentstatus(String employmentstatus) {
+		this.employmentstatus = employmentstatus;
+	}
+	public long getBaseWageAmount() {
+		return baseWageAmount;
+	}
+	public void setBaseWageAmount(long baseWageAmount) {
+		this.baseWageAmount = baseWageAmount;
+	}
+	// Getter / Setter
     public Long getPayrollEmployeeId() { return payrollEmployeeId; }
     public void setPayrollEmployeeId(Long payrollEmployeeId) { this.payrollEmployeeId = payrollEmployeeId; }
 
@@ -66,6 +79,6 @@ public class PayrollEmployeeDTO {
     public String getPosition() { return position; }
     public void setPosition(String position) { this.position = position; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getStatus() { return employmentstatus; }
+    public void setStatus(String status) { this.employmentstatus = status; }
 }

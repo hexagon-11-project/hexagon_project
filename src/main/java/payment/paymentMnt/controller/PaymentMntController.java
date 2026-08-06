@@ -1,4 +1,4 @@
-package controller;
+package payment.paymentMnt.controller;
 
 import java.sql.Connection;
 import java.util.List;
@@ -8,12 +8,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
 import connection.ConnectionProvider;
-import payroll.dao.PayrollDAO;
-import payroll.dto.PayrollEmployeeDTO; // PayrollDTO -> PayrollEmployeeDTO로 수정됨
+import payment.paymentMnt.dao.PaymentMntDAO;
+import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 
 // 급여 입력 및 관리를 처리하는 커맨드 핸들러 클래스
 // 給与入力および管理を処理するコマンドハンドラークラス
-public class PayrollController implements CommandHandler {
+public class PaymentMntController implements CommandHandler {
 
 	@Override
 	public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -31,14 +31,24 @@ public class PayrollController implements CommandHandler {
 			paySequence = Integer.parseInt(paySeqStr);
 		}
 
-		PayrollDAO dao = new PayrollDAO();
-		List<PayrollEmployeeDTO> employeeList = null; // List 타입이 PayrollEmployeeDTO로 수정됨
+		PaymentMntDAO dao = new PaymentMntDAO();
+		List<PaymentMntEmployeeDTO> employeeList = null; // List 타입이 PayrollEmployeeDTO로 수정됨
 
 		// DB 연결 및 데이터 조회 수행
 		// DB接続およびデータ照会の実行
 		try (Connection conn = ConnectionProvider.getConnection()) {
-			// 이 부분의 에러를 없애려면 DAO에도 아래 메서드가 추가되어 있어야 합니다.
-			employeeList = dao.getPayrollEmployeeList(conn, payYearMonth, paySequence);
+			
+			// 1. 먼저 선택된 귀속연월과 차수에 이미 저장된 급여 데이터가 있는지 확인합니다.
+			if (payYearMonth != null && !payYearMonth.isEmpty()) {
+				employeeList = dao.getPayrollEmployeeList(conn, payYearMonth, paySequence);
+			}
+			
+			// ★ [추가된 부분] 2. 만약 저장된 데이터가 없거나 처음 화면에 들어왔다면?
+			// 방금 모달창용으로 완벽하게 고쳐둔 전체 사원 목록을 가져와서 왼쪽에 쫙 띄워줍니다!
+			if (employeeList == null || employeeList.isEmpty()) {
+				employeeList = dao.getModalEmployeeList(conn, null);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,6 +59,6 @@ public class PayrollController implements CommandHandler {
 
 		// 이동할 JSP View 페이지의 경로 리턴
 		// 移動するJSP Viewページのパスをリターン
-		return "/WEB-INF/pages/payroll/input.jsp";
+		return "/WEB-INF/pages/payment/paymentMnt.jsp";
 	}
 }

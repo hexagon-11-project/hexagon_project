@@ -1,39 +1,39 @@
-package payroll.dto;
+package payment.paymentMnt.dto;
 
 import java.util.Date;
 
-public class PayrollDeductionDetailDTO {
+public class PaymentMntPayDetailDTO {
     
-    private Long payrollDeductionDetailId; // 급여공제상세아이디
-    private Long payrollEmployeeId;        // 사원별급여아이디
-    private Long deductionItemId;          // 공제항목아이디
-    private String itemName;               // 공제항목명 (화면 표시용으로 DEDUCTION_ITEM 테이블과 JOIN해서 가져올 값)
-    private Long amount;                   // 실제공제금액
-    private String regId;                  // 등록자 아이디
-    private String modId;                  // 수정자 아이디
-    private Date createdAt;                // 생성일시
-    private Date updatedAt;                // 수정일시
+    private Long payrollPayDetailId;   // 급여지급상세아이디
+    private Long payrollEmployeeId;    // 사원별급여아이디
+    private Long payItemId;            // 지급항목아이디
+    private String itemName;           // 지급항목명 (화면 표시용으로 PAY_ITEM 테이블과 JOIN해서 가져올 값)
+    private Long amount;               // 실제지급금액
+    private String regId;              // 등록자 아이디
+    private String modId;              // 수정자 아이디
+    private Date createdAt;            // 생성일시
+    private Date updatedAt;            // 수정일시
 
     // Getter / Setter
-    public Long getPayrollDeductionDetailId() {
-        return payrollDeductionDetailId;
+    public Long getPayrollPayDetailId() {
+        return payrollPayDetailId;
     }
-    public void setPayrollDeductionDetailId(Long payrollDeductionDetailId) {
-        this.payrollDeductionDetailId = payrollDeductionDetailId;
+    public void setPayrollPayDetailId(Long payrollPayDetailId) {
+        this.payrollPayDetailId = payrollPayDetailId;
     }
-
+    
     public Long getPayrollEmployeeId() {
         return payrollEmployeeId;
     }
     public void setPayrollEmployeeId(Long payrollEmployeeId) {
         this.payrollEmployeeId = payrollEmployeeId;
     }
-
-    public Long getDeductionItemId() {
-        return deductionItemId;
+    
+    public Long getPayItemId() {
+        return payItemId;
     }
-    public void setDeductionItemId(Long deductionItemId) {
-        this.deductionItemId = deductionItemId;
+    public void setPayItemId(Long payItemId) {
+        this.payItemId = payItemId;
     }
 
     public String getItemName() {
@@ -49,28 +49,28 @@ public class PayrollDeductionDetailDTO {
     public void setAmount(Long amount) {
         this.amount = amount;
     }
-
+    
     public String getRegId() {
         return regId;
     }
     public void setRegId(String regId) {
         this.regId = regId;
     }
-
+    
     public String getModId() {
         return modId;
     }
     public void setModId(String modId) {
         this.modId = modId;
     }
-
+    
     public Date getCreatedAt() {
         return createdAt;
     }
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-
+    
     public Date getUpdatedAt() {
         return updatedAt;
     }

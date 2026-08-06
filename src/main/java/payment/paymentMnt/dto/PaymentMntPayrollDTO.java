@@ -1,10 +1,10 @@
-package payroll.dto;
+package payment.paymentMnt.dto;
 
 import java.util.Date;
 
 // 급여 정보 DTO 클래스
 // 給与情報DTOクラス
-public class PayrollDTO {
+public class PaymentMntPayrollDTO {
 
 	private int payrollId; // 급여아이디 (給与ID)
 	private int companyId; // 회사아이디 (会社ID)
@@ -25,7 +25,7 @@ public class PayrollDTO {
 
 	// 기본 생성자
 	// デフォルトコンストラクタ
-	public PayrollDTO() {
+	public PaymentMntPayrollDTO() {
 	}
 
 	// Getter 및 Setter 메서드

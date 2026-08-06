@@ -1,17 +1,18 @@
-package command;
+package payment.paymentMnt.command;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import payroll.dto.PayrollDeductionDetailDTO;
-import payroll.dto.PayrollPayDetailDTO;
-import payroll.service.PayrollService;
+import command.CommandHandler;
+import payment.paymentMnt.dto.PaymentMntDeductionDetailDTO;
+import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
+import payment.paymentMnt.service.PaymentMntService;
 
-public class PayrollDetailAjaxHandler implements CommandHandler {
+public class PaymentMntDetailAjaxHandler implements CommandHandler {
 
-    private PayrollService payrollService = new PayrollService();
+    private PaymentMntService payrollService = new PaymentMntService();
 
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -23,8 +24,8 @@ public class PayrollDetailAjaxHandler implements CommandHandler {
         Long payrollEmployeeId = Long.parseLong(empIdStr);
 
         // 지급항목과 공제항목 리스트 가져오기
-        List<PayrollPayDetailDTO> payList = payrollService.getPayDetails(payrollEmployeeId);
-        List<PayrollDeductionDetailDTO> dedList = payrollService.getDeductionDetails(payrollEmployeeId);
+        List<PaymentMntPayDetailDTO> payList = payrollService.getPayDetails(payrollEmployeeId);
+        List<PaymentMntDeductionDetailDTO> dedList = payrollService.getDeductionDetails(payrollEmployeeId);
 
         // 라이브러리 추가 설정 없이 바로 쓸 수 있도록 순수 자바 문자열로 JSON 형태 만들기
         StringBuilder json = new StringBuilder();
