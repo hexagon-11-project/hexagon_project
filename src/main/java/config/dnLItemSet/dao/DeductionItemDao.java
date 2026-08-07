@@ -1,4 +1,4 @@
-package config.payitemset.dao;
+package config.dnLItemSet.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import config.dnLItemSet.model.DeductionItem;
 import jdbc.JdbcUtil;
-import config.model.DeductionItem;
 
 public class DeductionItemDao {
 
@@ -36,6 +36,35 @@ public class DeductionItemDao {
 			}
 
 			return result;
+
+		} finally {
+
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+
+		}
+
+	}
+
+	public DeductionItem selectById(Connection conn, int deductionItemId) throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			pstmt = conn
+					.prepareStatement("SELECT DEDUCTION_ITEM_ID, COMPANY_ID, DEDUCTION_ITEM_NAME, CALCULATION_METHOD, "
+							+ "TRUNCATION_UNIT, REMARK, USE_YN, DISPLAY_ORDER, REG_ID, MOD_ID, "
+							+ "CREATED_AT, UPDATED_AT " + "FROM DEDUCTION_ITEM " + "WHERE DEDUCTION_ITEM_ID = ?");
+			pstmt.setInt(1, deductionItemId);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return mapRow(rs);
+			}
+
+			return null;
 
 		} finally {
 

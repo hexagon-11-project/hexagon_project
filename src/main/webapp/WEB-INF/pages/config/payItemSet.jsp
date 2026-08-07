@@ -1,10 +1,24 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
-<%@ page import="config.payitemset.model.PayItemModel"%>
+<%@ page import="config.model.AttendanceType"%>
+<%@ page import="config.model.PayItem"%>
 <%
-List<PayItemModel> payItemList = (List<PayItemModel>) request.getAttribute("payItemList");
-PayItemModel selected = (PayItemModel) request.getAttribute("selectedPayItem");
+List<PayItem> payItemList = (List<PayItem>) request.getAttribute("payItemList");
+List<AttendanceType> attendanceTypeList = (List<AttendanceType>) request.getAttribute("attendanceTypeList");
+PayItem selected = (PayItem) request.getAttribute("selectedPayItem");
 boolean hasSelected = selected != null;
+String selectedAttendanceName = hasSelected && selected.getAttendancePayRule() != null ? selected.getAttendancePayRule()
+		: "";
+boolean selectedAttendanceInList = false;
+if (attendanceTypeList != null && !selectedAttendanceName.isBlank()) {
+	for (AttendanceType attendanceType : attendanceTypeList) {
+		if (selectedAttendanceName.equals(attendanceType.getAttendanceName())) {
+	selectedAttendanceInList = true;
+	break;
+		}
+	}
+}
+boolean showBulkPayAmount = "일괄지급".equals(selectedAttendanceName);
 %>
 
 <%
@@ -13,7 +27,7 @@ request.setAttribute("pageSection", "기본환경");
 request.setAttribute("pageDescription", "급여 계산에 사용할 지급항목과 공제항목을 설정합니다.");
 request.setAttribute("activeKey", "pay-item-settings");
 request.setAttribute("pageCss", "environment.css");
-request.setAttribute("pageJs", null);
+request.setAttribute("pageJs", "pay-item-settings.js");
 %>
 
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
@@ -36,7 +50,7 @@ request.setAttribute("pageJs", null);
 				<tbody>
 					<%
 					if (payItemList != null) {
-						for (PayItemModel item : payItemList) {
+						for (PayItem item : payItemList) {
 					%>
 					<tr style="cursor: pointer;"
 						onclick="location.href='<%=ctx%>/Config/payitemsetselect.do?payItemId=<%=item.getPayItemId()%>'">
@@ -129,14 +143,38 @@ request.setAttribute("pageJs", null);
 						<td class="span-3"><select class="select"
 							name="attendancePayRule">
 								<option value=""
-									<%=!hasSelected || selected.getAttendancePayRule() == null || selected.getAttendancePayRule().isBlank()
-		? "selected"
-		: ""%>>선택해주세요</option>
-								<option value="시간외근무"
-									<%=hasSelected && "시간외근무".equals(selected.getAttendancePayRule()) ? "selected" : ""%>>시간외근무</option>
-								<option value="일괄지급"
-									<%=hasSelected && "일괄지급".equals(selected.getAttendancePayRule()) ? "selected" : ""%>>일괄지급</option>
+									<%=selectedAttendanceName.isBlank() ? "selected" : ""%>>선택해주세요</option>
+								<%
+								if (attendanceTypeList != null) {
+									for (AttendanceType attendanceType : attendanceTypeList) {
+										String name = attendanceType.getAttendanceName();
+										if (name == null || name.isBlank()) {
+									continue;
+										}
+								%>
+								<option value="<%=name%>"
+									<%=selectedAttendanceName.equals(name) ? "selected" : ""%>><%=name%></option>
+								<%
+								}
+								}
+								if (!selectedAttendanceName.isBlank() && !selectedAttendanceInList) {
+								%>
+								<option value="<%=selectedAttendanceName%>" selected><%=selectedAttendanceName%></option>
+								<%
+								}
+								%>
 						</select></td>
+					</tr>
+					<tr id="bulkPayAmountRow"
+						style="<%=showBulkPayAmount ? "" : "display: none;"%>">
+						<th>일괄지급액</th>
+						<td class="span-3">
+							<div class="money-control">
+								<input type="text" class="input number" name="bulkPayAmount"
+									value="<%=showBulkPayAmount ? selected.getBulkPayAmountLabel() : ""%>">
+								<span>원</span>
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<th>사용여부</th>
@@ -156,7 +194,8 @@ request.setAttribute("pageJs", null);
 			</table>
 			<div class="source-editor-actions">
 				<button type="submit" class="btn btn-primary"
-					formaction="<%=ctx%>/Config/payitemsetinsert.do">추가</button>
+					formaction="<%=ctx%>/Config/payitemsetinsert.do"
+					onclick="if (!document.querySelector('[name=payItemName]').value.trim()) { alert('지급항목을 입력하세요.'); location.href='<%=ctx%>/Config/payitemsetlist.do'; return false; }">추가</button>
 				<button type="submit" class="btn btn-blue"
 					formaction="<%=ctx%>/Config/payitemsetupdate.do"
 					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('수정할 항목을 리스트에서 선택하세요.'); return false; }">수정</button>
@@ -164,7 +203,8 @@ request.setAttribute("pageJs", null);
 					formaction="<%=ctx%>/Config/payitemsetdelete.do"
 					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('삭제할 항목을 리스트에서 선택하세요.'); return false; } return confirm('선택한 지급항목을 삭제하시겠습니까?');">삭제</button>
 				<button type="button" class="btn"
-					onclick="location.href='<%=ctx%>/Config/payitemsetclear.do'">내용 지우기</button>
+					onclick="location.href='<%=ctx%>/Config/payitemsetclear.do'">내용
+					지우기</button>
 			</div>
 		</form>
 	</div>

@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdbc.JdbcUtil;
-import config.payitemset.model.NonTaxDetailModel;
+import config.model.NonTaxDetail;
 
 public class NonTaxDetailDao {
 
-	public List<NonTaxDetailModel> selectByCompanyId(Connection conn, int companyId) throws SQLException {
+	public List<NonTaxDetail> selectByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -24,7 +24,7 @@ public class NonTaxDetailDao {
 					+ "ORDER BY NON_TAX_ID");
 			rs = pstmt.executeQuery();
 
-			List<NonTaxDetailModel> result = new ArrayList<>();
+			List<NonTaxDetail> result = new ArrayList<>();
 
 			while (rs.next()) {
 
@@ -43,9 +43,9 @@ public class NonTaxDetailDao {
 
 	}
 
-	private NonTaxDetailModel mapRow(ResultSet rs) throws SQLException {
+	private NonTaxDetail mapRow(ResultSet rs) throws SQLException {
 
-		NonTaxDetailModel item = new NonTaxDetailModel();
+		NonTaxDetail item = new NonTaxDetail();
 
 		item.setNonTaxId(rs.getInt("NON_TAX_ID"));
 

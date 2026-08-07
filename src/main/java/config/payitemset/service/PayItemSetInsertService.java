@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import config.payitemset.dao.PayItemDao;
-import config.payitemset.model.PayItemModel;
+import config.model.PayItem;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
@@ -12,7 +12,7 @@ public class PayItemSetInsertService {
 
 	private PayItemDao payItemDao = new PayItemDao();
 
-	public void insert(PayItemModel item) {
+	public void insert(PayItem item) {
 
 		Connection conn = null;
 

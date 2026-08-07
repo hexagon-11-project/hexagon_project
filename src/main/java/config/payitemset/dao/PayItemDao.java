@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdbc.JdbcUtil;
-import config.payitemset.model.PayItemModel;
+import config.model.PayItem;
 
 public class PayItemDao {
 
-	public List<PayItemModel> selectByCompanyId(Connection conn, int companyId) throws SQLException {
+	public List<PayItem> selectByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -28,7 +28,7 @@ public class PayItemDao {
 			pstmt.setInt(1, companyId);
 			rs = pstmt.executeQuery();
 
-			List<PayItemModel> result = new ArrayList<>();
+			List<PayItem> result = new ArrayList<>();
 
 			while (rs.next()) {
 
@@ -47,9 +47,9 @@ public class PayItemDao {
 
 	}
 
-	private PayItemModel mapRow(ResultSet rs) throws SQLException {
+	private PayItem mapRow(ResultSet rs) throws SQLException {
 
-		PayItemModel item = new PayItemModel();
+		PayItem item = new PayItem();
 
 		item.setPayItemId(rs.getInt("PAY_ITEM_ID"));
 		item.setCompanyId(rs.getInt("COMPANY_ID"));
@@ -96,7 +96,7 @@ public class PayItemDao {
 
 	}
 
-	public PayItemModel selectById(Connection conn, int payItemId) throws SQLException {
+	public PayItem selectById(Connection conn, int payItemId) throws SQLException {
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -129,7 +129,7 @@ public class PayItemDao {
 
 	}
 
-	public void insert(Connection conn, PayItemModel item) throws SQLException {
+	public void insert(Connection conn, PayItem item) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -187,7 +187,7 @@ public class PayItemDao {
 
 	}
 
-	public void update(Connection conn, PayItemModel item) throws SQLException {
+	public void update(Connection conn, PayItem item) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -195,7 +195,7 @@ public class PayItemDao {
 
 			pstmt = conn.prepareStatement(
 					"UPDATE PAY_ITEM SET " + "PAY_ITEM_NAME = ?, TAXABLE_YN = ?, CALCULATION_METHOD = ?, "
-							+ "TRUNCATION_UNIT = ?, ATTENDANCE_PAY_RULE = ?, USE_YN = ?, NON_TAX_ID = ?, "
+							+ "TRUNCATION_UNIT = ?, ATTENDANCE_PAY_RULE = ?, BULK_PAY_AMOUNT = ?, USE_YN = ?, NON_TAX_ID = ?, "
 							+ "NON_PAY_AMOUT = ?, MOD_ID = ?, UPDATED_AT = CURRENT_TIMESTAMP "
 							+ "WHERE PAY_ITEM_ID = ? AND COMPANY_ID = ?");
 			pstmt.setString(1, item.getPayItemName());
@@ -219,31 +219,37 @@ public class PayItemDao {
 
 			}
 
-			pstmt.setString(6, item.getUseYn());
+			if (item.getBulkPayAmount() == null) {
+				pstmt.setNull(6, java.sql.Types.BIGINT);
+			} else {
+				pstmt.setLong(6, item.getBulkPayAmount());
+			}
+
+			pstmt.setString(7, item.getUseYn());
 
 			if (item.getNonTaxId() == null) {
 
-				pstmt.setNull(7, java.sql.Types.INTEGER);
+				pstmt.setNull(8, java.sql.Types.INTEGER);
 
 			} else {
 
-				pstmt.setInt(7, item.getNonTaxId());
+				pstmt.setInt(8, item.getNonTaxId());
 
 			}
 
 			if (item.getNonPayAmount() == null) {
 
-				pstmt.setNull(8, java.sql.Types.BIGINT);
+				pstmt.setNull(9, java.sql.Types.BIGINT);
 
 			} else {
 
-				pstmt.setLong(8, item.getNonPayAmount());
+				pstmt.setLong(9, item.getNonPayAmount());
 
 			}
 
-			pstmt.setString(9, item.getModId());
-			pstmt.setInt(10, item.getPayItemId());
-			pstmt.setInt(11, item.getCompanyId());
+			pstmt.setString(10, item.getModId());
+			pstmt.setInt(11, item.getPayItemId());
+			pstmt.setInt(12, item.getCompanyId());
 			pstmt.executeUpdate();
 
 		} finally {

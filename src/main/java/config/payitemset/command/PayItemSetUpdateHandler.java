@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
-import config.payitemset.model.PayItemModel;
+import config.model.PayItem;
 import config.payitemset.service.PayItemSetUpdateService;
 
 public class PayItemSetUpdateHandler implements CommandHandler {
@@ -32,7 +32,7 @@ public class PayItemSetUpdateHandler implements CommandHandler {
 
 		}
 
-		PayItemModel item = new PayItemModel();
+		PayItem item = new PayItem();
 
 		item.setPayItemId(Integer.parseInt(req.getParameter("payItemId")));
 		item.setCompanyId(1001);
@@ -48,6 +48,12 @@ public class PayItemSetUpdateHandler implements CommandHandler {
 
 		if (item.getCalculationMethod() == null) {
 			item.setCalculationMethod("FIXED");
+		}
+
+		if ("일괄지급".equals(item.getAttendancePayRule())) {
+			item.setBulkPayAmount(parseLongOrNull(req.getParameter("bulkPayAmount")));
+		} else {
+			item.setBulkPayAmount(null);
 		}
 
 		updateService.update(item);

@@ -1,8 +1,8 @@
-package config.payitemset.model;
+package config.dnLItemSet.model;
 
 import java.util.Date;
 
-public class DeductionItemModel {
+public class DeductionItem {
 
 	private Integer deductionItemId;
 	private Integer companyId;
@@ -17,11 +17,11 @@ public class DeductionItemModel {
 	private Date createdAt;
 	private Date updatedAt;
 
-	public DeductionItemModel() {
+	public DeductionItem() {
 
 	}
 
-	public DeductionItemModel(Integer deductionItemId, Integer companyId, String deductionItemName, String calculationMethod,
+	public DeductionItem(Integer deductionItemId, Integer companyId, String deductionItemName, String calculationMethod,
 			Integer truncationUnit, String remark, String useYn, Integer displayOrder, String regId, String modId,
 			Date createdAt, Date updatedAt) {
 
