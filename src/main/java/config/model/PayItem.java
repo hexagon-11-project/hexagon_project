@@ -2,6 +2,7 @@ package config.model;
 
 import java.util.Date;
 
+//--
 public class PayItem {
 
 	private Integer payItemId;

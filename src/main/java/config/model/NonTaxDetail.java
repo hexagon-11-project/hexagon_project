@@ -1,5 +1,6 @@
 package config.model;
 
+//--
 public class NonTaxDetail {
 
 	private Integer nonTaxId;

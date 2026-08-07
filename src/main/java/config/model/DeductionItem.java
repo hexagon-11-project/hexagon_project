@@ -2,6 +2,7 @@ package config.model;
 
 import java.util.Date;
 
+//--
 public class DeductionItem {
 
 	private Integer deductionItemId;
