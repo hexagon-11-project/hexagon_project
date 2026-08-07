@@ -1,4 +1,4 @@
-package membersinfo.model;
+package config.model;
 
 import java.sql.Timestamp;
 

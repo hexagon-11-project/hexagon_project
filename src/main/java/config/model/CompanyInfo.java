@@ -1,6 +1,6 @@
-package membersinfo.model;
+package config.model;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class CompanyInfo {
 	private int companyId;
@@ -9,9 +9,9 @@ public class CompanyInfo {
 	private String ceoTitle;
 	private String ceoName;
 	private String corpNo;
-	private String estDate;
+	private Date estDate;
 	private String webSite;
-	private String address;
+	
 	private String telNo;
 	private String faxNo;
 	private String businessType;
@@ -37,7 +37,7 @@ public class CompanyInfo {
     
     
 	public CompanyInfo(int companyId, String companyName, String businessNo, String ceoTitle, String ceoName,
-			String corpNo, String estDate, String webSite, String address, String telNo, String faxNo,
+			String corpNo, Date estDate , String webSite,  String telNo, String faxNo,
 			String businessType, String businessItem, int payDay, int payPeriodStartDay, int payPeriodEndDay,
 			String bankName, String accountHolder, String bankAccount, String logoPath, String sealPath,
 			String createdAt, String updatedAt,String managerName, String managerTel, String managerMobile, String managerEmail) {
@@ -50,7 +50,6 @@ public class CompanyInfo {
 		this.corpNo = corpNo;
 		this.estDate = estDate;
 		this.webSite = webSite;
-		this.address = address;
 		this.telNo = telNo;
 		this.faxNo = faxNo;
 		this.businessType = businessType;
@@ -218,7 +217,7 @@ public class CompanyInfo {
 
 
 
-	public String getEstDate() {
+	public Date getEstDate() {
 		return estDate;
 	}
 
@@ -228,7 +227,7 @@ public class CompanyInfo {
 
 
 
-	public void setEstDate(String estDate) {
+	public void setEstDate(Date estDate) {
 		this.estDate = estDate;
 	}
 
@@ -258,9 +257,6 @@ public class CompanyInfo {
 
 
 
-	public String getAddress() {
-		return address;
-	}
 
 
 
@@ -268,9 +264,6 @@ public class CompanyInfo {
 
 
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
 
 
 

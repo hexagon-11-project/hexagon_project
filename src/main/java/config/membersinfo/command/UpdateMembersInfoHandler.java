@@ -1,13 +1,14 @@
-package membersinfo.command;
+package config.membersinfo.command;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
-import membersinfo.model.CompanyInfo;
-import membersinfo.service.UpdateMembersInfoService; // ★ 올바른 서비스 임포트
+import config.membersinfo.service.UpdateMembersInfoService;
+import config.model.CompanyInfo;
 
 public class UpdateMembersInfoHandler implements CommandHandler {
 
@@ -46,9 +47,11 @@ public class UpdateMembersInfoHandler implements CommandHandler {
         String corpNo = request.getParameter("corpNo");
         
         // 날짜 데이터 처리
+        
 //        String estDateStr = request.getParameter("estDate");
 //        Timestamp estDate = (estDateStr != null && !estDateStr.isEmpty()) ? Timestamp.valueOf(estDateStr + " 00:00:00") : null;
-        String estDate = request.getParameter("estDate");
+//        String estDate = request.getParameter("estDate");
+        java.sql.Date estDate = parseDate(request.getParameter("estDate"));
         String webSite = request.getParameter("webSite");
         String address = request.getParameter("address");
         String telNo = request.getParameter("telNo");
@@ -76,7 +79,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
         info.setCorpNo(corpNo);
         info.setEstDate(estDate);
         info.setWebSite(webSite);
-        info.setAddress(address);
+      
         info.setTelNo(telNo);
         info.setFaxNo(faxNo);
         info.setBusinessType(businessType);
@@ -96,5 +99,24 @@ public class UpdateMembersInfoHandler implements CommandHandler {
         // 4. 수정 완료 후 리다이렉트 (하드코딩 1001 대신 companyId 변수 사용)
         response.sendRedirect(request.getContextPath() + "/config/membersInfo.do?id=" + 1001);
         return null;
+    }
+    
+ // 화면에서 넘어온 날짜 문자열(yyyy-MM-dd 또는 yyyyMMdd)을 java.sql.Date로 변환
+    private java.sql.Date parseDate(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null; // 값이 없으면 null 반환
+        }
+        String trimmed = value.trim();
+        try {
+            if (trimmed.contains("-")) {
+                // yyyy-MM-dd 형태일 때 변환
+                return java.sql.Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ISO_LOCAL_DATE));
+            } else {
+                // yyyyMMdd 형태일 때 변환
+                return java.sql.Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyyMMdd")));
+            }
+        } catch (Exception e) {
+            return null; // 형식이 안 맞아도 에러를 내지 않고 null 반환
+        }
     }
 }

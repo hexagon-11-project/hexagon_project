@@ -1,12 +1,12 @@
-package membersinfo.command;
+package config.membersinfo.command;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
-import membersinfo.model.CompanyInfo;
-import membersinfo.service.CompanyNotFoundException;
-import membersinfo.service.ReadmembersInfoService;
+import config.membersinfo.service.CompanyNotFoundException;
+import config.membersinfo.service.ReadmembersInfoService;
+import config.model.CompanyInfo;
 
 public class ReadMembersInfoHandler implements CommandHandler {
 

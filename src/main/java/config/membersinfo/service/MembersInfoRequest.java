@@ -1,4 +1,4 @@
-package membersinfo.service;
+package config.membersinfo.service;
 
 import java.sql.Date;
 

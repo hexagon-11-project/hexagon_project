@@ -1,12 +1,12 @@
-package membersinfo.service;
+package config.membersinfo.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import config.membersinfo.dao.CompanyInfoDao;
+import config.model.CompanyInfo;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
-import membersinfo.dao.CompanyInfoDao;
-import membersinfo.model.CompanyInfo;
 
 public class UpdateMembersInfoService {
 	private CompanyInfoDao companyInfoDao = new CompanyInfoDao();
