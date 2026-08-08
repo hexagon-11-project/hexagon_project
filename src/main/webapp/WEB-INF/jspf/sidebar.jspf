@@ -19,7 +19,7 @@
 			href="<%=ctx%>/pages/environment/leave-settings.jsp"><span
 			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/pay-item-settings.jsp"><span
+			href="<%=ctx%>/Config/payitemsetlist.do"><span
 			class="nav-icon">□</span><span>급여항목 설정</span></a>
 	</div>
 	<div class="nav-group">

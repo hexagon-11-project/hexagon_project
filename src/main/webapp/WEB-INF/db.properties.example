@@ -1,8 +1,0 @@
-jdbcdriver=
-jdbcUrl=
-dbUser=
-dbPass=
-
-minIdle=3
-maxTotal=30
-poolName=
