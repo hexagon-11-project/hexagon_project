@@ -10,7 +10,7 @@ import config.employee.service.EmployeeRegister1Service;
 public class EmployeeRegister1Handler implements CommandHandler {
 
     // JSP 뷰 파일 경로 설정 (WEB-INF/view 디렉터리 기준)
-    private static final String FORM_VIEW = "/WEB-INF/pages/environment/employee-register1.jsp";
+    private static final String FORM_VIEW = "/WEB-INF/pages/config/employee-register1.jsp";
 
     private EmployeeRegister1Service registerService = new EmployeeRegister1Service();
 
