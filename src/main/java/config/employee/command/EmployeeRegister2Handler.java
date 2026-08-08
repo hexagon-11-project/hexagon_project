@@ -15,7 +15,7 @@ import jdbc.JdbcUtil;
 public class EmployeeRegister2Handler implements CommandHandler {
 
     // 사원 등록 2페이지 JSP 파일 경로로 지정
-    private static final String FORM_VIEW = "/WEB-INF/pages/environment/employee-register2.jsp";
+    private static final String FORM_VIEW = "/WEB-INF/pages/config/employee-register2.jsp";
 
     private EmployeeRegister2Service registerService = new EmployeeRegister2Service();
 
@@ -115,7 +115,7 @@ public class EmployeeRegister2Handler implements CommandHandler {
         if (empInfo == null) {
             // 사원번호가 없거나 잘못된 경우 - 1페이지부터 다시 진행하도록 안내
             request.setAttribute("errorMsg", "사원 정보를 찾을 수 없습니다. 1페이지부터 다시 진행해주세요.");
-            return "/WEB-INF/pages/environment/employee-register1.jsp";
+            return "/WEB-INF/pages/config/employee-register1.jsp";
         }
         registerService.saveAdditionalInfo(empInfo.getEmployeeId(), request);
 
