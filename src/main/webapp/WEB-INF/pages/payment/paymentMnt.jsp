@@ -71,25 +71,17 @@ body {
 			</div>
 		</div>
 
-		<!-- 1. 현재 시스템의 연도와 월을 구합니다 -->
-<jsp:useBean id="now" class="java.util.Date" />
-<fmt:formatDate value="${now}" pattern="yyyy" var="currentYear" />
-<fmt:formatDate value="${now}" pattern="MM" var="currentMonth" />
+		<!-- [조각 1] 상단 검색 바 및 기능 버튼 영역 불러오기 -->
+		<!-- 1. 현재 시스템의 연도(yyyy)와 월(MM) 구하기 -->
+		<jsp:useBean id="now" class="java.util.Date" />
+		<fmt:formatDate value="${now}" pattern="yyyy" var="currentYear" />
+		<fmt:formatDate value="${now}" pattern="MM" var="currentMonth" />
 
-<!-- 2. 현재 월에서 1을 뺀 전월(prev)을 계산합니다 -->
-<c:set var="prevMonth" value="${currentMonth - 1}" />
-<c:set var="prevYear" value="${currentYear}" />
-
-<c:if test="${prevMonth == 0}">
-    <c:set var="prevMonth" value="12" />
-    <c:set var="prevYear" value="${currentYear - 1}" />
-</c:if>
-
-<fmt:formatNumber value="${prevMonth}" pattern="00" var="formattedPrevMonth" />
-
-<!-- 3. 파라미터가 없으면 기본값으로 '전월'을 사용합니다 -->
-<c:set var="selectedYear" value="${not empty param.payYear ? param.payYear : prevYear}" />
-<c:set var="selectedMonth" value="${not empty param.payMonth ? param.payMonth : formattedPrevMonth}" />
+		<!-- 2. 검색 파라미터가 있으면 그 값을 유지하고, 없으면 현재 연/월을 기본값으로 세팅 -->
+		<c:set var="selectedYear"
+			value="${not empty param.payYear ? param.payYear : currentYear}" />
+		<c:set var="selectedMonth"
+			value="${not empty param.payMonth ? param.payMonth : currentMonth}" />
 
 		<form id="searchForm"
 			action="${pageContext.request.contextPath}/Payment/paymentMnt.do"
@@ -164,11 +156,10 @@ body {
 						<input type="text" id="payDate" value="${payrollInfo.payDate}"
 							readonly class="form-control input-sm"
 							style="display: inline-block; width: 95px; background: #fff; color: #333; padding: 3px 5px; text-align: center;">
-					<!-- 	[수정] 버튼 임시 주석 처리	
 						<button type="button" class="btn btn-default btn-xs"
 							style="padding: 3px 6px; background: #fff; border: 1px solid #ccc; color: #333; margin-left: 2px;">
 							<i class="fas fa-sync-alt"></i> 수정
-						</button> -->
+						</button>
 					</div>
 				</div>
 
@@ -181,76 +172,69 @@ body {
 		</form>
 
 		<div style="margin-bottom: 10px; display: flex; gap: 5px;">
-		<button type="button" class="btn btn-default" onclick="openLoadPrevModal()"
-    style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px;">
-    <i class="fas fa-file-import"></i> 지난급여 불러오기
-</button>
+			<button type="button" class="btn btn-default"
+				style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px;">
+				<i class="fas fa-file-import"></i> 지난급여 불러오기
+			</button>
 			<button type="button" class="btn btn-primary"
 				onclick="openEmployeeSelectModal()"
 				style="background: #337ab7; color: #fff; border: none; padding: 4px 10px; font-size: 12px;">
 				<i class="fas fa-plus"></i> 신규추가
 			</button>
 			<!-- [선택삭제] 버튼 -->
-			<button type="button" class="btn btn-default"
-				onclick="deleteSelectedEmployees()"
-				style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px; cursor: pointer;">
-				<i class="fas fa-trash-alt"></i> 선택삭제
-			</button>
+<button type="button" class="btn btn-default" onclick="deleteSelectedEmployees()"
+    style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px; cursor: pointer;">
+    <i class="fas fa-trash-alt"></i> 선택삭제
+</button>
 
-			<!-- [전체삭제] 버튼 -->
-			<button type="button" class="btn btn-danger"
-				onclick="deleteAllEmployees()"
-				style="background: #d9534f; color: #fff; border: none; padding: 4px 10px; font-size: 12px; cursor: pointer;">
-				<i class="fas fa-trash"></i> 전체삭제
-			</button>
+<!-- [전체삭제] 버튼 -->
+<button type="button" class="btn btn-danger" onclick="deleteAllEmployees()"
+    style="background: #d9534f; color: #fff; border: none; padding: 4px 10px; font-size: 12px; cursor: pointer;">
+    <i class="fas fa-trash"></i> 전체삭제
+</button>
 		</div>
 
 		<!-- 귀속연월에 맞춰 정산기간 및 급여지급일 자동 계산 스크립트 -->
 		<script>
-    function updateAutoDates() {
-        var yearSel = document.getElementById("payYear");
-        var monthSel = document.getElementById("payMonth");
-        
-        if (!yearSel || !monthSel) return;
+	function updateAutoDates() {
+		var yearSel = document.getElementById("payYear");
+		var monthSel = document.getElementById("payMonth");
+		
+		if (!yearSel || !monthSel) return;
 
-        var year = parseInt(yearSel.value, 10);
-        var month = parseInt(monthSel.value, 10);
+		var year = parseInt(yearSel.value, 10);
+		var month = parseInt(monthSel.value, 10);
 
-        var monthStr = month < 10 ? "0" + month : "" + month;
-        var startDateStr = year + "-" + monthStr + "-01";
-        var lastDay = new Date(year, month, 0).getDate();
-        var endDateStr = year + "-" + monthStr + "-" + lastDay;
+		// 월을 무조건 2자리(01, 02..)로 맞춤
+		var monthStr = month < 10 ? "0" + month : "" + month;
 
-        // ★ 요구사항: 귀속연월의 다음달 5일 고정
-        var nextYear = year;
-        var nextMonth = month + 1;
-        if (nextMonth > 12) { nextMonth = 1; nextYear++; }
-        var nextMonthStr = nextMonth < 10 ? "0" + nextMonth : "" + nextMonth;
-        var payDateStr = nextYear + "-" + nextMonthStr + "-05";
+		// 1. 정산기간 시작일 (항상 1일)
+		var startDateStr = year + "-" + monthStr + "-01";
 
-        document.getElementById("calcPeriodStart").value = startDateStr;
-        document.getElementById("calcPeriodEnd").value = endDateStr;
-        document.getElementById("payDate").value = payDateStr;
-    }
+		// 2. 정산기간 종료일 (해당 월의 마지막 날짜 계산)
+		// Date 객체에서 일을 0으로 주면 이전 달의 마지막 날을 반환함. 
+		// 따라서 넘어온 month를 그대로 넣으면 해당 month의 마지막 날짜가 나옴.
+		var lastDay = new Date(year, month, 0).getDate();
+		var endDateStr = year + "-" + monthStr + "-" + lastDay;
 
-    // ★ 핵심: 페이지 로드 시점에 '파라미터가 비어있다면' 전월로 세팅하고 계산!
-    window.addEventListener("DOMContentLoaded", function() {
-        // 서버에서 받아온 값이 비어있을 때만(처음 접속 시) 전월로 강제 세팅
-        var yearSel = document.getElementById("payYear");
-        var monthSel = document.getElementById("payMonth");
-        
-        // JSP에서 파라미터가 안 넘어왔다면(즉, 값이 비어있다면) 전월 계산
-        if (!yearSel.value || !monthSel.value) {
-            var d = new Date();
-            d.setMonth(d.getMonth() - 1); // 전월 계산
-            
-            yearSel.value = d.getFullYear();
-            monthSel.value = d.getMonth() + 1;
-        }
-        
-        // 세팅된(혹은 기존의) 값으로 날짜 계산 함수 실행
-        updateAutoDates();
-    });
+		// 3. 급여지급일 (다음 달 5일 계산)
+		var nextYear = year;
+		var nextMonth = month + 1;
+		if (nextMonth > 12) {
+			nextMonth = 1;
+			nextYear++;
+		}
+		var nextMonthStr = nextMonth < 10 ? "0" + nextMonth : "" + nextMonth;
+		var payDateStr = nextYear + "-" + nextMonthStr + "-05";
+
+		// 계산된 값들을 화면의 input 태그에 자동 세팅
+		document.getElementById("calcPeriodStart").value = startDateStr;
+		document.getElementById("calcPeriodEnd").value = endDateStr;
+		document.getElementById("payDate").value = payDateStr;
+	}
+
+	// 화면이 처음 로드될 때 바로 날짜 계산 함수 실행
+	window.addEventListener("DOMContentLoaded", updateAutoDates);
 </script>
 
 		<!-- 메인 컨텐츠 그리드 레이아웃 (좌/우 분할) -->
@@ -352,56 +336,182 @@ body {
 				</div>
 
 				<!-- 폼 시작 -->
-				<form action="${pageContext.request.contextPath}/Payment/save.do"
+				<form action="${pageContext.request.contextPath}/payroll/save.do"
 					method="POST" id="payrollDetailForm">
 					<input type="hidden" name="payrollEmployeeId"
 						id="selectedPayrollEmployeeId"
 						value="${selectedEmployee.payrollEmployeeId}">
 
 					<div style="display: flex; gap: 10px;">
-<!-- 지급항목 테이블 -->
-<div style="flex: 1;">
-	<div
-		style="display: flex; justify-content: space-between; align-items: center; background: #f4f6f9; padding: 4px 8px; border: 1px solid #ddd; font-weight: bold;">
-		<span>지급항목 <span
-			style="background: #009688; color: white; font-size: 9px; padding: 1px 4px; border-radius: 2px;">M</span></span>
-	</div>
-	<table class="table table-bordered table-condensed"
-		style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
-		
-		<c:forEach var="item" items="${payItemList}">
-			<tr>
-				<!-- 왼쪽 칸: 텍스트(항목 이름) 출력 -->
-				<td style="padding: 4px; background: #fafafa; width: 40%;">
-					${item.payItemName}
-					<c:if test="${item.payItemName.contains('식대') or item.payItemName.contains('차량')}">
-						<span style="color: red;">[비]</span>
-					</c:if>
-				</td>
-				
-				<!-- 오른쪽 칸: 금액 입력창 출력 -->
-				<td style="padding: 4px;">
-					<input type="text"
-						name="payItem_${item.payItemId}" 
-						id="input_payItem_${item.payItemId}" 
-						value="${item.bulkPayAmount != null && item.bulkPayAmount > 0 ? item.bulkPayAmount : 0}"
-						data-default="${item.bulkPayAmount != null && item.bulkPayAmount > 0 ? item.bulkPayAmount : 0}"
-						oninput="calculateRealPay()"
-						class="form-control input-sm pay-input"
-						style="width: 100%; height: 24px; padding: 2px; text-align: right;">
-				</td>
-			</tr>
-			<tr class="calc-method-row">
-				<td style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
-				<td style="padding: 4px;"><input type="text" readonly
-					class="form-control input-sm"
-					style="width: 100%; height: 22px; background: #f9f9f9;" 
-					value="${item.calculationMethod != null ? item.calculationMethod : ''}"></td>
-			</tr>
-		</c:forEach>
-		
-	</table>
-</div>
+						<!-- 지급항목 테이블 -->
+						<div style="flex: 1;">
+							<div
+								style="display: flex; justify-content: space-between; align-items: center; background: #f4f6f9; padding: 4px 8px; border: 1px solid #ddd; font-weight: bold;">
+								<span>지급항목 <span
+									style="background: #009688; color: white; font-size: 9px; padding: 1px 4px; border-radius: 2px;">M</span></span>
+								<!--<button type="button" class="btn btn-xs btn-dark"
+						onclick="executeAutoCalculation()"
+						style="background: #222; color: #fff; font-size: 10px; padding: 1px 6px; border: none;">±
+						자동계산</button>-->
+							</div>
+							<table class="table table-bordered table-condensed"
+								style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
+								<tr>
+									<td style="padding: 4px; background: #fafafa; width: 40%;">기본급</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="baseWage" id="input_baseWage" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">식비<span
+										style="color: red;">[비]</span></td>
+									<!-- [수정] 클래스에 pay-input 추가 (계산에는 포함되어야 함) -->
+									<td style="padding: 4px;"><input type="text"
+										name="mealAllowance" id="input_mealAllowance" value="200000"
+										class="form-control input-sm pay-input" readonly
+										style="width: 100%; height: 24px; padding: 2px; text-align: right; background-color: #e9ecef; cursor: not-allowed;">
+									</td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background-color: #e9ecef; cursor: not-allowed;">
+									</td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">보육수당</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="childAllowance" id="input_childAllowance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">직책수당</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="positionAllowance" id="input_positionAllowance"
+										value="0" oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">차량유지비<span
+										style="color: red;">[비]</span></td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="carAllowance" id="input_carAllowance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">근속수당</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="tenureAllowance" id="input_tenureAllowance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">당직수당</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="nightAllowance" id="input_nightAllowance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">상여금</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text" name="bonus"
+										id="input_bonus" value="0" oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">휴일수당</td>
+									<!-- [수정] 클래스에 pay-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="holidayAllowance" id="input_holidayAllowance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm pay-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+							</table>
+						</div>
 
 						<!-- 공제항목 테이블 -->
 						<div style="flex: 1;">
@@ -412,27 +522,125 @@ body {
 							</div>
 							<table class="table table-bordered table-condensed"
 								style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
-								<c:forEach var="dedItem" items="${deductionItemList}">
-									<tr>
-										<td style="padding: 4px; background: #fafafa; width: 40%;">${dedItem.deductionItemName}</td>
-										<td style="padding: 4px;"><input type="text"
-											name="dedItem_${dedItem.deductionItemId}"
-											id="input_dedItem_${dedItem.deductionItemId}" value="0"
-											oninput="calculateRealPay()"
-											class="form-control input-sm deduction-input"
-											style="width: 100%; height: 24px; padding: 2px; text-align: right;">
-										</td>
-									</tr>
-									<tr class="calc-method-row">
-										<td
-											style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
-										<td style="padding: 4px;"><input type="text" readonly
-											class="form-control input-sm"
-											style="width: 100%; height: 22px; background: #f9f9f9;"
-											value="${dedItem.calculationMethod != null ? dedItem.calculationMethod : ''}"></td>
-									</tr>
-								</c:forEach>
-								<!-- 줄 맞춤용 여백 -->
+								<tr>
+									<td style="padding: 4px; background: #fafafa; width: 40%;">국민연금</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="nationalPension" id="input_nationalPension" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">건강보험</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="healthInsurance" id="input_healthInsurance" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">장기요양보험</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="longTermCare" id="input_longTermCare" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">고용보험</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="employmentInsurance" id="input_employmentInsurance"
+										value="0" oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">소득세</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="incomeTax" id="input_incomeTax" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">지방소득세</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="localIncomeTax" id="input_localIncomeTax" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
+								<tr>
+									<td style="padding: 4px; background: #fafafa;">상조회비</td>
+									<!-- [수정] 클래스에 deduction-input 추가 -->
+									<td style="padding: 4px;"><input type="text"
+										name="mutualAid" id="input_mutualAid" value="0"
+										oninput="calculateRealPay()"
+										class="form-control input-sm deduction-input"
+										style="width: 100%; height: 24px; padding: 2px; text-align: right;"></td>
+								</tr>
+								<tr class="calc-method-row">
+									<td
+										style="padding: 4px; background: #fafafa; font-size: 11px; color: #666;">계산방법</td>
+									<td style="padding: 4px;"><input type="text" readonly
+										class="form-control input-sm"
+										style="width: 100%; height: 22px; background: #f9f9f9;"></td>
+								</tr>
+
 								<tr>
 									<td colspan="2"
 										style="background: #fff; border: none; height: 48px;"></td>
@@ -446,12 +654,14 @@ body {
 						style="display: flex; border: 1px solid #ddd; margin-top: 10px; font-weight: bold; text-align: center;">
 						<div
 							style="flex: 1; background: #f4f6f9; padding: 6px; border-right: 1px solid #ddd; font-size: 13px;">
+							<!-- [수정] JS에서 값을 바꿀 수 있도록 id="totalPayResult" 로 변경 -->
 							지급총액 : <span id="totalPayResult" style="color: #337ab7;"><fmt:formatNumber
 									value="${selectedEmployee.totalPayAmount != null ? selectedEmployee.totalPayAmount : 0}"
 									pattern="#,###" /></span> 원
 						</div>
 						<div
 							style="flex: 1; background: #f4f6f9; padding: 6px; font-size: 13px;">
+							<!-- [수정] JS에서 값을 바꿀 수 있도록 id="totalDeductionResult" 로 변경 -->
 							공제총액 : <span id="totalDeductionResult" style="color: #d9534f;"><fmt:formatNumber
 									value="${selectedEmployee.totalDeductionAmount != null ? selectedEmployee.totalDeductionAmount : 0}"
 									pattern="#,###" /></span> 원
@@ -459,6 +669,7 @@ body {
 					</div>
 					<div
 						style="background: #204d74; color: white; text-align: center; padding: 10px; font-weight: bold; font-size: 15px; margin-top: 5px; border-radius: 2px;">
+						<!-- [수정] JS에서 값을 바꿀 수 있도록 실지급액 숫자를 감싸는 span 태그 추가 -->
 						실지급액 : <span id="netPayResult"> <fmt:formatNumber
 								value="${selectedEmployee.netPayAmount != null ? selectedEmployee.netPayAmount : 0}"
 								pattern="#,###" />
@@ -689,59 +900,31 @@ body {
 			document.getElementById("searchForm").submit();
 		}
 
+		// ★ [핵심 수정] 좌측 사원 클릭 시 AJAX로 우측 데이터 갱신하기
 		function selectEmployeeRow(rowElement, payrollEmployeeId) {
-		    // 1. 클릭한 사원 행 배경색 변경
-		    var rows = document.querySelectorAll("#employeeTableBody tr");
-		    if(rows.length > 0) {
-		        rows.forEach(function(r) { r.style.background = ""; });
-		    }
-		    rowElement.style.background = "#eef4fb";
-		    
-		    // 2. 선택된 사원 ID 저장
-		    document.getElementById("selectedPayrollEmployeeId").value = payrollEmployeeId;
+			// 1. 선택된 행 색상 변경 (기존 로직 유지)
+			var rows = document.querySelectorAll("#employeeTableBody tr");
+			if(rows.length > 0) {
+				rows.forEach(function(r) { r.style.background = ""; });
+			}
+			rowElement.style.background = "#eef4fb";
+			
+			var selectedIdInput = document.getElementById("selectedPayrollEmployeeId");
+			if(selectedIdInput) selectedIdInput.value = payrollEmployeeId;
 
-		    // 3. DB에서 데이터 가져오기 (AJAX)
-		    var url = "${pageContext.request.contextPath}/Payment/detailAjax.do?payrollEmployeeId=" + payrollEmployeeId;
+			// 2. AJAX 비동기 통신으로 상세 데이터 요청 (화면 새로고침 없음)
+			var contextPath = "${pageContext.request.contextPath}";
+			var url = contextPath + "/payroll/detailAjax.do?payrollEmployeeId=" + payrollEmployeeId;
 
-		    fetch(url)
-		        .then(response => response.json())
-		        .then(data => {
-		        	// 4. 우측 폼 입력칸 초기화 (무조건 0이 아니라 기본값이 있으면 기본값으로 리셋)
-		        	document.querySelectorAll('.pay-input, .deduction-input').forEach(function(input) {
-		        	    var defaultVal = input.getAttribute('data-default');
-		        	    if (defaultVal) {
-		        	        input.value = defaultVal; // 식대 등은 200000 유지
-		        	    } else {
-		        	        input.value = 0; // 나머지는 0으로
-		        	    }
-		        	});
-
-		            // 5. DB에서 가져온 지급항목 데이터 꽂아넣기 (동적 ID 매칭)
-		            if (data.payDetails) {
-		                data.payDetails.forEach(function(item) {
-		                    var inputField = document.getElementById('input_payItem_' + item.payItemId);
-		                    if (inputField) {
-		                        inputField.value = item.amount;
-		                    }
-		                });
-		            }
-
-		            // 6. DB에서 가져온 공제항목 데이터 꽂아넣기 (동적 ID 매칭)
-		            if (data.deductionDetails && data.deductionDetails.length > 0) {
-		                data.deductionDetails.forEach(function(item) {
-		                    var inputField = document.getElementById('input_dedItem_' + item.deductionItemId);
-		                    if (inputField) {
-		                        inputField.value = item.amount;
-		                    }
-		                });
-		            }
-
-		            // 7. 하단 총액/실지급액 자동 재계산
-		            calculateRealPay();
-		        })
-		        .catch(error => {
-		            console.error("데이터 로드 에러:", error);
-		        });
+			fetch(url)
+				.then(response => response.json())
+				.then(data => {
+					console.log("서버에서 성공적으로 가져온 데이터:", data);
+					calculateRealPay();
+				})
+				.catch(error => {
+					console.error("데이터를 가져오는 중 오류 발생:", error);
+				});
 		}
 
 		function toggleCalcMethod() {
@@ -798,33 +981,8 @@ body {
 	    }
 
 	    function addEmployeesToMain(selectedEmpIds) {
-	        console.log("선택된 사원 ID 목록:", selectedEmpIds);
-
-	        if (!selectedEmpIds || selectedEmpIds.length === 0) {
-	            alert("선택된 사원이 없습니다.");
-	            return;
-	        }
-
-	        var payrollId = "${payroll.payrollId}"; 
-
-	        // AJAX를 통해 선택된 사원 ID들만 서버로 전송
-	        var xhr = new XMLHttpRequest();
-	        xhr.open("POST", "${pageContext.request.contextPath}/Payment/employeeInsert.do", true);
-	        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	        
-	        xhr.onreadystatechange = function() {
-	            if (xhr.readyState === 4) {
-	                if (xhr.status === 200) {
-	                    alert("선택된 사원이 목록에 추가되었습니다.");
-	                    location.reload(); // 새로고침하여 추가된 사원만 화면에 반영
-	                } else {
-	                    alert("사원 추가 중 오류가 발생했습니다.");
-	                }
-	            }
-	        };
-
-	        var data = "payrollId=" + encodeURIComponent(payrollId) + "&employeeIds=" + encodeURIComponent(selectedEmpIds.join(","));
-	        xhr.send(data);
+	        console.log("추가된 사원 ID 목록:", selectedEmpIds);
+	        alert("선택된 사원이 목록에 추가되었습니다.");
 	    }
 		
 	    function openTipModal() {
@@ -916,182 +1074,8 @@ body {
         }
     }
 </script>
-	<script>
-    function addEmployeesToMain(selectedIds) {
-        if (!selectedIds || selectedIds.length === 0) return;
+	
 
-        // 1. 메인 화면에서 payrollId 값을 안전하게 가져오기 (input, select, URL 파라미터 전부 다 뒤져서 찾음)
-        var payrollId = "";
-        
-        // ① input이나 select 중에 payrollId라는 이름이나 아이디가 있는지 찾기
-        var payrollInput = document.querySelector("[name='payrollId']") || document.getElementById("payrollId");
-        if (payrollInput && payrollInput.value) {
-            payrollId = payrollInput.value;
-        }
-        
-        // ② 화면에 없다면 현재 주소창(URL)의 파라미터에서 찾기
-        if (!payrollId) {
-            var urlParams = new URLSearchParams(window.location.search);
-            payrollId = urlParams.get('payrollId');
-        }
-        
-        // ③ 그래도 없으면 화면에 있는 숨겨진 input이나 첫 번째 셀렉트 값 등에서 유추하거나 기본값 '1' 지정
-        if (!payrollId) {
-            payrollId = "1"; 
-        }
-
-        // 2. 요청할 URL 설정
-        var contextPath = "${pageContext.request.contextPath}";
-        var url = contextPath + "/Payment/paymentEmployeeInsert.do"; 
-
-        // 3. POST 방식으로 보낼 데이터 세팅
-        var formData = new URLSearchParams();
-        formData.append("payrollId", payrollId);
-        formData.append("employeeIds", selectedIds.join(","));
-
-        console.log("전송할 payrollId:", payrollId); // F12 개발자 도구 콘솔에서 확인 가능
-        console.log("전송할 employeeIds:", selectedIds.join(","));
-
-        // 4. AJAX(fetch) 전송
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: formData.toString()
-        })
-        .then(response => {
-            if (response.ok) { 
-                alert("신규 사원이 성공적으로 추가되었습니다.");
-                location.reload(); 
-            } else {
-                alert("추가 중 문제가 발생했습니다. (서버 응답 코드: " + response.status + ")");
-            }
-        })
-        .catch(error => {
-            console.error("통신 에러:", error);
-            alert("서버 통신에 실패했습니다.");
-        });
-    }
-</script>
-
-<script>
-    // [저장] 버튼 AJAX 제출 로직
-    document.getElementById("payrollDetailForm").addEventListener("submit", function(e) {
-        e.preventDefault(); // 기본 폼 전송(새로고침) 방지
-
-        var formData = new FormData(this);
-        var url = this.action;
-
-        fetch(url, {
-            method: "POST",
-            body: new URLSearchParams(formData)
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data === "SUCCESS") {
-                alert("성공적으로 저장되었습니다.");
-                location.reload(); // 저장 완료 후 화면 깔끔하게 새로고침 (검색조건 유지됨)
-            } else {
-                alert("저장 중 문제가 발생했습니다.");
-            }
-        })
-        .catch(error => {
-            console.error("저장 에러:", error);
-            alert("서버 통신에 실패했습니다.");
-        });
-    });
-    
- // 1. 모달창 열기 및 셀렉트 박스(최근 12개월) 자동 생성
-    function openLoadPrevModal() {
-        var select = document.getElementById("prevPayrollSelect");
-        select.innerHTML = '<option value="">귀속연월 차수 선택</option>';
-        
-        var today = new Date();
-        var year = today.getFullYear();
-        var month = today.getMonth() + 1;
-
-        for (var i = 0; i < 12; i++) {
-            var m = month - i;
-            var y = year;
-            if (m <= 0) { m += 12; y -= 1; }
-            
-            var mStr = m < 10 ? "0" + m : "" + m;
-            var val = y + "" + mStr + "-1"; // 예: 202607-1
-            var text = y + "년 " + mStr + "월 01차";
-            select.options.add(new Option(text, val));
-        }
-        document.getElementById('loadPrevModalOverlay').style.display = 'flex';
-    }
-
-    // 2. 모달창 닫기
-    function closeLoadPrevModal() {
-        document.getElementById('loadPrevModalOverlay').style.display = 'none';
-    }
-
-    // 3. [급여정보 불러오기] 클릭 시 실행 (3번, 4번 사진 로직)
-    function executeLoadPrev() {
-        var selectedVal = document.getElementById("prevPayrollSelect").value;
-        if (!selectedVal) {
-            alert("불러올 귀속연월 차수를 선택해주세요.");
-            return;
-        }
-
-        // 3번 사진: 경고 멘트
-        var confirmMsg = "기등록된 급여테이블은 삭제되며,\n\n불러오기 한 급여테이블로 교체됩니다.\n\n불러오기 하시겠습니까?";
-        
-        if (confirm(confirmMsg)) {
-            var currYear = document.getElementById("payYear").value;
-            var currMonth = document.getElementById("payMonth").value;
-            var currSeq = document.getElementById("paySequence").value;
-
-            var prevYearMonth = selectedVal.split("-")[0];
-            var prevSeq = selectedVal.split("-")[1];
-
-            var url = "${pageContext.request.contextPath}/Payment/loadPrevAjax.do";
-            var formData = new URLSearchParams();
-            formData.append("currYear", currYear);
-            formData.append("currMonth", currMonth);
-            formData.append("currSeq", currSeq || "1");
-            formData.append("prevYearMonth", prevYearMonth);
-            formData.append("prevSeq", prevSeq);
-
-            fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData.toString()
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "SUCCESS") {
-                    // 4번 사진: 성공 알림 및 불러온 건수 표시
-                    alert("[불러오기] 일반소득: " + data.count + "건");
-                    location.reload(); // 성공 후 화면 갱신
-                } else {
-                    alert("불러오기 중 오류가 발생했습니다.");
-                }
-            })
-            .catch(error => {
-                console.error("통신 에러:", error);
-                alert("서버 통신에 실패했습니다.");
-            });
-        }
-    }
-</script>
 	<%@ include file="../../jspf/app-end.jspf"%>
-	
-	<!-- [지난급여 불러오기] 모달창 -->
-<div id="loadPrevModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div style="background: white; width: 320px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 25px; text-align: center; font-family: 'Malgun Gothic', sans-serif;">
-        <h4 style="margin-top: 0; margin-bottom: 20px; font-weight: bold; text-align: left; font-size: 16px;">급여연월 선택</h4>
-        <select id="prevPayrollSelect" class="form-control" style="width: 100%; margin-bottom: 20px; height: 35px;">
-            <option value="">귀속연월 차수 선택</option>
-            <!-- 자바스크립트가 이전 달 목록을 여기에 자동으로 채워줍니다 -->
-        </select>
-        <button type="button" class="btn btn-primary" onclick="executeLoadPrev()" style="width: 100%; background: #337ab7; border: none; padding: 10px; font-weight: bold;">급여정보 불러오기</button>
-        <button type="button" class="btn btn-default" onclick="closeLoadPrevModal()" style="width: 100%; margin-top: 8px; padding: 10px;">취소</button>
-    </div>
-</div>
-	
 </body>
 </html>
