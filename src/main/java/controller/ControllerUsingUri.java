@@ -32,16 +32,24 @@ public class ControllerUsingUri extends HttpServlet {
 		}
 		Iterator keyIter = prop.keySet().iterator();
 		while (keyIter.hasNext()) {
-			String command = (String)keyIter.next();
-			String handlerClassName = prop.getProperty(command);
+			String rawCommand = (String) keyIter.next();
+			String command = rawCommand == null ? "" : rawCommand.trim();
+			String handlerClassName = prop.getProperty(rawCommand);
+			if (command.isEmpty() || handlerClassName == null || handlerClassName.trim().isEmpty()) {
+				continue;
+			}
+			handlerClassName = handlerClassName.trim();
+			if (handlerClassName.startsWith("#")) {
+				continue;
+			}
 			try {
 				Class<?> handlerClass = Class.forName(handlerClassName);
-				CommandHandler handlerInstance = (CommandHandler)handlerClass.getDeclaredConstructor().newInstance();
+				CommandHandler handlerInstance = (CommandHandler) handlerClass.getDeclaredConstructor().newInstance();
 				commandHandlerMap.put(command, handlerInstance);
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new ServletException(e);
-			} catch (Exception e) {}
+				throw new ServletException("Handler load failed: " + command + " -> " + handlerClassName, e);
+			}
 		}
 	}
 
