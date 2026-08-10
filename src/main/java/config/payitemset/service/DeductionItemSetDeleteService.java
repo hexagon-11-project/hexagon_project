@@ -1,29 +1,32 @@
-package config.dnLItemSet.service;
+package config.payitemset.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
-import config.dnLItemSet.dao.DeductionItemDao;
-import config.dnLItemSet.model.DeductionItem;
+import config.payitemset.dao.DeductionItemDao;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
-public class DeductionItemSetListService {
+public class DeductionItemSetDeleteService {
 
 	private DeductionItemDao deductionItemDao = new DeductionItemDao();
 
-	public List<DeductionItem> getList(int companyId) {
+	public void delete(int deductionItemId) {
 
 		Connection conn = null;
 
 		try {
 
 			conn = ConnectionProvider.getConnection();
+			conn.setAutoCommit(false);
 
-			return deductionItemDao.selectByCompanyId(conn, companyId);
+			deductionItemDao.delete(conn, deductionItemId);
+
+			conn.commit();
 
 		} catch (SQLException e) {
+
+			JdbcUtil.rollback(conn);
 
 			throw new RuntimeException(e);
 
