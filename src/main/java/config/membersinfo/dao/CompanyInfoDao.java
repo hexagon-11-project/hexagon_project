@@ -18,10 +18,7 @@ public class CompanyInfoDao {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			System.out.println("--- DB 연결 정보 확인 ---");
-			System.out.println("실제 접속한 DB URL: " + conn.getMetaData().getURL());
-			System.out.println("실제 접속한 DB User: " + conn.getMetaData().getUserName());
-			System.out.println("조회하려는 companyId: " + companyId);
+			
 			// 별칭 없이 테이블명 직접 명시
 			String sql = "SELECT company_info.*, " +
 

@@ -29,6 +29,9 @@ public class Employee {
 	private int nationalPensionBaseAmount;  // 국민연금 기준소득월액
 	private int healthInsuranceBaseAmount;  // 건강보험 보수월액
 	private int employmentInsuranceAmount;  // 고용보험 보수월액
+	
+	private String retirementYn; // 재직상태 구분 추가(이승준/ 260809)
+	private String birthDate; // 사원현황관리 생년월일 추가(이승준/ 260809)
 
 	// ==========================================
 	// Getters and Setters
@@ -234,4 +237,25 @@ public class Employee {
 	public void setEmpIncomeType(String empIncomeType) {
 		this.empIncomeType = empIncomeType;
 	}
+
+	// 재직상태 구분 추가 (이승준/260809)
+	public String getRetirementYn() {
+		return retirementYn;
+	}
+
+	public void setRetirementYn(String retirementYn) {
+		this.retirementYn = retirementYn;
+	}
+
+	public String getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
+	}
+	
+	
+	
+	
 }
