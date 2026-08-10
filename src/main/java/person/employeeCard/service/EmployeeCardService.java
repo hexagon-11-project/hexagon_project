@@ -1,10 +1,7 @@
 package person.employeeCard.service;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import connection.ConnectionProvider;
@@ -27,7 +24,7 @@ public class EmployeeCardService {
 			// DAO를 통해 데이터 조회
 			EmployeeCard card = employeeCardDao.selectById(conn, employeeId);
 			
-			// 데이터가 없을 경우 예외 처리 (필요에 따라 커스텀 예외로 변경 가능)
+			// 데이터가 없을 경우 예외 처리
 			if (card == null) {
 				throw new RuntimeException("해당 사원의 인사기록을 찾을 수 없습니다. 사원번호: " + employeeId);
 			}
@@ -41,30 +38,21 @@ public class EmployeeCardService {
 			JdbcUtil.close(conn);
 		}
 	}
-	/**
-	 * 전체 사원 목록 (사원번호, 이름 등 기본 정보) 조회
-	 */
-	public List<EmployeeCard> selectAllEmployees(Connection conn) throws SQLException {
-		List<EmployeeCard> list = new ArrayList<>();
-		String sql = "SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYEE_NAME FROM EMPLOYEE ORDER BY EMPLOYEE_NAME ASC";
-		
-		try (PreparedStatement pstmt = conn.prepareStatement(sql);
-			 ResultSet rs = pstmt.executeQuery()) {
-			
-			while (rs.next()) {
-				EmployeeCard card = new EmployeeCard();
-				// 주의: EmployeeCard 모델에 employeeId(int) 변수와 세터가 없다면 추가해주셔야 합니다!
-				card.setEmployeeNo(rs.getString("EMPLOYEE_NO"));
-				card.setEmployeeName(rs.getString("EMPLOYEE_NAME"));
-				// 필요하다면 임시로 ID도 담을 수 있게 처리
-				list.add(card);
-			}
-		}
-		return list;
-	}
-	public List<EmployeeCard> getAllEmployeeList() {
-		
-		return null;
-	}
 
+	/**
+	 * Handler에서 직접 호출하는 메서드 (전체 사원 목록)
+	 */
+	public List<EmployeeCard> getAllEmployeeList() {
+		Connection conn = null;
+		try {
+			// 커넥션을 맺고 DAO 호출
+			conn = ConnectionProvider.getConnection();
+			return employeeCardDao.selectAllEmployees(conn); 
+		} catch (SQLException e) {
+			throw new RuntimeException("전체 사원 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			// 커넥션 자원 반납
+			JdbcUtil.close(conn);
+		}
+	}
 }

@@ -17,9 +17,9 @@ import config.employee.model.EmployeeTraining;
 public class EmployeeCard {
 	private int employeeId;
 	
-	// ==========================================
+	
 	// 1. 기본 인적사항 & 퇴직사항 (Employee + Employee2 통합)
-	// ==========================================
+	
 	private String employeeNo;
 	private Date hireDate;
 	private String photoPath;
@@ -36,9 +36,9 @@ public class EmployeeCard {
 	private String retireReason;    // 퇴직사유
 	private String retirePhone;     // 퇴직 후 연락처
 
-	// ==========================================
+	
 	// 2. 하위 1:N 데이터 리스트
-	// ==========================================
+	
 	private List<EmployeeDependent> dependentList;
 	private List<EmployeeInsurance> insuranceList;
 	private List<EmployeeEducation> educationList;
@@ -50,9 +50,8 @@ public class EmployeeCard {
 	private List<EmployeeRewardPunishment> rewardPunishmentList;
 	private List<EmployeeAppointment> appointmentList;
 
-	// ==========================================
-	// Getter & Setter
-	// ==========================================
+	
+	
 	
 	public int getEmployeeId() { return employeeId; }
     public void setEmployeeId(int employeeId) { this.employeeId = employeeId; }

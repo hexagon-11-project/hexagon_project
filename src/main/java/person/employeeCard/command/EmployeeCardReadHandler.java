@@ -16,8 +16,10 @@ public class EmployeeCardReadHandler implements CommandHandler {
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		
-		// 1. [핵심] 드롭박스(select)에 채워 넣을 전체 사원 목록을 무조건 조회해서 request에 담기!
+		// 1.드롭박스(select)에 채워 넣을 전체 사원 목록을 무조건 조회해서 request에 담기!
 		List<EmployeeCard> empList = employeeCardService.getAllEmployeeList();
+		
+		
 		req.setAttribute("empList", empList);
 
 		// 2. 사용자가 드롭박스에서 사원을 고르고 '조회' 버튼을 눌렀을 때 (파라미터가 넘어올 때)
@@ -32,7 +34,7 @@ public class EmployeeCardReadHandler implements CommandHandler {
 		}
 
 		// 3. JSP 페이지로 포워딩
-		return "/WEB-INF/pages/Person/employeeCard.jsp";  // 님의 프로젝트 실제 JSP 경로에 맞춰주세요
-	}
+		return "/WEB-INF/pages/person/employeeCard.jsp";  
+}
 }
 

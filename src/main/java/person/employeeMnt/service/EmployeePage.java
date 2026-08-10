@@ -31,7 +31,7 @@ public class EmployeePage {
 		}
 	}
 
-	// JSP에서 쓰기 위한 Getter들
+
 	public int getTotal() { return total; }
 	public boolean hasNoEmployees() { return total == 0; }
 	public boolean hasEmployees() { return total > 0; }

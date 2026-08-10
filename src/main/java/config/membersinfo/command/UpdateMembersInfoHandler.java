@@ -20,9 +20,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
         if (request.getMethod().equalsIgnoreCase("GET")) {
             return processForm(request, response);
         } else if (request.getMethod().equalsIgnoreCase("POST")) {
-        	System.out.println("=============================");
-        	System.out.println("=============================");
-        	System.out.println("=============================");
+        	
             return processSubmit(request, response);
         } else {
             response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -32,7 +30,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 
     // 수정 폼을 보여줄 때 (GET)
     private String processForm(HttpServletRequest request, HttpServletResponse response) {
-        return "/WEB-INF/page/config/membersInfo.jsp";
+        return "/WEB-INF/page/Config/membersInfo.jsp";
     }
 
     // 저장 버튼을 눌러 제출했을 때 (POST)
@@ -97,7 +95,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
         updateService.update(info);
 
         // 4. 수정 완료 후 리다이렉트 (하드코딩 1001 대신 companyId 변수 사용)
-        response.sendRedirect(request.getContextPath() + "/config/membersInfo.do?id=" + 1001);
+        response.sendRedirect(request.getContextPath() + "/Config/membersInfo.do?id=" + 1001);
         return null;
     }
     

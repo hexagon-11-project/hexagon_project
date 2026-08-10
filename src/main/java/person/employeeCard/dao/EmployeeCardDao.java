@@ -292,4 +292,26 @@ public class EmployeeCardDao {
 		}
 		return list;
 	}
+
+	
+	// 새로 추가된 전체 사원 목록 조회 메서드 (드롭박스용)
+	
+	public List<EmployeeCard> selectAllEmployees(Connection conn) throws SQLException {
+		List<EmployeeCard> list = new ArrayList<>();
+		String sql = "SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYEE_NAME FROM EMPLOYEE ORDER BY EMPLOYEE_NAME ASC";
+		
+		try (PreparedStatement pstmt = conn.prepareStatement(sql);
+			 ResultSet rs = pstmt.executeQuery()) {
+			
+			while (rs.next()) {
+				EmployeeCard card = new EmployeeCard();
+				// JSP의 <option value="${emp.employeeId}"> 에 들어갈 핵심 값 세팅
+				card.setEmployeeId(rs.getInt("EMPLOYEE_ID")); 
+				card.setEmployeeNo(rs.getString("EMPLOYEE_NO"));
+				card.setEmployeeName(rs.getString("EMPLOYEE_NAME"));
+				list.add(card);
+			}
+		}
+		return list;
+	}
 }

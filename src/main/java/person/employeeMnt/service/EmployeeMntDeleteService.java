@@ -23,7 +23,7 @@ public class EmployeeMntDeleteService {
                         int empId = Integer.parseInt(idStr.trim());
                         employeeDao.deleteEmployeeMnt(conn, empId);
                     } catch (NumberFormatException e) {
-                        System.out.println("🚨 숫자 변환 실패 (무시됨) : " + idStr);
+                        
                     }
                 }
                 conn.commit(); 

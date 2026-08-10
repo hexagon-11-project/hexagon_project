@@ -24,7 +24,7 @@ public class EmployeeMntDeleteHandler implements CommandHandler {
             }
             
             // 삭제 완료 후 조회 페이지로 강제 이동 (리다이렉트)
-            res.sendRedirect(req.getContextPath() + "/person/employeeMnt.do");
+            res.sendRedirect(req.getContextPath() + "/Person/employeeMnt.do");
             return null;
             
         } else {
