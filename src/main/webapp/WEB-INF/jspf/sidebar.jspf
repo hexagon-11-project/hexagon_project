@@ -74,7 +74,7 @@
 			href="<%=ctx%>/pages/payroll/employee-pay-history.jsp"><span
 			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/transfer-request.jsp"><span
+			href="<%=ctx%>/Payment/paymenttransfer.do"><span
 			class="nav-icon">□</span><span>급여이체 신청</span></a><a
 			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/payroll/transfer-result.jsp"><span
