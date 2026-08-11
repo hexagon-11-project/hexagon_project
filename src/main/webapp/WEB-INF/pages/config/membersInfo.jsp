@@ -12,7 +12,7 @@ request.setAttribute("pageJs", null);
 
 <!-- ★ 1. action 경로를 데이터를 '조회'하는 read가 아니라 '수정'을 처리할 핸들러 주소로 변경합니다. (예: updateMembersInfo.do) -->
 <form
-	action="${pageContext.request.contextPath}/config/updateMembersInfo.do"
+	action="${pageContext.request.contextPath}/Config/updateMembersInfo.do"
 	method="post">
 
 	<!-- 어떤 회사의 데이터인지 식별하기 위해 companyId를 숨김 필드로 전달 -->
