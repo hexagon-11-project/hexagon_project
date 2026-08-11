@@ -12,6 +12,7 @@ import payment.paymentMnt.dao.PaymentMntDAO;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;        // 추가
 import payment.paymentMnt.dto.PaymentMntDeductionItemDTO;  // 추가
+import payment.paymentMnt.dto.PaymentMntSummaryDTO;        // 추가 (급여 종합정보)
 import payment.paymentMnt.service.PaymentMntService;       // 추가
 
 // 급여 입력 및 관리를 처리하는 커맨드 핸들러 클래스
@@ -72,10 +73,17 @@ public class PaymentMntController implements CommandHandler {
 		List<PaymentMntPayItemDTO> payItemList = payrollService.getPayItemList();
 		List<PaymentMntDeductionItemDTO> deductionItemList = payrollService.getDeductionItemList();
 
+		// ★ [추가된 부분] 4. 하단 [급여 종합정보] 집계 조회
+		// - 선택된 귀속연월(payYearMonth) + 급여차수(paySequence) 기준으로
+		//   PAYROLL_EMPLOYEE 금액을 실시간 집계하므로, 사원 급여를 저장/수정한 뒤
+		//   화면이 다시 로딩될 때마다(=저장 후 location.reload()) 자동으로 최신값이 반영됨
+		PaymentMntSummaryDTO summaryInfo = payrollService.getPayrollSummary(payYearMonth, paySequence);
+
 		// 조회된 사원 목록과 마스터 항목들을 request 객체에 담음
 		request.setAttribute("employeeList", employeeList);
 		request.setAttribute("payItemList", payItemList);
 		request.setAttribute("deductionItemList", deductionItemList);
+		request.setAttribute("summaryInfo", summaryInfo);
 
 		// 이동할 JSP View 페이지의 경로 리턴
 		return "/WEB-INF/pages/payment/paymentMnt.jsp";

@@ -12,6 +12,7 @@ import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;
 import payment.paymentMnt.dto.PaymentMntDeductionItemDTO;
+import payment.paymentMnt.dto.PaymentMntSummaryDTO;
 
 public class PaymentMntDAO {
 
@@ -475,5 +476,49 @@ public class PaymentMntDAO {
             }
         }
     }
-    
+
+ // ★ 하단 [급여 종합정보] 집계 조회
+    // - 월 합계 : 재직중(RESIGN_DATE IS NULL)인 사원 수
+    // - 지급/공제/실지급 총액 : 선택한 귀속연월(payYearMonth) + 급여차수(paySequence)에 등록된
+    //   PAYROLL_EMPLOYEE 전체 사원의 금액을 합산 (사원 급여정보가 저장/수정될 때마다
+    //   PAYROLL_EMPLOYEE.TOTAL_PAY_AMOUNT / TOTAL_DEDUCTION_AMOUNT 가 같이 갱신되므로,
+    //   화면을 다시 조회할 때마다 최신값이 자동 반영됨)
+    public PaymentMntSummaryDTO selectPayrollSummary(Connection conn, String payYearMonth, int paySequence) throws SQLException {
+        PaymentMntSummaryDTO summary = new PaymentMntSummaryDTO();
+
+        // 1. 월 합계 - 재직중인 사원 수 (별도 쿼리로 분리)
+        String countSql = "SELECT COUNT(*) AS TOTAL_COUNT FROM EMPLOYEE WHERE RESIGN_DATE IS NULL";
+        try (PreparedStatement pstmt = conn.prepareStatement(countSql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                summary.setTotalCount(rs.getInt("TOTAL_COUNT"));
+            }
+        }
+
+        // 2. 지급/공제/실지급 총액 - 선택한 귀속연월+급여차수 기준 집계
+        String sql = "SELECT "
+                   + "    NVL(SUM(pe.TOTAL_PAY_AMOUNT), 0) AS TOTAL_GIVE_AMOUNT, "
+                   + "    NVL(SUM(pe.TOTAL_DEDUCTION_AMOUNT), 0) AS TOTAL_DEDU_AMOUNT "
+                   + "FROM PAYROLL_EMPLOYEE pe "
+                   + "JOIN PAYROLL pr ON pe.PAYROLL_ID = pr.PAYROLL_ID "
+                   + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, payYearMonth);
+            pstmt.setInt(2, paySequence);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    long totalGive = rs.getLong("TOTAL_GIVE_AMOUNT");
+                    long totalDedu = rs.getLong("TOTAL_DEDU_AMOUNT");
+
+                    summary.setTotalGiveAmount(totalGive);
+                    summary.setTotalDeduAmount(totalDedu);
+                    summary.setTotalRealAmount(totalGive - totalDedu); // 실지급액 = 지급총액 - 공제총액
+                }
+            }
+        }
+
+        return summary;
+    }
 }

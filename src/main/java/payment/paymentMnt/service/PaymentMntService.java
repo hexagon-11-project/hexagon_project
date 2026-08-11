@@ -13,6 +13,7 @@ import payment.paymentMnt.dto.PaymentMntDeductionItemDTO;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;
+import payment.paymentMnt.dto.PaymentMntSummaryDTO;
 
 public class PaymentMntService {
 
@@ -151,5 +152,18 @@ public class PaymentMntService {
         }
         return count; // 성공하면 3건 등 결과 리턴
     }
+
+	// ★ 하단 [급여 종합정보] 조회 (월 합계 / 지급총액 / 공제총액 / 실지급액)
+	public PaymentMntSummaryDTO getPayrollSummary(String payYearMonth, int paySequence) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return payrollDao.selectPayrollSummary(conn, payYearMonth, paySequence);
+		} catch (SQLException e) {
+			throw new RuntimeException("급여 종합정보 조회 중 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
 
 }
