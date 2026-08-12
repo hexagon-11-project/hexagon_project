@@ -18,11 +18,17 @@ public class PaymentMntDayWorkerEmployeeAddModalHandler implements CommandHandle
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
         String keyword = request.getParameter("empName");
+        String department = request.getParameter("department");
+        String status = request.getParameter("status");
 
-        List<PaymentMntDayWorkerEmployeeDTO> availableEmployeeList = service.getModalEmployeeList(keyword);
+        List<PaymentMntDayWorkerEmployeeDTO> availableEmployeeList = service.getModalEmployeeList(keyword, department, status);
+        List<String> deptList = service.getDepartmentList();
 
         request.setAttribute("availableEmployeeList", availableEmployeeList);
+        request.setAttribute("deptList", deptList);
         request.setAttribute("empName", keyword);
+        request.setAttribute("selectedDept", department);
+        request.setAttribute("selectedStatus", status);
 
         return "/WEB-INF/pages/payment/paymentMntDayWorker_employee_add_modal.jsp";
     }

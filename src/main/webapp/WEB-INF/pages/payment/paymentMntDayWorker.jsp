@@ -20,14 +20,13 @@ body { min-width: 1200px; }
 .dw-table td { border: 1px solid #ddd; padding: 4px; text-align: center; }
 .dw-table input { width: 100%; height: 24px; border: 1px solid #ddd; padding: 2px 4px; text-align: right; box-sizing: border-box; }
 .dw-table input.date-input { text-align: center; }
-.dw-table input.tax-input { background: #fff8de; }
 .dw-table input.readonly-input { background: #f2f2f2; color: #666; cursor: default; }
 .dw-table input.ded-input::-webkit-outer-spin-button,
 .dw-table input.ded-input::-webkit-inner-spin-button,
-.dw-table input.tax-input::-webkit-outer-spin-button,
-.dw-table input.tax-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dw-table input.readonly-input::-webkit-outer-spin-button,
+.dw-table input.readonly-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .dw-table input.ded-input[type=number],
-.dw-table input.tax-input[type=number] { -moz-appearance: textfield; }
+.dw-table input.readonly-input[type=number] { -moz-appearance: textfield; }
 
 .ded-panel-head { display: flex; justify-content: space-between; align-items: center; background: #fcecec; border: 1px solid #f1dada; padding: 5px 10px; font-weight: bold; color: #c0392b; font-size: 12px; }
 .ded-mode-btn { font-size: 11px; padding: 3px 8px; border-radius: 4px; border: none; cursor: pointer; background: #ddd; color: #555; margin-left: 4px; }
@@ -107,9 +106,6 @@ body { min-width: 1200px; }
 		</form>
 
 		<div style="margin-bottom: 10px; display: flex; gap: 5px;">
-			<button type="button" class="btn btn-default" onclick="openLoadPrevModal()" style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px;">
-				<i class="fas fa-file-import"></i> 지난급여 불러오기
-			</button>
 			<button type="button" class="btn btn-primary" onclick="openEmployeeSelectModal()" style="background: #337ab7; color: #fff; border: none; padding: 4px 10px; font-size: 12px;">
 				<i class="fas fa-plus"></i> 신규추가
 			</button>
@@ -183,7 +179,7 @@ body { min-width: 1200px; }
 								<c:forEach var="item" items="${deductionItemList}">
 									<tr>
 										<td style="text-align: left; background: #fafafa;">${item.deductionItemName}</td>
-										<td><input type="number" class="ded-input" data-item-id="${item.deductionItemId}" value="0" oninput="recalcTotals()"></td>
+										<td><input type="number" class="ded-input" data-item-id="${item.deductionItemId}" value="0" oninput="recalcTotals()" onchange="autoSaveDeduction()"></td>
 									</tr>
 								</c:forEach>
 							</tbody>
@@ -211,35 +207,23 @@ body { min-width: 1200px; }
 			<div style="display: flex; gap: 10px;">
 				<div style="flex: 1; background: #95a5a6; color: white; padding: 15px; border-radius: 4px; text-align: center;">
 					<div style="font-size: 12px;">월 합계</div>
-					<div id="sumCount" style="font-size: 20px; font-weight: bold; margin-top: 5px;">0 건</div>
+					<div id="sumCount" style="font-size: 20px; font-weight: bold; margin-top: 5px;">${empty summaryInfo.workerCount ? 0 : summaryInfo.workerCount} 건</div>
 				</div>
 				<div style="flex: 2; background: #5bc0de; color: white; padding: 15px; border-radius: 4px; text-align: center;">
 					<div style="font-size: 12px;">＋ 지급 총액</div>
-					<div id="sumPay" style="font-size: 20px; font-weight: bold; margin-top: 5px;">0 원</div>
+					<div id="sumPay" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.payTotal ? 0 : summaryInfo.payTotal}" pattern="#,###" /> 원</div>
 				</div>
 				<div style="flex: 2; background: #d9534f; color: white; padding: 15px; border-radius: 4px; text-align: center;">
 					<div style="font-size: 12px;">－ 공제 총액</div>
-					<div id="sumDeduction" style="font-size: 20px; font-weight: bold; margin-top: 5px;">0 원</div>
+					<div id="sumDeduction" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.deductionTotal ? 0 : summaryInfo.deductionTotal}" pattern="#,###" /> 원</div>
 				</div>
 				<div style="flex: 2; background: #4e5d6c; color: white; padding: 15px; border-radius: 4px; text-align: center;">
 					<div style="font-size: 12px;">실지급액</div>
-					<div id="sumNet" style="font-size: 20px; font-weight: bold; margin-top: 5px;">0 원</div>
+					<div id="sumNet" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.netPay ? 0 : summaryInfo.netPay}" pattern="#,###" /> 원</div>
 				</div>
 			</div>
 		</div>
 	</main>
-
-	<!-- [지난급여 불러오기] 모달 -->
-	<div id="loadPrevModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-		<div style="background: white; width: 320px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 25px; text-align: center; font-family: 'Malgun Gothic', sans-serif;">
-			<h4 style="margin-top: 0; margin-bottom: 20px; font-weight: bold; text-align: left; font-size: 16px;">급여연월 선택</h4>
-			<select id="prevPayrollSelect" class="form-control" style="width: 100%; margin-bottom: 20px; height: 35px;">
-				<option value="">귀속연월 차수 선택</option>
-			</select>
-			<button type="button" class="btn btn-primary" onclick="executeLoadPrev()" style="width: 100%; background: #337ab7; border: none; padding: 10px; font-weight: bold;">급여정보 불러오기</button>
-			<button type="button" class="btn btn-default" onclick="closeLoadPrevModal()" style="width: 100%; margin-top: 8px; padding: 10px;">취소</button>
-		</div>
-	</div>
 
 	<%@ include file="../../jspf/app-end.jspf"%>
 
@@ -267,7 +251,6 @@ body { min-width: 1200px; }
 	}
 	window.addEventListener("DOMContentLoaded", function () {
 	    updateAutoDates();
-	    loadSummary();
 	});
 
 	function reloadPayrollData() {
@@ -276,23 +259,23 @@ body { min-width: 1200px; }
 
 	// ---------------- 근로자 목록 선택 ----------------
 	function selectEmployeeRow(rowEl, empId) {
-	    if (!confirm("변경된 근무기록 데이터가 있습니다.\n\n변경된 데이터로 수정 하시겠습니까?")) return;
-	    alert("근무기록이 변경됨에 따라 근무기록 확인 후,\n\n저장버튼을 클릭하시어 저장해주세요.");
-
-	    document.querySelectorAll('#employeeTableBody tr').forEach(function (r) { r.style.background = ""; r.style.color = ""; });
-	    rowEl.style.background = "#2f6fa8";
-	    rowEl.style.color = "#fff";
-	    document.getElementById("selectedEmpId").value = empId;
-
 	    fetch(CTX + "/Payment/dayWorkerDetailAjax.do?payrollDayWorkerEmployeeId=" + empId)
 	        .then(function (res) { return res.json(); })
 	        .then(function (data) {
-	            document.getElementById("dailyBody").innerHTML = "";
-	            if (data.dailyList) {
-	                data.dailyList.forEach(function (d) {
-	                    addDailyRow(d.workDate, d.rate, d.payAmt, d.incomeTax, d.localTax);
-	                });
+	            if (!data.dailyList || data.dailyList.length === 0) {
+	                alert("해당 월에는 근무일이 없습니다.");
+	                return;
 	            }
+
+	            document.querySelectorAll('#employeeTableBody tr').forEach(function (r) { r.style.background = ""; r.style.color = ""; });
+	            rowEl.style.background = "#2f6fa8";
+	            rowEl.style.color = "#fff";
+	            document.getElementById("selectedEmpId").value = empId;
+
+	            document.getElementById("dailyBody").innerHTML = "";
+	            data.dailyList.forEach(function (d) {
+	                addDailyRow(d.workDate, d.rate, d.payAmt, d.incomeTax, d.localTax);
+	            });
 
 	            var amounts = data.deductionAmounts || {};
 	            document.querySelectorAll('#dedBody .ded-input').forEach(function (input) {
@@ -314,8 +297,8 @@ body { min-width: 1200px; }
 	        '<td><input type="text" class="date-input f-date readonly-input" value="' + (workDate || '') + '" readonly></td>' +
 	        '<td><input type="number" step="0.1" class="f-rate readonly-input" value="' + (rate != null ? rate : 1.0) + '" readonly></td>' +
 	        '<td><input type="number" class="f-pay readonly-input" value="' + (payAmt || 0) + '" readonly></td>' +
-	        '<td><input type="number" class="tax-input f-income" value="' + (incomeTax || 0) + '"></td>' +
-	        '<td><input type="number" class="tax-input f-local" value="' + (localTax || 0) + '"></td>';
+	        '<td><input type="number" class="f-income readonly-input" value="' + (incomeTax || 0) + '" readonly></td>' +
+	        '<td><input type="number" class="f-local readonly-input" value="' + (localTax || 0) + '" readonly></td>';
 	    document.getElementById("dailyBody").appendChild(tr);
 	}
 
@@ -348,6 +331,8 @@ body { min-width: 1200px; }
 	}
 
 	// 모달(paymentMntDayWorker_employee_add_modal.jsp)에서 호출
+	// 전체 새로고침을 하지 않고 방금 추가한 사원 행만 화면에 붙인다.
+	// (새로고침을 하면 [선택삭제]/[전체삭제]로 화면에서만 지워둔 사원들이 DB 기준으로 다시 나타나 버리기 때문)
 	function addEmployeesToMain(selectedEmpIds) {
 	    if (!selectedEmpIds || selectedEmpIds.length === 0) { alert("선택된 사원이 없습니다."); return; }
 	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
@@ -360,56 +345,64 @@ body { min-width: 1200px; }
 	        method: "POST",
 	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
 	        body: formData.toString()
-	    }).then(function (res) {
-	        if (res.ok) { alert("신규 근로자가 추가되었습니다."); location.reload(); }
-	        else { alert("추가 중 오류가 발생했습니다."); }
-	    }).catch(function () { alert("서버 통신에 실패했습니다."); });
+	    }).then(function (res) { return res.json(); })
+	      .then(function (list) {
+	          if (!list || list.length === 0) { alert("추가된 근로자가 없습니다."); return; }
+
+	          var emptyRow = document.getElementById("emptyRow");
+	          if (emptyRow) emptyRow.remove();
+
+	          list.forEach(function (emp) {
+	              var empId = String(emp.payrollEmployeeId);
+	              if (document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]')) return; // 이미 화면에 있으면 중복 추가 방지
+
+	              var tr = document.createElement("tr");
+	              tr.setAttribute("data-id", empId);
+	              tr.style.cursor = "pointer";
+	              tr.onclick = function () { selectEmployeeRow(tr, empId); };
+	              tr.innerHTML =
+	                  "<td>" + emp.employmentType + "</td>" +
+	                  "<td>" + emp.employeeName + "</td>" +
+	                  "<td>" + emp.department + "</td>" +
+	                  "<td style='text-align:right;'>" + won(emp.netPayAmount) + "</td>";
+	              document.getElementById("employeeTableBody").appendChild(tr);
+	          });
+
+	          alert("신규 근로자가 추가되었습니다.");
+	      })
+	      .catch(function () { alert("서버 통신에 실패했습니다."); });
 	}
 
 	// ---------------- 선택삭제 / 전체삭제 (실제 DB 반영) ----------------
+	// 주의: 이 화면의 [선택삭제]/[전체삭제]는 DB 데이터(PAYROLL_EMPLOYEE/DAILY_WORK_RECORD/PAYROLL_DEDUCTION_DETAIL)를
+	// 절대 지우지 않는다. 오직 이 화면의 사원 목록에서만 안 보이게 할 뿐이며, 페이지를 새로고침하면 다시 보인다.
+	function clearDetailPanel() {
+	    document.getElementById("selectedEmpId").value = "";
+	    document.getElementById("dailyBody").innerHTML = "";
+	    document.querySelectorAll('#dedBody .ded-input').forEach(function (input) { input.value = 0; });
+	    recalcTotals();
+	}
+
 	function deleteSelectedEmployees() {
 	    var empId = document.getElementById("selectedEmpId").value;
 	    if (!empId) { alert("삭제할 근로자를 선택하세요."); return; }
-	    if (!confirm("선택한 근로자를 삭제하시겠습니까? 삭제된 정보는 복구할 수 없습니다.")) return;
+	    if (!confirm("선택한 근로자를 목록에서 삭제하시겠습니까?")) return;
 
-	    var formData = new URLSearchParams();
-	    formData.append("payrollDayWorkerEmployeeIds", empId);
-
-	    fetch(CTX + "/Payment/dayWorkerDeleteSelected.do", {
-	        method: "POST",
-	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-	        body: formData.toString()
-	    }).then(function (res) { return res.text(); })
-	      .then(function (result) {
-	          if (result === "SUCCESS") { alert("삭제되었습니다."); location.reload(); }
-	          else { alert("삭제 중 오류가 발생했습니다."); }
-	      });
+	    var row = document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]');
+	    if (row) row.remove();
+	    clearDetailPanel();
 	}
 
 	function deleteAllEmployees() {
-	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
-	    if (!confirm("■ 주의! 삭제된 급여입력 정보는 복구할 수 없습니다. 전체 삭제하시겠습니까?")) return;
-	    if (!confirm("[전체] 급여입력 정보를 삭제 하시겠습니까?")) return;
+	    if (!confirm("화면의 모든 근로자를 목록에서 삭제하시겠습니까?")) return;
 
-	    var formData = new URLSearchParams();
-	    formData.append("payrollDayWorkerId", payrollDayWorkerId);
-
-	    fetch(CTX + "/Payment/dayWorkerDeleteAll.do", {
-	        method: "POST",
-	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-	        body: formData.toString()
-	    }).then(function (res) { return res.text(); })
-	      .then(function (result) {
-	          if (result === "SUCCESS") { alert("전체 삭제되었습니다."); location.reload(); }
-	          else { alert("삭제 중 오류가 발생했습니다."); }
-	      });
+	    document.getElementById("employeeTableBody").innerHTML =
+	        '<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">등록된 근로자가 없습니다.</td></tr>';
+	    clearDetailPanel();
 	}
 
 	// ---------------- 저장 ----------------
-	function saveDetail() {
-	    var empId = document.getElementById("selectedEmpId").value;
-	    if (!empId) { alert("근로자를 먼저 선택하세요."); return; }
-
+	function buildDetailFormData(empId) {
 	    var formData = new URLSearchParams();
 	    formData.append("payrollDayWorkerEmployeeId", empId);
 
@@ -429,10 +422,17 @@ body { min-width: 1200px; }
 	        formData.append("dedAmount", input.value || "0");
 	    });
 
+	    return formData;
+	}
+
+	function saveDetail() {
+	    var empId = document.getElementById("selectedEmpId").value;
+	    if (!empId) { alert("근로자를 먼저 선택하세요."); return; }
+
 	    fetch(CTX + "/Payment/dayWorkerSave.do", {
 	        method: "POST",
 	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-	        body: formData.toString()
+	        body: buildDetailFormData(empId).toString()
 	    }).then(function (res) { return res.text(); })
 	      .then(function (result) {
 	          if (result === "SUCCESS") { alert("저장되었습니다."); location.reload(); }
@@ -441,79 +441,51 @@ body { min-width: 1200px; }
 	      .catch(function () { alert("서버 통신에 실패했습니다."); });
 	}
 
+	// 공제항목 금액을 바꾸고 다른 곳을 클릭(blur)하면 알림/새로고침 없이 바로 DB에 저장하고,
+	// 좌측 목록의 실지급액과 하단 [급여 종합정보]를 그 자리에서 갱신한다.
+	function autoSaveDeduction() {
+	    var empId = document.getElementById("selectedEmpId").value;
+	    if (!empId) return;
+
+	    fetch(CTX + "/Payment/dayWorkerSave.do", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	        body: buildDetailFormData(empId).toString()
+	    }).then(function (res) { return res.text(); })
+	      .then(function (result) {
+	          if (result !== "SUCCESS") { console.error("자동 저장 실패"); return; }
+	          var row = document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]');
+	          if (row) {
+	              var netCell = row.querySelectorAll('td')[3];
+	              if (netCell) netCell.innerText = document.getElementById("netPayText").innerText;
+	          }
+	          refreshSummary();
+	      })
+	      .catch(function (err) { console.error("자동 저장 통신 실패:", err); });
+	}
+
 	function clearForm() {
-	    document.querySelectorAll('#dailyBody tr').forEach(function (tr) {
-	        tr.querySelector('.f-income').value = 0;
-	        tr.querySelector('.f-local').value = 0;
-	    });
+	    document.querySelectorAll('#employeeTableBody tr').forEach(function (r) { r.style.background = ""; r.style.color = ""; });
+	    document.getElementById("selectedEmpId").value = "";
+	    document.getElementById("dailyBody").innerHTML = "";
 	    document.querySelectorAll('#dedBody .ded-input').forEach(function (input) { input.value = 0; });
 	    recalcTotals();
 	}
 
 	// ---------------- 종합정보 ----------------
-	function loadSummary() {
+	// 서버(DB)에서 이 급여차수의 일용직 사원 전체 합계를 다시 조회해서 하단 4개 박스를 갱신
+	function refreshSummary() {
 	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
 	    if (!payrollDayWorkerId) return;
-	    // 종합정보는 서버에서 JSTL로 최초 렌더링하지 않으므로, 목록 합계를 화면에서 즉시 집계
-	    var payTotal = 0, dedTotal = 0, netTotal = 0, count = 0;
-	    document.querySelectorAll('#employeeTableBody tr[data-id]').forEach(function (tr) {
-	        count++;
-	        var netCell = tr.querySelectorAll('td')[3];
-	        netTotal += Number((netCell ? netCell.innerText.replace(/,/g, '') : 0)) || 0;
-	    });
-	    document.getElementById("sumCount").innerText = count + " 건";
-	    document.getElementById("sumNet").innerText = won(netTotal) + " 원";
-	}
-
-	// ---------------- 지난급여 불러오기 ----------------
-	function openLoadPrevModal() {
-	    var select = document.getElementById("prevPayrollSelect");
-	    select.innerHTML = '<option value="">귀속연월 차수 선택</option>';
-	    var today = new Date();
-	    var year = today.getFullYear(), month = today.getMonth() + 1;
-	    for (var i = 0; i < 12; i++) {
-	        var m = month - i, y = year;
-	        if (m <= 0) { m += 12; y -= 1; }
-	        var mStr = m < 10 ? "0" + m : "" + m;
-	        var val = y + "" + mStr + "-1";
-	        var text = y + "년 " + mStr + "월 01차";
-	        select.options.add(new Option(text, val));
-	    }
-	    document.getElementById('loadPrevModalOverlay').style.display = 'flex';
-	}
-
-	function closeLoadPrevModal() {
-	    document.getElementById('loadPrevModalOverlay').style.display = 'none';
-	}
-
-	function executeLoadPrev() {
-	    var selectedVal = document.getElementById("prevPayrollSelect").value;
-	    if (!selectedVal) { alert("불러올 귀속연월 차수를 선택해주세요."); return; }
-	    if (!confirm("기등록된 급여테이블은 삭제되며,\n\n불러오기 한 급여테이블로 교체됩니다.\n\n불러오기 하시겠습니까?")) return;
-
-	    var currYear = document.getElementById("payYear").value;
-	    var currMonth = document.getElementById("payMonth").value;
-	    var currSeq = document.getElementById("paySequence").value;
-	    var prevYearMonth = selectedVal.split("-")[0];
-	    var prevSeq = selectedVal.split("-")[1];
-
-	    var formData = new URLSearchParams();
-	    formData.append("currYear", currYear);
-	    formData.append("currMonth", currMonth);
-	    formData.append("currSeq", currSeq || "1");
-	    formData.append("prevYearMonth", prevYearMonth);
-	    formData.append("prevSeq", prevSeq);
-
-	    fetch(CTX + "/Payment/dayWorkerLoadPrevAjax.do", {
-	        method: "POST",
-	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-	        body: formData.toString()
-	    }).then(function (res) { return res.json(); })
-	      .then(function (data) {
-	          if (data.status === "SUCCESS") { alert("[불러오기] " + data.count + "건"); location.reload(); }
-	          else { alert("불러오기 중 오류가 발생했습니다."); }
-	      })
-	      .catch(function () { alert("서버 통신에 실패했습니다."); });
+	    fetch(CTX + "/Payment/dayWorkerSummaryAjax.do?payrollDayWorkerId=" + payrollDayWorkerId)
+	        .then(function (res) { return res.json(); })
+	        .then(function (data) {
+	            document.getElementById("sumCount").innerText = (data.workerCount || 0) + " 건";
+	            document.getElementById("sumPay").innerText = won(data.payTotal) + " 원";
+	            document.getElementById("sumDeduction").innerText = won(data.deductionTotal) + " 원";
+	            document.getElementById("sumNet").innerText = won(data.netPay) + " 원";
+	        })
+	        .catch(function (err) { console.error("종합정보 조회 실패:", err); });
 	}
 
 	</script>

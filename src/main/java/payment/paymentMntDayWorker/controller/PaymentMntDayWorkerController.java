@@ -2,6 +2,7 @@ package payment.paymentMntDayWorker.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,9 +45,13 @@ public class PaymentMntDayWorkerController implements CommandHandler {
         // 4. 공제항목 패널을 DB(DEDUCTION_ITEM) 기준으로 동적 렌더링하기 위한 마스터 목록
         List<PaymentMntDayWorkerDeductionItemDTO> deductionItemList = service.getDeductionItemList();
 
+        // 5. 하단 [급여 종합정보] - 이 급여차수의 일용직 사원 전체 합계 (사원 추가/삭제/저장될 때마다 최신값)
+        Map<String, Object> summaryInfo = service.getSummary(payrollDayWorkerId);
+
         request.setAttribute("employeeList", employeeList);
         request.setAttribute("payrollDayWorkerId", payrollDayWorkerId);
         request.setAttribute("deductionItemList", deductionItemList);
+        request.setAttribute("summaryInfo", summaryInfo);
 
         return "/WEB-INF/pages/payment/paymentMntDayWorker.jsp";
     }

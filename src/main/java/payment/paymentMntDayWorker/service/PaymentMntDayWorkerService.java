@@ -66,11 +66,11 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    public List<PaymentMntDayWorkerEmployeeDTO> getModalEmployeeList(String keyword) {
+    public List<PaymentMntDayWorkerEmployeeDTO> getModalEmployeeList(String keyword, String department, String status) {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
-            return dao.getModalEmployeeList(conn, keyword);
+            return dao.getModalEmployeeList(conn, keyword, department, status);
         } catch (Exception e) {
             throw new RuntimeException("근로자 검색 중 오류 발생", e);
         } finally {
@@ -78,13 +78,28 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    public void insertEmployees(Long payrollDayWorkerId, List<String> empIds) {
+    public List<String> getDepartmentList() {
+        Connection conn = null;
+        try {
+            conn = ConnectionProvider.getConnection();
+            return dao.getDepartmentList(conn);
+        } catch (Exception e) {
+            throw new RuntimeException("부서 목록 조회 중 오류 발생", e);
+        } finally {
+            JdbcUtil.close(conn);
+        }
+    }
+
+    /** 신규추가 후, 방금 등록한 사원들의 화면 표시용 정보를 반환 (전체 새로고침 없이 해당 행만 추가하기 위함) */
+    public List<PaymentMntDayWorkerEmployeeDTO> insertEmployees(Long payrollDayWorkerId, List<String> empIds) {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
             conn.setAutoCommit(false);
             dao.insertDayWorkerEmployees(conn, payrollDayWorkerId, empIds);
+            List<PaymentMntDayWorkerEmployeeDTO> inserted = dao.getPayrollDayWorkerEmployeesByEmployeeIds(conn, payrollDayWorkerId, empIds);
             conn.commit();
+            return inserted;
         } catch (Exception e) {
             JdbcUtil.rollback(conn);
             throw new RuntimeException("근로자 신규추가 중 오류 발생", e);
@@ -176,27 +191,6 @@ public class PaymentMntDayWorkerService {
         } catch (Exception e) {
             JdbcUtil.rollback(conn);
             throw new RuntimeException("급여상세 저장 중 오류 발생", e);
-        } finally {
-            JdbcUtil.close(conn);
-        }
-    }
-
-    /** 지난급여 불러오기: 현재 차수 데이터 삭제 후 이전 차수 데이터 복사 */
-    public int loadPreviousPayrollData(String prevYearMonth, int prevSeq, String currYearMonth, int currSeq) {
-        Connection conn = null;
-        try {
-            conn = ConnectionProvider.getConnection();
-            conn.setAutoCommit(false);
-
-            Long currId = dao.ensurePayrollDayWorkerExists(conn, currYearMonth, currSeq);
-            dao.deleteAllDayWorkerEmployees(conn, currId);
-            int count = dao.copyPreviousEmployees(conn, prevYearMonth, prevSeq, currId);
-
-            conn.commit();
-            return count;
-        } catch (Exception e) {
-            JdbcUtil.rollback(conn);
-            throw new RuntimeException("지난급여 불러오기 중 오류 발생", e);
         } finally {
             JdbcUtil.close(conn);
         }
