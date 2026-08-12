@@ -8,11 +8,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
 import config.employee.model.Employee;
-import person.certificatePrintWorking.service.CertificatePrintWorkingService;
+import person.certificatePrintWorking.service.CertificatePrintWorkingReadService;
 
-public class certificatePrintWorkingReadHandler implements CommandHandler {
+public class CertificatePrintWorkingReadHandler implements CommandHandler {
 
-	private CertificatePrintWorkingService certService = new CertificatePrintWorkingService();
+	private CertificatePrintWorkingReadService certService = new CertificatePrintWorkingReadService();
 
     @Override
     public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -50,7 +50,7 @@ public class certificatePrintWorkingReadHandler implements CommandHandler {
         req.setAttribute("selectedCertType", certType);
         req.setAttribute("today", LocalDate.now().toString());
 
-        // 4. 리턴할 JSP 뷰 경로 (경로는 프로젝트 설정에 맞게 조금 수정해서 쓰시면 됩니다)
+        // 4. 리턴할 JSP 뷰 경로 
         return "/WEB-INF/pages/person/certificatePrintWorking.jsp";
     }
 }

@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
 
-public class certificatePrintWorkingHandler implements CommandHandler {
+public class CertificatePrintWorkingHandler implements CommandHandler {
 
 
 	@Override

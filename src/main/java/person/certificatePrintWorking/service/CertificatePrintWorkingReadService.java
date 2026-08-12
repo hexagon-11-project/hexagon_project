@@ -10,7 +10,7 @@ import config.employee.model.Employee;
 import connection.ConnectionProvider;
 import person.certificatePrintWorking.Dao.CertificatePrintWorkingDao;
 
-public class CertificatePrintWorkingService {
+public class CertificatePrintWorkingReadService {
 	private CertificatePrintWorkingDao certDao = new CertificatePrintWorkingDao();
 
     // 1. 사원 목록 조회
