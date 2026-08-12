@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!-- ★ JSTL 사용을 위한 태그 라이브러리 추가 -->
+<!--  JSTL 사용을 위한 태그 라이브러리 추가 -->
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 request.setAttribute("pageTitle", "제 증명서 발급");
@@ -12,7 +12,7 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<!-- ★ 퇴직증명서 예외 처리 알림창 (JS 없이 HTML로 화면에 노출) -->
+<!--  퇴직증명서 예외 처리 알림창 (JS 없이 HTML로 화면에 노출) -->
 <c:if test="${not empty alertMessage}">
 	<div
 		style="color: #d9534f; background-color: #f2dede; border: 1px solid #ebccd1; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-weight: bold;">
@@ -36,11 +36,11 @@ request.setAttribute("pageJs", null);
 						<th>부서</th>
 						<th>직위</th>
 						<th>상태</th>
-						<!-- ★ 상태 컬럼 추가 -->
+						<!--  상태 컬럼 추가 -->
 					</tr>
 				</thead>
 				<tbody>
-					<!-- ★ 서버에서 넘겨받은 사원 리스트 반복 출력 -->
+					<!--  서버에서 넘겨받은 사원 리스트 반복 출력 -->
 					<c:forEach var="emp" items="${empList}">
 						<!-- 선택된 사원의 행(tr) 배경색을 살짝 다르게 표시 (선택사항) -->
 						<tr
@@ -48,7 +48,7 @@ request.setAttribute("pageJs", null);
 							<!-- <td><input type="checkbox"...></td> 삭제됨 -->
 							<td>${emp.employmentType}</td>
 							<td>${emp.employeeNo}</td>s
-							<!-- ★ a태그의 href 경로를 반드시 본인의 프로젝트 환경에 맞게 수정해야 합니다! -->
+							<!--  a태그의 href 경로를 반드시 본인의 프로젝트 환경에 맞게 수정해야 합니다! -->
 							<td><a
 								href="${pageContext.request.contextPath}/Person/certificatePrintWorking.do?employeeNo=${emp.employeeNo}&certType=${selectedCertType}"
 								style="color: #0056b3; text-decoration: underline; font-weight: bold;">
@@ -85,11 +85,11 @@ request.setAttribute("pageJs", null);
 				style="text-decoration: none;">퇴직증명서</a>
 		</div>
 
-		<!-- ★ 여기서부터 <form> 태그 시작! (Handler와 연결되는 주소 입력) -->
+		<!--  여기서부터 <form> 태그 시작! (Handler와 연결되는 주소 입력) -->
 		<!-- action 주소는 Handler가 매핑된 URL로 맞춰주세요. -->
 		<form action="${pageContext.request.contextPath}/Person/certificatePrintWorkingInsert.do" method="POST">
 
-			<!-- ★ 서버로 몰래 넘겨야 하는 필수 데이터 (hidden) -->
+			<!--  서버로 몰래 넘겨야 하는 필수 데이터 (hidden) -->
 			<!-- Handler에서 req.getParameter("employeeNo") 로 받기 위한 이름표(name) -->
 			<input type="hidden" name="employeeNo" value="${selectedEmpNo}">
 			<input type="hidden" name="certificateTypeCode"
@@ -140,7 +140,7 @@ request.setAttribute("pageJs", null);
 							<td>${workPeriod}</td>
 						</tr>
 
-						<!-- ★ 변경된 부분: name="purpose" 속성 추가 -->
+						<!--  변경된 부분: name="purpose" 속성 추가 -->
 						<tr>
 							<th>발급용도</th>
 							<td colspan="4"><select class="select" name="purpose"
@@ -152,7 +152,7 @@ request.setAttribute("pageJs", null);
 							</select></td>
 						</tr>
 
-						<!-- ★ 추가된 부분: Handler에서 요구하는 '제출처(submissionTarget)' 입력란 -->
+						<!--  추가된 부분: Handler에서 요구하는 '제출처(submissionTarget)' 입력란 -->
 						<tr>
 							<th>제출처</th>
 							<td colspan="4"><input type="text" class="input"
@@ -188,12 +188,12 @@ request.setAttribute("pageJs", null);
 			</div>
 
 			<div class="source-bottom-actions">
-				<!-- ★ 버튼 타입 변경: 단순 인쇄(button)에서 폼 데이터 전송(submit)으로 바꿈 -->
+				<!--  버튼 타입 변경: 단순 인쇄(button)에서 폼 데이터 전송(submit)으로 바꿈 -->
 				<button type="submit" class="btn btn-primary">저장하기</button>
 				<!-- 인쇄는 저장 후 완료 화면에서 진행하거나 JS로 따로 빼는 것이 좋습니다 -->
 			</div>
 		</form>
-		<!-- ★ form 태그 닫기 -->
+		<!--  form 태그 닫기 -->
 	</section>
 </div>
 

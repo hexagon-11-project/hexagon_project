@@ -7,7 +7,7 @@ import config.membersinfo.dao.CompanyInfoDao;
 import config.model.CompanyInfo;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
-import person.certificatePrintWorking.Dao.CertificatePrintWorkingDao;
+import person.certificatePrintWorking.dao.CertificatePrintWorkingDao;
 import person.model.CertificatePrintWorkingModel;
 
 public class CertificatePrintWorkingInsertService {

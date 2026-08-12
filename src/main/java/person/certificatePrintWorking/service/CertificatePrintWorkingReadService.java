@@ -8,7 +8,7 @@ import java.util.List;
 
 import config.employee.model.Employee;
 import connection.ConnectionProvider;
-import person.certificatePrintWorking.Dao.CertificatePrintWorkingDao;
+import person.certificatePrintWorking.dao.CertificatePrintWorkingDao;
 
 public class CertificatePrintWorkingReadService {
 	private CertificatePrintWorkingDao certDao = new CertificatePrintWorkingDao();

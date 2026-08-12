@@ -14,7 +14,7 @@ public class EmployeeMntDeleteHandler implements CommandHandler {
     @Override
     public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
         
-        // 🚦 오직 POST 요청(폼 전송)일 때만 삭제 처리!
+        // 오직 POST 요청(폼 전송)일 때만 삭제 처리!
         if (req.getMethod().equalsIgnoreCase("POST")) {
             
             String[] empIds = req.getParameterValues("empId");

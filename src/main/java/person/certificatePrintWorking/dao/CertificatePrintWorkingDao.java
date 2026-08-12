@@ -1,4 +1,4 @@
-package person.certificatePrintWorking.Dao;
+package person.certificatePrintWorking.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -87,7 +87,7 @@ public class CertificatePrintWorkingDao {
 	        String sql = "INSERT INTO CERTIFICATE_ISSUE ( "
 	                   + "    CERTIFICATE_ISSUE_ID, COMPANY_ID, EMPLOYEE_ID, CERTIFICATE_TYPE_CODE, "
 	                   + "    ISSUE_YEAR, ISSUE_SEQUENCE, ISSUE_NO, ISSUE_DATE, PURPOSE, "
-	                   + "    SUBMISSION_TARGET, REG_ID, MOD_ID, CREATED_AT, UPDATED_AT, CERTIFICATE_YN "
+	                   + "    SUBMISSION_TARGET, REGID, MODID, CREATED_AT, UPDATED_AT  "
 	                   + ") "
 	                   + "SELECT "
 	                   + "    CERTIFICATE_ISSUE_SEQ.NEXTVAL, " // 1. 발급 고유아이디 (시퀀스)
@@ -96,7 +96,7 @@ public class CertificatePrintWorkingDao {
 	                   + "    E.EMPLOYEE_ID, "                 // 3. 사원 고유아이디 (EMPLOYEE에서 꺼냄)
 	                   + "    ?, "                             // 4. [Model] 증명서종류코드
 	                   + "    TO_CHAR(SYSDATE, 'YYYY'), "      // 5. 발급연도 (현재 연도)
-	                   // ★ 이 부분이 핵심 수정 사항입니다. (하드코딩 1 ➔ 자동 증가 서브쿼리)
+	                   // 이 부분이 핵심 수정 사항입니다. (하드코딩 1 ➔ 자동 증가 서브쿼리)
            + "    (SELECT NVL(MAX(ISSUE_SEQUENCE), 0) + 1 FROM CERTIFICATE_ISSUE WHERE ISSUE_YEAR = TO_CHAR(SYSDATE, 'YYYY')), "
 	                   + "    ?, "                             // 7. [Model] 발급번호
 	                   + "    SYSDATE, "                       // 8. 발급일 (오늘)
@@ -106,7 +106,6 @@ public class CertificatePrintWorkingDao {
 	                   + "    ?, "                      // 12. 수정자 
 	                   + "    SYSDATE, "                       // 13. 생성일시 (오늘)
 	                   + "    SYSDATE, "                       // 14. 수정일시 (오늘)
-	                   + "    ? "                              // 15. [Model] 상태확인 (Y/N)
 	                   + "FROM EMPLOYEE E "
 	                   + "WHERE E.EMPLOYEE_NO = ?";            // [Model] 사원번호를 조건으로 조회 (동명이인 방지)
 
@@ -117,10 +116,10 @@ public class CertificatePrintWorkingDao {
 	        pstmt.setString(2, model.getIssueNo());             
 	        pstmt.setString(3, model.getPurpose());             
 	        pstmt.setString(4, model.getSubmissionTarget());    
-	        pstmt.setString(5, model.getReg_Id());               // ★ 5번 자리에 등록자(김민수) 추가
-	        pstmt.setString(6, model.getReg_Id());               // ★ 6번 자리에 수정자(김민수) 추가
-	        pstmt.setString(7, model.getCertificateYn());       // ★ 기존 5번이 7번으로 밀려남
-	        pstmt.setString(8, model.getEmployeeNo());          // ★ 기존 6번이 8번으로 밀려남
+	        pstmt.setString(5, model.getRegId());               //  5번 자리에 등록자(김민수) 추가
+	        pstmt.setString(6, model.getRegId());               // 6번 자리에 수정자(김민수) 추가
+	       
+	        pstmt.setString(7, model.getEmployeeNo());          //  기존 6번이 8번으로 밀려남
 	        result = pstmt.executeUpdate();
 	        
 	    } finally {

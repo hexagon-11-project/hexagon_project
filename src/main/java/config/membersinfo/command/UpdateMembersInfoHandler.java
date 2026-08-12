@@ -12,7 +12,7 @@ import config.model.CompanyInfo;
 
 public class UpdateMembersInfoHandler implements CommandHandler {
 
-    // ★ 서비스 객체 이름을 작성하신 클래스명과 똑같이 맞춤
+    // 서비스 객체 이름을 작성하신 클래스명과 똑같이 맞춤
     private UpdateMembersInfoService updateService = new UpdateMembersInfoService();
 
     @Override
