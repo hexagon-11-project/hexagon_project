@@ -247,22 +247,28 @@ public class PaymentMntDAO {
                    + "      WHERE p.payroll_id = ? AND p.employee_id = e.employee_id"
                    + "  )";
 
-     // 2. PAYROLL_PAY_DETAIL 테이블에 기본급 등록 (중복 방지 조건 추가)
-     // 2. PAYROLL_PAY_DETAIL 테이블에 기본급 등록
+     // 2. PAYROLL_PAY_DETAIL 테이블에 지급항목 등록 (고용형태에 따라 분기)
+     //    - DAILY(일용직) : '일용급여' 항목에 등록
+     //    - 그 외(REGULAR/CONTRACT 등) : '기본급'(2801) 항목에 등록
         String insertPayDetailSql = "INSERT INTO PAYROLL_PAY_DETAIL ("
                    + "    payroll_pay_detail_id, payroll_employee_id, pay_item_id, amount, reg_id, mod_id"
                    + ") "
                    + "SELECT "
                    + "    (SELECT NVL(MAX(payroll_pay_detail_id), 0) FROM PAYROLL_PAY_DETAIL) + 1, "
                    + "    p.payroll_employee_id, "
-                   + "    2801, " // ★ 기본급 아이디를 1에서 2801로 수정!
+                   + "    CASE WHEN e.employment_type = 'DAILY' "
+                   + "         THEN (SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여') "
+                   + "         ELSE 2801 END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급(2801)
                    + "    e.base_wage_amount, "
                    + "    'admin', 'admin' "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
                    + "WHERE p.payroll_id = ? AND p.employee_id = ? "
                    + "  AND NOT EXISTS (" 
                    + "      SELECT 1 FROM PAYROLL_PAY_DETAIL d "
-                   + "      WHERE d.payroll_employee_id = p.payroll_employee_id AND d.pay_item_id = 2801" // ★ 여기도 2801로 수정!
+                   + "      WHERE d.payroll_employee_id = p.payroll_employee_id "
+                   + "        AND d.pay_item_id = CASE WHEN e.employment_type = 'DAILY' "
+                   + "             THEN (SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여') "
+                   + "             ELSE 2801 END"
                    + "  )";
 
         try (PreparedStatement pstmtEmp = conn.prepareStatement(insertEmpSql);
@@ -476,6 +482,23 @@ public class PaymentMntDAO {
             }
         }
     }
+    
+ // ★ 귀속연월 + 급여차수에 해당하는 정확한 PAYROLL_ID 조회
+    // (신규 사원 추가 시, 화면에서 JS가 엉뚱한 payrollId를 보내는 버그 방지용)
+    public Long selectPayrollId(Connection conn, String payYearMonth, int paySequence) throws SQLException {
+        String sql = "SELECT PAYROLL_ID FROM PAYROLL WHERE PAY_YEAR_MONTH = ? AND PAY_SEQUENCE = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, payYearMonth);
+            pstmt.setInt(2, paySequence);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong("PAYROLL_ID");
+                }
+            }
+        }
+        return null;
+    }
+    
 
  // ★ 하단 [급여 종합정보] 집계 조회
     // - 월 합계 : 재직중(RESIGN_DATE IS NULL)인 사원 수

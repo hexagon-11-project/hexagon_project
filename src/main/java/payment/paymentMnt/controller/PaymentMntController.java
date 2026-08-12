@@ -53,8 +53,14 @@ public class PaymentMntController implements CommandHandler {
 		List<PaymentMntEmployeeDTO> employeeList = null; 
 
 		// DB 연결 및 데이터 조회 수행
+		Long payrollId = null; // ★ 추가 : 현재 귀속연월+차수의 정확한 PAYROLL_ID
 		try (Connection conn = ConnectionProvider.getConnection()) {
-			
+
+			// ★ 추가 : 해당 연월+차수의 PAYROLL이 없으면 먼저 생성해두고, 정확한 PAYROLL_ID를 가져온다
+			//   (신규 사원 추가 시 화면에서 이 값을 그대로 서버에 보내야 엉뚱한 회차에 등록되는 버그가 안 생김)
+			dao.ensurePayrollExists(conn, payYearMonth, paySequence);
+			payrollId = dao.selectPayrollId(conn, payYearMonth, paySequence);
+
 			// 1. 먼저 선택된 귀속연월과 차수에 이미 저장된 급여 데이터가 있는지 확인합니다.
 			if (payYearMonth != null && !payYearMonth.isEmpty()) {
 				employeeList = dao.getPayrollEmployeeList(conn, payYearMonth, paySequence);
@@ -84,6 +90,7 @@ public class PaymentMntController implements CommandHandler {
 		request.setAttribute("payItemList", payItemList);
 		request.setAttribute("deductionItemList", deductionItemList);
 		request.setAttribute("summaryInfo", summaryInfo);
+		request.setAttribute("payrollId", payrollId); // ★ 추가 : 화면 hidden input에 심어서 JS가 정확히 읽도록 함
 
 		// 이동할 JSP View 페이지의 경로 리턴
 		return "/WEB-INF/pages/payment/paymentMnt.jsp";
