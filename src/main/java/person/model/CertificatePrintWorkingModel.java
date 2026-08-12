@@ -62,12 +62,12 @@ public class CertificatePrintWorkingModel {
         this.certificateYn = certificateYn;
     }
 
-	public String getReg_Id() {
+	public String getRegId() {
 		return regId;
 	}
 
-	public void setReg_Id(String reg_Id) {
-		this.regId = reg_Id;
+	public void setRegId(String regId) {
+		this.regId = regId;
 	}
     
     

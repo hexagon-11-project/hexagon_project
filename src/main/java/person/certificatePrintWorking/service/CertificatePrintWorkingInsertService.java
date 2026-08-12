@@ -30,9 +30,9 @@ public class CertificatePrintWorkingInsertService {
             
             // 담당자 이름이 정상적으로 조회되었다면, Model의 발급자(RegId)로 세팅합니다.
             if (companyInfo != null && companyInfo.getManagerName() != null) {
-                model.setReg_Id(companyInfo.getManagerName()); // '김민수'가 쏙 들어갑니다!
+                model.setRegId(companyInfo.getManagerName()); // '김민수'가 쏙 들어갑니다!
             } else {
-                model.setReg_Id("시스템"); // 혹시 데이터가 없을 때를 대비한 기본값
+                model.setRegId("시스템"); // 혹시 데이터가 없을 때를 대비한 기본값
             }
             // ==========================================================
             

@@ -87,7 +87,7 @@ public class CertificatePrintWorkingDao {
 	        String sql = "INSERT INTO CERTIFICATE_ISSUE ( "
 	                   + "    CERTIFICATE_ISSUE_ID, COMPANY_ID, EMPLOYEE_ID, CERTIFICATE_TYPE_CODE, "
 	                   + "    ISSUE_YEAR, ISSUE_SEQUENCE, ISSUE_NO, ISSUE_DATE, PURPOSE, "
-	                   + "    SUBMISSION_TARGET, REGID, MODID, CREATED_AT, UPDATED_AT  "
+	                   + "    SUBMISSION_TARGET, REG_ID, MOD_ID, CREATED_AT, UPDATED_AT  "
 	                   + ") "
 	                   + "SELECT "
 	                   + "    CERTIFICATE_ISSUE_SEQ.NEXTVAL, " // 1. 발급 고유아이디 (시퀀스)
@@ -105,7 +105,7 @@ public class CertificatePrintWorkingDao {
 	                   + "    ?, "                      // 11. 등록자 
 	                   + "    ?, "                      // 12. 수정자 
 	                   + "    SYSDATE, "                       // 13. 생성일시 (오늘)
-	                   + "    SYSDATE, "                       // 14. 수정일시 (오늘)
+	                   + "    SYSDATE "                       // 14. 수정일시 (오늘)
 	                   + "FROM EMPLOYEE E "
 	                   + "WHERE E.EMPLOYEE_NO = ?";            // [Model] 사원번호를 조건으로 조회 (동명이인 방지)
 
