@@ -77,7 +77,7 @@
 			href="<%=ctx%>/Payment/paymenttransfer.do"><span
 			class="nav-icon">□</span><span>급여이체 신청</span></a><a
 			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/transfer-result.jsp"><span
+			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
 			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
 			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/payroll/item-ledger.jsp"><span
