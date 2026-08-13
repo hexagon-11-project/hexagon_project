@@ -53,4 +53,32 @@ public class CertificateRegisterDao {
 			JdbcUtil.close(pstmt);
 		}
 	}
+	
+	public int updateCertificateStatusToN(Connection conn, String[] issueNos) throws SQLException {
+        PreparedStatement pstmt = null;
+        int resultCount = 0;
+        
+        try {
+            // 상태를 'N'으로 변경하는 쿼리
+            String sql = "UPDATE certificate_issue SET certificate_yn = 'N' WHERE issue_no = ?";
+            pstmt = conn.prepareStatement(sql);
+            
+            // 배열로 넘어온 발급번호를 하나씩 꺼내서 즉시 업데이트 실행
+            for (String issueNo : issueNos) {
+                pstmt.setString(1, issueNo);
+                
+                // 오라클 버그를 피하기 위해 즉시 실행(executeUpdate) 사용
+                int result = pstmt.executeUpdate();
+                
+                // 정상적으로 1건이 업데이트 되었다면 카운트 증가
+                if (result > 0) {
+                    resultCount++;
+                }
+            }
+            
+            return resultCount;
+        } finally {
+            JdbcUtil.close(pstmt);
+        }
+    }
 }
