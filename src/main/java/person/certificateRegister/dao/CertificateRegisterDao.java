@@ -12,12 +12,14 @@ import person.model.CertificatePrintWorkingModel;
 
 public class CertificateRegisterDao {
 
-	public List<CertificatePrintWorkingModel> getAllCertificateList(Connection conn) throws SQLException {
+	// 파라미터 4개 추가
+	public List<CertificatePrintWorkingModel> getAllCertificateList(Connection conn, String startDate, String endDate, String certType, String empName) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		List<CertificatePrintWorkingModel> list = new ArrayList<>();
 
 		try {
+			//  기본 날짜 조건 포함
 			String sql = "SELECT certificate_issue.issue_no, "
 					   + "       TO_CHAR(certificate_issue.issue_date, 'yyyy-mm-dd') AS issue_date, "
 					   + "       employee.employee_name, "
@@ -27,9 +29,36 @@ public class CertificateRegisterDao {
 					   + "       certificate_issue.certificate_yn "
 					   + "FROM certificate_issue "
 					   + "JOIN employee ON certificate_issue.employee_id = employee.employee_id "
-					   + "ORDER BY certificate_issue.issue_date DESC, certificate_issue.issue_no DESC";
+					   + "WHERE TO_CHAR(certificate_issue.issue_date, 'yyyy-mm-dd') BETWEEN ? AND ? ";
+
+			// 증명서별 선택 검색 조건 추가
+			if (certType != null && !certType.equals("전체")) {
+				sql += "AND certificate_issue.certificate_type_code = ? ";
+			}
+			
+			// 사원명 검색 조건 추가
+			if (empName != null && !empName.trim().isEmpty()) {
+				sql += "AND employee.employee_name LIKE ? ";
+			}
+			
+			// 정렬 조건 추가
+			sql += "ORDER BY certificate_issue.issue_date DESC, certificate_issue.issue_no DESC";
 
 			pstmt = conn.prepareStatement(sql);
+			
+			// 파라미터 세팅
+			int paramIndex = 1;
+			pstmt.setString(paramIndex++, startDate);
+			pstmt.setString(paramIndex++, endDate);
+			
+			if (certType != null && !certType.equals("전체")) {
+				pstmt.setString(paramIndex++, certType);
+			}
+			
+			if (empName != null && !empName.trim().isEmpty()) {
+				pstmt.setString(paramIndex++, "%" + empName.trim() + "%");
+			}
+
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {

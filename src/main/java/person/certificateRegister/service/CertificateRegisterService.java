@@ -14,7 +14,7 @@ public class CertificateRegisterService {
 	private CertificateRegisterDao certificateRegisterDao = new CertificateRegisterDao();
 
 	// 핸들러에서 호출하는 메서드 (파라미터 없음)
-	public List<CertificatePrintWorkingModel> getCertificateList() {
+	public List<CertificatePrintWorkingModel> getCertificateList(String startDate, String endDate, String certType, String empName) {
 		Connection conn = null;
 		
 		try {
@@ -22,7 +22,7 @@ public class CertificateRegisterService {
 			conn = ConnectionProvider.getConnection();
 			
 			// 2. DAO에 Connection을 넘겨서 쿼리 실행 결과 받아오기
-			return certificateRegisterDao.getAllCertificateList(conn);
+			return certificateRegisterDao.getAllCertificateList(conn, startDate, endDate, certType, empName);
 			
 		} catch (SQLException e) {
 			// 예외 발생 시 Handler에서 처리할 수 있도록 RuntimeException으로 던짐

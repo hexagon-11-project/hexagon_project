@@ -11,30 +11,39 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<section class="filter-bar">
-	<div class="field ">
-		<label>발급기간</label>
-		<div class="range">
-			<input type="date" name="startDate" class="input"
-				value="${startDate}"> <span>~</span> <input type="date"
-				name="endDate" class="input" value="${endDate}">
+<!-- 검색 조건을 서버로 보내기 위해 폼(form)으로 감싸기 -->
+<form action="${pageContext.request.contextPath}/Person/certificateRegister.do" method="GET">
+	<section class="filter-bar">
+		<div class="field ">
+			<label>발급기간</label>
+			<div class="range">
+				<input type="date" name="startDate" class="input" value="${startDate}"> 
+				<span>~</span> 
+				<input type="date" name="endDate" class="input" value="${endDate}">
+			</div>
 		</div>
-	</div>
-	<div class="field ">
-		<label>증명서</label><select class="select"><option value="전체"
-				selected>전체</option>
-			<option value="재직증명서">재직증명서</option>
-			<option value="경력증명서">경력증명서</option>
-			<option value="퇴직증명서">퇴직증명서</option></select>
-	</div>
-	<div class="field ">
-		<label>사원명</label><input type="text" class="input">
-	</div>
-	<div class="actions">
-		<button type="button" class="btn btn-primary">조회</button>
-		<button type="button" class="btn ">인쇄</button>
-	</div>
-</section>
+		<div class="field ">
+			<label>증명서</label>
+			<!--  name="certType" 부여 및 선택된 값 유지 로직 -->
+			<select class="select" name="certType">
+				<option value="전체" ${certType == '전체' ? 'selected' : ''}>전체</option>
+				<option value="재직증명서" ${certType == '재직증명서' ? 'selected' : ''}>재직증명서</option>
+				<option value="경력증명서" ${certType == '경력증명서' ? 'selected' : ''}>경력증명서</option>
+				<option value="퇴직증명서" ${certType == '퇴직증명서' ? 'selected' : ''}>퇴직증명서</option>
+			</select>
+		</div>
+		<div class="field ">
+			<!-- name="empName" 부여 및 검색어 유지 -->
+			<label>사원명</label>
+			<input type="text" name="empName" class="input" value="${empName}">
+		</div>
+		<div class="actions">
+			<!--  검색 버튼이 작동하도록 type="submit"으로 변경 -->
+			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="button" class="btn ">인쇄</button>
+		</div>
+	</section>
+</form>
 
 <section class="card ">
 	<div class="card-header">
@@ -43,10 +52,11 @@ request.setAttribute("pageJs", null);
 	<div class="card-body">
 		
 		<!-- 선택 삭제 기능을 위해 테이블 전체를 감싸는 폼 태그 -->
-		<!-- action 속성의 경로는 본인의 매핑 주소에 맞게 수정하세요 -->
+		
 		<form action="${pageContext.request.contextPath}/Person/certificateRegisterUpdate.do" method="POST" onsubmit="return confirm('선택한 증명서를 정말 취소 처리하시겠습니까?');">
 			<div class="table-toolbar">
-				<span class="table-count">총 3건</span>
+				
+				<span class="table-count">총 ${certList.size()}건</span>
 				<div class="actions">
 					<!-- 자바스크립트 없이 폼 데이터를 넘기기 위해 type을 submit으로 변경 -->
 					<button type="submit" class="btn btn-danger">선택 삭제</button>
@@ -96,7 +106,7 @@ request.setAttribute("pageJs", null);
 					</tbody>
 				</table>
 			</div>
-		</form> <!-- 폼 닫기 -->
+		</form> 
 		
 	</div>
 </section>
