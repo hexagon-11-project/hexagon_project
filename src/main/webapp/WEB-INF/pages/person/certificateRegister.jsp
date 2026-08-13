@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 request.setAttribute("pageTitle", "제 증명서 발급 대장");
 request.setAttribute("pageSection", "인사관리");
@@ -13,8 +14,9 @@ request.setAttribute("pageJs", null);
 	<div class="field ">
 		<label>발급기간</label>
 		<div class="range">
-			<input type="date" class="input" value="2026-07-01"><span>~</span><input
-				type="date" class="input" value="2026-08-04">
+			<input type="date" name="startDate" class="input"
+				value="${startDate}"> <span>~</span> <input type="date"
+				name="endDate" class="input" value="${endDate}">
 		</div>
 	</div>
 	<div class="field ">
@@ -59,40 +61,21 @@ request.setAttribute("pageJs", null);
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td><input type="checkbox"></td>
-						<td>2026-0003</td>
-						<td>2026-08-03</td>
-						<td>김민준</td>
-						<td>재직증명서</td>
-						<td>은행 제출</td>
-						<td>송지수</td>
-						<td>발급</td>
-					</tr>
-					<tr>
-						<td><input type="checkbox"></td>
-						<td>2026-0002</td>
-						<td>2026-07-28</td>
-						<td>박서연</td>
-						<td>경력증명서</td>
-						<td>관공서 제출</td>
-						<td>송지수</td>
-						<td>발급</td>
-					</tr>
-					<tr>
-						<td><input type="checkbox"></td>
-						<td>2026-0001</td>
-						<td>2026-07-15</td>
-						<td>이도윤</td>
-						<td>재직증명서</td>
-						<td>회사 제출</td>
-						<td>송지수</td>
-						<td>취소</td>
-					</tr>
+					<c:forEach var="cert" items="${certList}">
+						<tr>
+							<td><input type="checkbox"></td>
+							<td>${cert.issueNo}</td>
+							<td>${cert.issueDate}</td>
+							<td>${cert.employeeName}</td>
+							<td>${cert.certificateTypeCode}</td>
+							<td>${cert.purpose}</td>
+							<td>${cert.regId}</td>
+							<td>${cert.certificateYn}</td>
+						</tr>
+					</c:forEach>
 				</tbody>
 			</table>
 		</div>
 	</div>
 </section>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
-s

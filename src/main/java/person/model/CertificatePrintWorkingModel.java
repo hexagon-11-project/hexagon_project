@@ -7,9 +7,10 @@ public class CertificatePrintWorkingModel {
     private String issueNo;             // 발급번호
     private String purpose;             // 용도 (DB의 PURPOSE)
     private String submissionTarget;    // 제출처 (선택사항, 화면에 제출처가 있다면 사용)
-    private String certificateYn = "Y"; // 상태 (기본값 'Y')
+    private String certificateYn ; // 상태 (기본값 'Y')
     private String regId;              // 담당자 
-
+    private String employeeName;
+    private String issueDate;
     // 기본 생성자
     public CertificatePrintWorkingModel() {}
 
@@ -68,6 +69,22 @@ public class CertificatePrintWorkingModel {
 
 	public void setRegId(String regId) {
 		this.regId = regId;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
+
+	public String getIssueDate() {
+		return issueDate;
+	}
+
+	public void setIssueDate(String issueDate) {
+		this.issueDate = issueDate;
 	}
     
     
