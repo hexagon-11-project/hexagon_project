@@ -10,6 +10,7 @@ import jdbc.JdbcUtil;
 import payment.paymentMnt.dao.PaymentMntDAO;
 import payment.paymentMnt.dto.PaymentMntDeductionDetailDTO;
 import payment.paymentMnt.dto.PaymentMntDeductionItemDTO;
+import payment.paymentMnt.dto.PaymentMntEffectiveDetail;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;
@@ -55,7 +56,22 @@ public class PaymentMntService {
 		}
 	}
 
-	public void insertEmployees(Long payrollId, List<String> empIds) {
+	/** 사원별급여(payrollEmployeeId) 하나의 "최종" 지급/공제 상세 (저장된 값 + 기본급/일용급여/공제 기본값 보정 반영).
+	 *  좌측 사원목록 총액과 우측 상세패널이 항상 같은 숫자가 나오도록, 목록/상세 양쪽에서 이 메서드만 사용한다. */
+	public PaymentMntEffectiveDetail getEffectiveDetail(Long payrollEmployeeId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return payrollDao.computeEffectiveDetail(conn, payrollEmployeeId);
+		} catch (SQLException e) {
+			throw new RuntimeException("급여 상세 조회 중 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/** 신규추가 후, 방금 등록한 사원들의 화면 표시용 정보를 반환 (전체 새로고침 없이 해당 행만 추가하기 위함) */
+	public List<PaymentMntEmployeeDTO> insertEmployees(Long payrollId, List<String> empIds) {
 		Connection conn = null;
 		try {
 			conn = ConnectionProvider.getConnection();
@@ -63,11 +79,14 @@ public class PaymentMntService {
 
 			PaymentMntDAO dao = new PaymentMntDAO();
 
+			List<PaymentMntEmployeeDTO> inserted = null;
 			if (empIds != null && !empIds.isEmpty()) {
 				dao.insertPayrollEmployees(conn, payrollId, empIds);
+				inserted = dao.selectEmployeesByEmployeeIds(conn, payrollId, empIds);
 			}
 
 			conn.commit();
+			return inserted;
 		} catch (Exception e) {
 			JdbcUtil.rollback(conn);
 			throw new RuntimeException(e);

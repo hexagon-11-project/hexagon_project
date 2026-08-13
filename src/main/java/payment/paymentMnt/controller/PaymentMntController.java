@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import connection.ConnectionProvider;
 import payment.paymentMnt.dao.PaymentMntDAO;
+import payment.paymentMnt.dto.PaymentMntEffectiveDetail;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;        // 추가
 import payment.paymentMnt.dto.PaymentMntDeductionItemDTO;  // 추가
@@ -65,12 +66,25 @@ public class PaymentMntController implements CommandHandler {
 			if (payYearMonth != null && !payYearMonth.isEmpty()) {
 				employeeList = dao.getPayrollEmployeeList(conn, payYearMonth, paySequence);
 			}
-			
-			// 2. 만약 저장된 데이터가 없거나 처음 화면에 들어왔다면 전체 사원 목록 띄우기
+
+			// 2. 저장된 급여 데이터가 있으면, 목록의 지급총액/공제총액/실지급액을 우측 상세패널과 동일한 로직
+			//    (기본급/일용급여/공제 기본값 보정)으로 다시 계산해서 덮어쓴다.
+			//    (PAYROLL_EMPLOYEE에 저장된 값이 상세내역과 어긋나 있어도 좌측 목록과 우측 패널이 항상 일치하도록)
+			if (employeeList != null) {
+				for (PaymentMntEmployeeDTO emp : employeeList) {
+					PaymentMntEffectiveDetail effective = dao.computeEffectiveDetail(conn, emp.getPayrollEmployeeId());
+					emp.setTotalPayAmount(effective.getTotalPayAmount());
+					emp.setTotalDeductionAmount(effective.getTotalDeductionAmount());
+					emp.setNetPayAmount(effective.getNetPayAmount());
+				}
+			}
+
+			// 3. 만약 저장된 데이터가 없거나 처음 화면에 들어왔다면 전체 사원 목록 띄우기
+			//    (아직 급여차수에 등록되지 않은 사원 목록이라 payrollEmployeeId가 없으므로 위 보정 대상이 아님)
 			if (employeeList == null || employeeList.isEmpty()) {
 				employeeList = dao.getModalEmployeeList(conn, null);
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

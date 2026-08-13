@@ -163,6 +163,19 @@ public class PaymentMntDayWorkerService {
         }
     }
 
+    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null) */
+    public Long getDeductionItemIdByName(String deductionItemName) {
+        Connection conn = null;
+        try {
+            conn = ConnectionProvider.getConnection();
+            return dao.selectDeductionItemIdByName(conn, deductionItemName);
+        } catch (Exception e) {
+            throw new RuntimeException("공제항목 조회 중 오류 발생", e);
+        } finally {
+            JdbcUtil.close(conn);
+        }
+    }
+
     /** 저장: 일자별 내역 + 공제항목을 한번에 저장, 합계도 갱신 */
     public void saveDetail(Long payrollDayWorkerEmployeeId, List<PaymentMntDayWorkerDailyVO> dailyList,
                             PaymentMntDayWorkerDeductionVO deduction) {

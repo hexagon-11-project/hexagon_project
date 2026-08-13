@@ -13,6 +13,7 @@ import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 
 public class EmployeeAddModalHandler implements CommandHandler {
 
+    // 필터(부서/직위/상태) 및 검색어 조건에 맞는 사원 목록을 페이징 조회하여 모달에 표시
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
         

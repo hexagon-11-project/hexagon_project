@@ -91,8 +91,8 @@
         function validateSearch() {
             var keyword = document.getElementById("empNameInput").value.trim();
             if (event.submitter && event.submitter.className === 'btn-search') {
-                if (keyword.length > 0 && keyword.length < 2) {
-                    alert("검색어를 확인해주세요.\n\n검색어는 최소 2자 이상이어야 합니다.");
+                if (keyword.length < 2) {
+                    alert("검색어를 확인해 주세요.");
                     return false;
                 }
             }

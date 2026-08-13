@@ -280,7 +280,7 @@ body {
 					</thead>
 					<tbody id="employeeTableBody">
 						<c:forEach var="emp" items="${employeeList}">
-							<tr onclick="selectEmployeeRow(this, '${emp.payrollEmployeeId}')"
+							<tr data-id="${emp.payrollEmployeeId}" onclick="selectEmployeeRow(this, '${emp.payrollEmployeeId}')"
 								style="cursor: pointer;">
 								<td
 									style="border: 1px solid #ddd; padding: 6px; text-align: center;">${emp.employmentType}</td>
@@ -300,7 +300,7 @@ body {
 							</tr>
 						</c:forEach>
 						<c:if test="${empty employeeList}">
-							<tr>
+							<tr id="emptyRow">
 								<td colspan="6"
 									style="border: 1px solid #ddd; padding: 25px; text-align: center; color: #666;">등록된
 									사원 데이터가 없습니다.</td>
@@ -926,6 +926,8 @@ body {
         console.log("전송할 employeeIds:", selectedIds.join(","));
 
         // 4. AJAX(fetch) 전송
+        // 전체 새로고침(location.reload)을 하지 않고 방금 추가된 사원 행만 화면에 붙인다.
+        // (새로고침을 하면 [선택삭제]/[전체삭제]로 화면에서만 지워둔 사원들이 DB 기준으로 다시 나타나 버리기 때문)
         fetch(url, {
             method: "POST",
             headers: {
@@ -934,16 +936,43 @@ body {
             body: formData.toString()
         })
         .then(response => {
-            if (response.ok) { 
-                alert("신규 사원이 성공적으로 추가되었습니다.");
-                location.reload(); 
-            } else {
-                alert("추가 중 문제가 발생했습니다. (서버 응답 코드: " + response.status + ")");
+            if (!response.ok) {
+                throw new Error("서버 응답 코드: " + response.status);
             }
+            return response.json();
+        })
+        .then(list => {
+            if (!list || list.length === 0) {
+                alert("추가된 사원이 없습니다.");
+                return;
+            }
+
+            var emptyRow = document.getElementById("emptyRow");
+            if (emptyRow) emptyRow.remove();
+
+            list.forEach(function (emp) {
+                var empId = String(emp.payrollEmployeeId);
+                if (document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]')) return; // 이미 화면에 있으면 중복 추가 방지
+
+                var tr = document.createElement("tr");
+                tr.setAttribute("data-id", empId);
+                tr.style.cursor = "pointer";
+                tr.onclick = function () { selectEmployeeRow(tr, empId); };
+                tr.innerHTML =
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: center;">' + emp.employmentType + '</td>' +
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: center;">' + emp.employeeName + '</td>' +
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: center;">' + emp.department + '</td>' +
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: right; color: #337ab7; font-weight: bold;">' + Number(emp.totalPayAmount || 0).toLocaleString('ko-KR') + '</td>' +
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: right; color: #d9534f; font-weight: bold;">' + Number(emp.totalDeductionAmount || 0).toLocaleString('ko-KR') + '</td>' +
+                    '<td style="border: 1px solid #ddd; padding: 6px; text-align: right;">' + Number(emp.netPayAmount || 0).toLocaleString('ko-KR') + '</td>';
+                document.getElementById("employeeTableBody").appendChild(tr);
+            });
+
+            alert("신규 사원이 성공적으로 추가되었습니다.");
         })
         .catch(error => {
             console.error("통신 에러:", error);
-            alert("서버 통신에 실패했습니다.");
+            alert("추가 중 문제가 발생했습니다. (" + error.message + ")");
         });
     }
 </script>

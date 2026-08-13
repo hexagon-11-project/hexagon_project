@@ -363,6 +363,21 @@ public class PaymentMntDayWorkerDAO {
         return vo;
     }
 
+    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null) */
+    public Long selectDeductionItemIdByName(Connection conn, String deductionItemName) throws SQLException {
+        String sql = "SELECT DEDUCTION_ITEM_ID FROM DEDUCTION_ITEM WHERE DEDUCTION_ITEM_NAME = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, deductionItemName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    long id = rs.getLong(1);
+                    return rs.wasNull() ? null : id;
+                }
+            }
+        }
+        return null;
+    }
+
     private void deleteDeductionByEmployee(Connection conn, Long payrollEmployeeId) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(
                 "DELETE FROM PAYROLL_DEDUCTION_DETAIL WHERE PAYROLL_EMPLOYEE_ID = ?")) {
