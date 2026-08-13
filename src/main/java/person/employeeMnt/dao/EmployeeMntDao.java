@@ -30,6 +30,7 @@ public class EmployeeMntDao {
 				
 				// 2. Setter를 이용해 값을 하나씩 세팅
 				emp.setEmployeeId(rs.getInt("employee_id"));
+				emp.setEmployeeNo(rs.getString("employee_no"));
 				emp.setEmploymentType(rs.getString("employment_type"));
 				emp.setEmployeeName(rs.getString("employee_name"));
 				emp.setDepartment(rs.getString("department"));
@@ -63,6 +64,7 @@ public class EmployeeMntDao {
 				Employee emp = new Employee();
 				
 				emp.setEmployeeId(rs.getInt("employee_id"));
+				emp.setEmployeeNo(rs.getString("employee_no"));
 				emp.setEmploymentType(rs.getString("employment_type"));
 				emp.setEmployeeName(rs.getString("employee_name"));
 				emp.setDepartment(rs.getString("department"));
@@ -134,6 +136,7 @@ public class EmployeeMntDao {
 					Employee emp = new Employee();
 					emp.setEmployeeId(rs.getInt("employee_id"));
 					emp.setEmploymentType(rs.getString("employment_type"));
+					emp.setEmployeeNo(rs.getString("employee_no"));
 					emp.setEmployeeName(rs.getString("employee_name"));
 					emp.setDepartment(rs.getString("department"));
 					emp.setPosition(rs.getString("position"));
