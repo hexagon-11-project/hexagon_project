@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import config.model.EmployeeLeave;
+import config.model.EmployeeLeaveStatus;
 import jdbc.JdbcUtil;
 
 public class EmployeeLeaveDao {
@@ -52,6 +53,76 @@ public class EmployeeLeaveDao {
 					item.setEmployeeLeaveId(employeeLeaveId);
 				}
 				item.setGrantedDays(rs.getBigDecimal("GRANTED_DAYS"));
+
+				result.add(item);
+			}
+
+			return result;
+
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
+	// 근태기록 화면의 [휴가일수 현황] 버튼용 - 없으면 null (아직 부여 안 됨)
+	public java.math.BigDecimal selectGrantedDays(Connection conn, int employeeId, int leaveTypeId)
+			throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			pstmt = conn.prepareStatement(
+					"SELECT GRANTED_DAYS FROM EMPLOYEE_LEAVE WHERE EMPLOYEE_ID = ? AND LEAVE_TYPE_ID = ?");
+			pstmt.setInt(1, employeeId);
+			pstmt.setInt(2, leaveTypeId);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return rs.getBigDecimal("GRANTED_DAYS");
+			}
+
+			return null;
+
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
+	// [휴가일수 현황] 팝업용 - 이 사원이 부여받은 휴가항목별로 전체(부여일수)와
+	// 사용(그 휴가항목에 연결된 근태기록 DAY_COUNT 합계)을 같이 조회
+	public List<EmployeeLeaveStatus> selectStatusByEmployeeId(Connection conn, int employeeId)
+			throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			pstmt = conn.prepareStatement("SELECT e.EMPLOYMENT_TYPE, e.EMPLOYEE_NAME, e.POSITION, lt.LEAVE_NAME, "
+					+ "el.GRANTED_DAYS, "
+					+ "NVL((SELECT SUM(ar.DAY_COUNT) FROM ATTENDANCE_RECORD ar "
+					+ "JOIN ATTENDANCE_TYPE at ON at.ATTENDANCE_TYPE_ID = ar.ATTENDANCE_TYPE_ID "
+					+ "WHERE ar.EMPLOYEE_ID = el.EMPLOYEE_ID AND at.LEAVE_TYPE_ID = el.LEAVE_TYPE_ID), 0) AS USED_DAYS "
+					+ "FROM EMPLOYEE_LEAVE el " + "JOIN EMPLOYEE e ON e.EMPLOYEE_ID = el.EMPLOYEE_ID "
+					+ "JOIN LEAVE_TYPE lt ON lt.LEAVE_TYPE_ID = el.LEAVE_TYPE_ID " + "WHERE el.EMPLOYEE_ID = ? "
+					+ "ORDER BY lt.DISPLAY_ORDER, lt.LEAVE_TYPE_ID");
+			pstmt.setInt(1, employeeId);
+			rs = pstmt.executeQuery();
+
+			List<EmployeeLeaveStatus> result = new ArrayList<>();
+
+			while (rs.next()) {
+
+				EmployeeLeaveStatus item = new EmployeeLeaveStatus();
+
+				item.setEmploymentType(rs.getString("EMPLOYMENT_TYPE"));
+				item.setEmployeeName(rs.getString("EMPLOYEE_NAME"));
+				item.setPosition(rs.getString("POSITION"));
+				item.setLeaveName(rs.getString("LEAVE_NAME"));
+				item.setTotalDays(rs.getBigDecimal("GRANTED_DAYS"));
+				item.setUsedDays(rs.getBigDecimal("USED_DAYS"));
 
 				result.add(item);
 			}
