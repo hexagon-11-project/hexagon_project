@@ -67,7 +67,7 @@ public class CertificateRegisterDao {
             for (String issueNo : issueNos) {
                 pstmt.setString(1, issueNo);
                 
-                // 오라클 버그를 피하기 위해 즉시 실행(executeUpdate) 사용
+                
                 int result = pstmt.executeUpdate();
                 
                 // 정상적으로 1건이 업데이트 되었다면 카운트 증가
