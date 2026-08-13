@@ -3,7 +3,7 @@
 request.setAttribute("pageTitle", "연도별 전체급여 통계");
 request.setAttribute("pageSection", "급여통계");
 request.setAttribute("pageDescription", "최근 10년 회사 전체 급여총액과 급여인원 추이를 연도별로 확인합니다.");
-request.setAttribute("activeKey", "annual-total");
+request.setAttribute("activeKey", "paymentstatisticsall");
 request.setAttribute("pageCss", "statistics.css");
 request.setAttribute("pageJs", "charts.js");
 %>

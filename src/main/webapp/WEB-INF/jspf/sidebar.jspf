@@ -95,8 +95,8 @@
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
 			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
-			class="nav-item <%="annual-total".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/annual-total.jsp"><span
+			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
 			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
 			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-total.jsp"><span
