@@ -99,7 +99,7 @@
 			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
 			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
 			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/monthly-total.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatisticsAllMonth.do"><span
 			class="nav-icon">□</span><span>월별 전체급여 통계</span></a><a
 			class="nav-item <%="item-composition".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/item-composition.jsp"><span
