@@ -189,7 +189,13 @@ public class PayItem {
 
 	public String getTaxableLabel() {
 
-		return "N".equalsIgnoreCase(taxableYn) ? "비과세" : "전체과세";
+		if (!"N".equalsIgnoreCase(taxableYn)) {
+			return "전체과세";
+		}
+		if (nonTaxCategory == null || nonTaxCategory.isBlank()) {
+			return "비과세";
+		}
+		return "비과세_" + nonTaxCategory;
 
 	}
 
