@@ -60,7 +60,7 @@ public class EmployeeMntService {
             throw new RuntimeException("카운트 조회 에러", e);
         }
     }
-    private int size = 30; // ⭐️ 한 페이지에 보여줄 개수 (30개 고정)
+    private int size = 30; //  한 페이지에 보여줄 개수 (30개 고정)
 
 	public EmployeePage getEmployeePage(int pageNum) {
 		try (Connection conn = connection.ConnectionProvider.getConnection()) {

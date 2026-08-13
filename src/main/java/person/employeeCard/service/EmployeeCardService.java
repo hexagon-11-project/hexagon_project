@@ -13,7 +13,7 @@ public class EmployeeCardService {
 	private EmployeeCardDao employeeCardDao = new EmployeeCardDao();
 
 	/**
-	 * 사원번호(employeeId)를 받아 인사기록카드 데이터를 반환합니다.
+	 사원번호(employeeId)를 받아 인사기록카드 데이터를 반환합니다.
 	 */
 	public EmployeeCard getEmployeeCard(int employeeId) {
 		Connection conn = null;

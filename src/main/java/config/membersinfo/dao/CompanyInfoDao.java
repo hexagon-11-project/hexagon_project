@@ -36,7 +36,7 @@ public class CompanyInfoDao {
 
 			CompanyInfo info = null;
 			if (rs.next()) {
-				System.out.println("데이터 조회 성공! 회사명: " + rs.getString("company_name"));
+				
 				info = new CompanyInfo(rs.getInt("company_id"), rs.getString("company_name"),
 						rs.getString("business_no"), rs.getString("ceo_title"), rs.getString("ceo_name"),
 						rs.getString("corp_no"), rs.getDate("est_date"), rs.getString("web_site"),
