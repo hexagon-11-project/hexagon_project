@@ -38,7 +38,7 @@ public class EmployeeMntReadHandler implements CommandHandler {
             
         } catch (Exception e) {
             // DB 조회 중 에러 발생 시 처리
-            System.out.println("🚨 [Handler 에러 발생!] " + e.getMessage());
+            System.out.println(" [Handler 에러 발생!] " + e.getMessage());
             e.printStackTrace();
             req.getServletContext().log("사원 목록 조회 실패", e);
             res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
