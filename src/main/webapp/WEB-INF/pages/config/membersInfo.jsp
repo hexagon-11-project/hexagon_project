@@ -10,7 +10,7 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<!-- ★ 1. action 경로를 데이터를 '조회'하는 read가 아니라 '수정'을 처리할 핸들러 주소로 변경합니다. (예: updateMembersInfo.do) -->
+<!-- 1. action 경로를 데이터를 '조회'하는 read가 아니라 '수정'을 처리할 핸들러 주소로 변경합니다. (예: updateMembersInfo.do) -->
 <form
 	action="${pageContext.request.contextPath}/Config/updateMembersInfo.do"
 	method="post">
@@ -235,7 +235,7 @@ request.setAttribute("pageJs", null);
 				<div class="source-section-title">담당자정보</div>
 				<table class="source-form-table">
 					<tbody>
-						<!-- ★ 2. 담당자 정보(조인해온 데이터)를 value 속성에 연결하고 name을 명확히 지정합니다. -->
+						<!--  2. 담당자 정보(조인해온 데이터)를 value 속성에 연결하고 name을 명확히 지정합니다. -->
 						<tr>
 							<th>성명</th>
 							<td class="span-3"><input type="text" class="input"

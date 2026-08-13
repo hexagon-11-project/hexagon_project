@@ -92,11 +92,12 @@ body {
 <c:set var="selectedMonth" value="${not empty param.payMonth ? param.payMonth : formattedPrevMonth}" />
 
 		<form id="searchForm"
-			action="${pageContext.request.contextPath}/Payment/paymentMnt.do"
-			method="GET">
-			<input type="hidden" name="incomeType" id="incomeTypeParam"
-				value="${not empty param.incomeType ? param.incomeType : 'GENERAL'}">
-
+		action="${pageContext.request.contextPath}/Payment/paymentMnt.do"
+		method="GET">
+		<input type="hidden" name="incomeType" id="incomeTypeParam"
+			value="${not empty param.incomeType ? param.incomeType : 'GENERAL'}">
+		<!-- ★ 추가 : 현재 귀속연월+차수의 정확한 PAYROLL_ID (신규 사원 추가 시 JS가 이 값을 사용) -->
+		<input type="hidden" name="payrollId" id="payrollId" value="${payrollId}">
 			<div
 				style="background: #d9534f; padding: 10px 15px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; color: white; margin-bottom: 15px; font-size: 13px;">
 				<!-- 왼쪽 그룹 -->
@@ -797,35 +798,7 @@ body {
 	        window.open(popupUrl, "EmpSelectModal", "width=700,height=600,left=200,top=100,scrollbars=yes");
 	    }
 
-	    function addEmployeesToMain(selectedEmpIds) {
-	        console.log("선택된 사원 ID 목록:", selectedEmpIds);
-
-	        if (!selectedEmpIds || selectedEmpIds.length === 0) {
-	            alert("선택된 사원이 없습니다.");
-	            return;
-	        }
-
-	        var payrollId = "${payroll.payrollId}"; 
-
-	        // AJAX를 통해 선택된 사원 ID들만 서버로 전송
-	        var xhr = new XMLHttpRequest();
-	        xhr.open("POST", "${pageContext.request.contextPath}/Payment/employeeInsert.do", true);
-	        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	        
-	        xhr.onreadystatechange = function() {
-	            if (xhr.readyState === 4) {
-	                if (xhr.status === 200) {
-	                    alert("선택된 사원이 목록에 추가되었습니다.");
-	                    location.reload(); // 새로고침하여 추가된 사원만 화면에 반영
-	                } else {
-	                    alert("사원 추가 중 오류가 발생했습니다.");
-	                }
-	            }
-	        };
-
-	        var data = "payrollId=" + encodeURIComponent(payrollId) + "&employeeIds=" + encodeURIComponent(selectedEmpIds.join(","));
-	        xhr.send(data);
-	    }
+	   
 		
 	    function openTipModal() {
 	        document.getElementById('tipModalOverlay').style.display = 'flex';
