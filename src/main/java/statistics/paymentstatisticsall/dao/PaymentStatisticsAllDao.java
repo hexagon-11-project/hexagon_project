@@ -15,6 +15,9 @@ import statistics.model.AnnualTotalStatistics;
 /**
  * 연도별 전체급여 통계 Dao.
  * PAYROLL / PAYROLL_EMPLOYEE를 연도 단위로 집계한다.
+ *
+ * PAY_YEAR_MONTH 컬럼이 CHAR(6) 이므로 연도 비교는
+ * 'YYYY01' ~ 'YYYY12' 범위로 처리한다.
  */
 public class PaymentStatisticsAllDao {
 
@@ -24,11 +27,6 @@ public class PaymentStatisticsAllDao {
 	 * 선택 연도 기준으로 과거 10년간의 연도별 전체급여 통계를 조회한다.
 	 * 예: endYear=2026 → 2017~2026
 	 * 증가율 계산을 위해 직전 연도(fromYear - 1) 데이터도 함께 조회한다.
-	 *
-	 * @param conn      DB 연결
-	 * @param companyId 회사 아이디
-	 * @param endYear   선택 연도(구간의 마지막 연도)
-	 * @return 과거 10년 목록 (오름차순, 데이터 없는 연도는 0으로 채움)
 	 */
 	public List<AnnualTotalStatistics> selectAnnualTotalByEndYear(Connection conn, int companyId, int endYear)
 			throws SQLException {
@@ -39,32 +37,33 @@ public class PaymentStatisticsAllDao {
 		int queryFromYear = fromYear - 1;
 
 		try {
+			// CHAR(6) PAY_YEAR_MONTH 대비: 연월 문자열 범위로 필터
 			String sql = "SELECT PAY_YEAR, "
 					+ "NVL(SUM(MONTH_SALARY), 0) AS TOTAL_SALARY_AMOUNT, "
 					+ "NVL(AVG(EMP_CNT), 0) AS AVG_EMPLOYEE_COUNT "
 					+ "FROM ( "
-					+ "  SELECT SUBSTR(p.PAY_YEAR_MONTH, 1, 4) AS PAY_YEAR, "
+					+ "  SELECT TO_NUMBER(SUBSTR(p.PAY_YEAR_MONTH, 1, 4)) AS PAY_YEAR, "
 					+ "         p.PAY_YEAR_MONTH, "
 					+ "         COUNT(DISTINCT pe.EMPLOYEE_ID) AS EMP_CNT, "
 					+ "         NVL(SUM(pe.TOTAL_PAY_AMOUNT), 0) AS MONTH_SALARY "
 					+ "  FROM PAYROLL p "
 					+ "  JOIN PAYROLL_EMPLOYEE pe ON pe.PAYROLL_ID = p.PAYROLL_ID "
 					+ "  WHERE p.COMPANY_ID = ? "
-					+ "    AND SUBSTR(p.PAY_YEAR_MONTH, 1, 4) BETWEEN ? AND ? "
-					+ "  GROUP BY SUBSTR(p.PAY_YEAR_MONTH, 1, 4), p.PAY_YEAR_MONTH "
+					+ "    AND p.PAY_YEAR_MONTH BETWEEN ? AND ? "
+					+ "  GROUP BY TO_NUMBER(SUBSTR(p.PAY_YEAR_MONTH, 1, 4)), p.PAY_YEAR_MONTH "
 					+ ") "
 					+ "GROUP BY PAY_YEAR "
 					+ "ORDER BY PAY_YEAR";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, companyId);
-			pstmt.setString(2, String.valueOf(queryFromYear));
-			pstmt.setString(3, String.valueOf(endYear));
+			pstmt.setString(2, queryFromYear + "01");
+			pstmt.setString(3, endYear + "12");
 			rs = pstmt.executeQuery();
 
 			Map<Integer, AnnualTotalStatistics> yearMap = new HashMap<>();
 			while (rs.next()) {
-				int year = Integer.parseInt(rs.getString("PAY_YEAR"));
+				int year = rs.getInt("PAY_YEAR");
 				AnnualTotalStatistics row = new AnnualTotalStatistics();
 				row.setYear(year);
 				row.setTotalSalaryAmount(rs.getLong("TOTAL_SALARY_AMOUNT"));
