@@ -28,6 +28,27 @@ public class PaymentMntDayWorkerDetailAjaxHandler implements CommandHandler {
         List<PaymentMntDayWorkerDailyVO> dailyList = service.getDailyList(payrollDayWorkerEmployeeId);
         PaymentMntDayWorkerDeductionVO deduction = service.getDeduction(payrollDayWorkerEmployeeId);
 
+        // 공제항목(PAYROLL_DEDUCTION_DETAIL)이 이 급여차수엔 아직 저장 안 돼 있으면, 좌측 일자별 지급내역에 이미
+        // 계산되어 있는 소득세/지방소득세 합계를 공제항목의 '소득세'/'지방소득세'에 기본값으로 채워서 보여준다.
+        // (하단 [급여 종합정보]의 공제총액은 이 일자별 합계 기준이라, 공제항목 패널이 0으로만 보이면 서로 안 맞아 보임)
+        if ((deduction == null || deduction.getAmounts().isEmpty()) && dailyList != null && !dailyList.isEmpty()) {
+            long sumIncomeTax = 0, sumLocalTax = 0;
+            for (PaymentMntDayWorkerDailyVO d : dailyList) {
+                sumIncomeTax += (d.getIncomeTax() == null ? 0L : d.getIncomeTax());
+                sumLocalTax += (d.getLocalTax() == null ? 0L : d.getLocalTax());
+            }
+            Long incomeTaxItemId = service.getDeductionItemIdByName("소득세");
+            Long localTaxItemId = service.getDeductionItemIdByName("지방소득세");
+            if (incomeTaxItemId != null || localTaxItemId != null) {
+                if (deduction == null) {
+                    deduction = new PaymentMntDayWorkerDeductionVO();
+                    deduction.setPayrollDayWorkerEmployeeId(payrollDayWorkerEmployeeId);
+                }
+                if (incomeTaxItemId != null) deduction.putAmount(incomeTaxItemId.intValue(), sumIncomeTax);
+                if (localTaxItemId != null) deduction.putAmount(localTaxItemId.intValue(), sumLocalTax);
+            }
+        }
+
         StringBuilder json = new StringBuilder();
         json.append("{");
 

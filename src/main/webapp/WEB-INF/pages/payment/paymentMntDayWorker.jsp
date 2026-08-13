@@ -29,7 +29,7 @@ body { min-width: 1200px; }
 .dw-table input.readonly-input[type=number] { -moz-appearance: textfield; }
 
 .ded-panel-head { display: flex; justify-content: space-between; align-items: center; background: #fcecec; border: 1px solid #f1dada; padding: 5px 10px; font-weight: bold; color: #c0392b; font-size: 12px; }
-.ded-mode-btn { font-size: 11px; padding: 3px 8px; border-radius: 4px; border: none; cursor: pointer; background: #ddd; color: #555; margin-left: 4px; }
+.ded-mode-btn { font-size: 11px; padding: 3px 8px; border-radius: 4px; border: none; cursor: pointer; background: #1b2733; color: #fff; margin-left: 4px; }
 .ded-mode-btn.active { background: #1b2733; color: #fff; }
 </style>
 </head>

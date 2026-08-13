@@ -7,6 +7,7 @@ import java.util.List;
 
 import config.dnLItemSet.dao.EmployeeLeaveDao;
 import config.model.EmployeeLeave;
+import config.model.EmployeeLeaveStatus;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
@@ -21,6 +22,21 @@ public class EmployeeLeaveManageService {
 		try {
 			conn = ConnectionProvider.getConnection();
 			return employeeLeaveDao.selectByLeaveTypeId(conn, leaveTypeId, companyId);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	// [휴가일수 현황] 팝업용 - 근태기록/관리 화면에서 사원을 선택했을 때 호출
+	public List<EmployeeLeaveStatus> getStatusByEmployeeId(int employeeId) {
+
+		Connection conn = null;
+
+		try {
+			conn = ConnectionProvider.getConnection();
+			return employeeLeaveDao.selectStatusByEmployeeId(conn, employeeId);
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
