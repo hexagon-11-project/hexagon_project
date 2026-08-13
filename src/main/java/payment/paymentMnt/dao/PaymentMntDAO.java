@@ -4,10 +4,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import payment.paymentMnt.dto.PaymentMntDailyWorkSummary;
 import payment.paymentMnt.dto.PaymentMntDeductionDetailDTO;
+import payment.paymentMnt.dto.PaymentMntEffectiveDetail;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.dto.PaymentMntPayDetailDTO;
 import payment.paymentMnt.dto.PaymentMntPayItemDTO;
@@ -18,12 +23,17 @@ public class PaymentMntDAO {
 
     public List<PaymentMntEmployeeDTO> getPayrollEmployeeList(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
+        // 일용직/DAILY 사원은 이 급여차수에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 목록에 노출.
+        // (selectEmployeeList/selectPayrollSummary와 동일한 조건 - 0원짜리 빈 사원을 보여줄 필요가 없다는 요구사항)
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, e.employee_name, e.employment_type, e.department,"
                    + "p.total_pay_amount, p.total_deduction_amount, p.net_pay_amount "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
                    + "JOIN PAYROLL pr ON p.payroll_id = pr.payroll_id "
-                   + "WHERE pr.pay_year_month = ? AND pr.pay_sequence = ? ORDER BY e.employee_name";
-        
+                   + "WHERE pr.pay_year_month = ? AND pr.pay_sequence = ? "
+                   + "  AND (e.employment_type NOT IN ('일용직','DAILY') "
+                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.payroll_employee_id = p.payroll_employee_id)) "
+                   + "ORDER BY e.employee_name";
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, payYearMonth);
             pstmt.setInt(2, paySequence);
@@ -50,12 +60,17 @@ public class PaymentMntDAO {
 
     public List<PaymentMntEmployeeDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
+        // 일용직/DAILY 사원은 이 급여차수(payrollId)에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 목록에 노출.
+        // (0원짜리 빈 사원을 보여줄 필요가 없다는 요구사항. 일용직이 아닌 사원은 근무기록과 무관하게 그대로 노출)
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, e.employee_name, e.employment_type, "
-                   + "e.department, " 
+                   + "e.department, "
                    + "p.total_pay_amount, p.total_deduction_amount, p.net_pay_amount "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
-                   + "WHERE p.payroll_id = ? ORDER BY e.employee_name";
-                   
+                   + "WHERE p.payroll_id = ? "
+                   + "  AND (e.employment_type NOT IN ('일용직','DAILY') "
+                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.payroll_employee_id = p.payroll_employee_id)) "
+                   + "ORDER BY e.employee_name";
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, payrollId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -67,8 +82,51 @@ public class PaymentMntDAO {
                     dto.setEmployeeName(rs.getString("employee_name"));
                     dto.setEmploymentType(rs.getString("employment_type"));
                     dto.setDepartment(rs.getString("department"));
-                    
+
                     // 금액 3종 세팅
+                    dto.setTotalPayAmount(rs.getLong("total_pay_amount"));
+                    dto.setTotalDeductionAmount(rs.getLong("total_deduction_amount"));
+                    dto.setNetPayAmount(rs.getLong("net_pay_amount"));
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
+
+    /** 방금 신규추가(또는 지정)한 사원들만 조회 - 전체 새로고침 없이 해당 행만 화면에 바로 붙이기 위함 */
+    public List<PaymentMntEmployeeDTO> selectEmployeesByEmployeeIds(Connection conn, Long payrollId, List<String> empIds) throws SQLException {
+        List<PaymentMntEmployeeDTO> list = new ArrayList<>();
+        if (empIds == null || empIds.isEmpty()) return list;
+
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < empIds.size(); i++) {
+            if (i > 0) placeholders.append(",");
+            placeholders.append("?");
+        }
+
+        String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, e.employee_name, e.employment_type, "
+                   + "e.department, "
+                   + "p.total_pay_amount, p.total_deduction_amount, p.net_pay_amount "
+                   + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
+                   + "WHERE p.payroll_id = ? AND p.employee_id IN (" + placeholders + ") "
+                   + "ORDER BY e.employee_name";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int idx = 1;
+            pstmt.setLong(idx++, payrollId);
+            for (String empId : empIds) {
+                pstmt.setString(idx++, empId.trim());
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    PaymentMntEmployeeDTO dto = new PaymentMntEmployeeDTO();
+                    dto.setPayrollEmployeeId(rs.getLong("payroll_employee_id"));
+                    dto.setPayrollId(rs.getLong("payroll_id"));
+                    dto.setEmployeeId(rs.getString("employee_id"));
+                    dto.setEmployeeName(rs.getString("employee_name"));
+                    dto.setEmploymentType(rs.getString("employment_type"));
+                    dto.setDepartment(rs.getString("department"));
                     dto.setTotalPayAmount(rs.getLong("total_pay_amount"));
                     dto.setTotalDeductionAmount(rs.getLong("total_deduction_amount"));
                     dto.setNetPayAmount(rs.getLong("net_pay_amount"));
@@ -122,6 +180,212 @@ public class PaymentMntDAO {
             }
         }
         return list;
+    }
+
+    /** 이 사원별급여(payrollEmployeeId)에 저장된 공제내역이 없을 때, 같은 사원의 다른 급여차수 중
+     *  공제내역이 저장돼 있는 가장 최근 것을 대신 보여주기 위한 조회.
+     *  (급여차수마다 공제항목을 매번 새로 입력할 필요 없이, 최근에 입력해둔 값을 기본값으로 채워주기 위함) */
+    public List<PaymentMntDeductionDetailDTO> selectDefaultDeductionDetails(Connection conn, Long payrollEmployeeId) throws SQLException {
+        List<PaymentMntDeductionDetailDTO> list = new ArrayList<>();
+        String sql = "SELECT PAYROLL_DEDUCTION_DETAIL_ID, PAYROLL_EMPLOYEE_ID, DEDUCTION_ITEM_ID, AMOUNT "
+                   + "FROM PAYROLL_DEDUCTION_DETAIL "
+                   + "WHERE PAYROLL_EMPLOYEE_ID = ( "
+                   + "  SELECT PAYROLL_EMPLOYEE_ID FROM ( "
+                   + "    SELECT pe2.PAYROLL_EMPLOYEE_ID "
+                   + "    FROM PAYROLL_EMPLOYEE pe2 JOIN PAYROLL p2 ON pe2.PAYROLL_ID = p2.PAYROLL_ID "
+                   + "    WHERE pe2.EMPLOYEE_ID = (SELECT pe1.EMPLOYEE_ID FROM PAYROLL_EMPLOYEE pe1 WHERE pe1.PAYROLL_EMPLOYEE_ID = ?) "
+                   + "      AND EXISTS (SELECT 1 FROM PAYROLL_DEDUCTION_DETAIL dd WHERE dd.PAYROLL_EMPLOYEE_ID = pe2.PAYROLL_EMPLOYEE_ID) "
+                   + "    ORDER BY p2.PAY_YEAR_MONTH DESC, p2.PAY_SEQUENCE DESC "
+                   + "  ) WHERE ROWNUM = 1 "
+                   + ")";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, payrollEmployeeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    PaymentMntDeductionDetailDTO dto = new PaymentMntDeductionDetailDTO();
+                    dto.setPayrollDeductionDetailId(rs.getLong("PAYROLL_DEDUCTION_DETAIL_ID"));
+                    dto.setPayrollEmployeeId(payrollEmployeeId);
+                    dto.setDeductionItemId(rs.getLong("DEDUCTION_ITEM_ID"));
+                    dto.setAmount(rs.getLong("AMOUNT"));
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
+
+    /** 일용직(일용직/DAILY)이면 DAILY_WORK_RECORD(일자별 근무기록) 합계(없으면 0, recordCount=0)를 반환하고,
+     *  일용직이 아니면 null을 반환. 급여입력/관리 일반 화면에서 사원 클릭 시 지급/공제 상세를 자동으로 채우기 위함. */
+    public PaymentMntDailyWorkSummary selectDailyWorkSummary(Connection conn, Long payrollEmployeeId) throws SQLException {
+        String sql = "SELECT e.EMPLOYMENT_TYPE, "
+                + "  NVL(SUM(d.PAY_AMOUNT), 0) AS SUM_PAY, "
+                + "  NVL(SUM(d.INCOME_TAX_AMOUNT), 0) AS SUM_INCOME_TAX, "
+                + "  NVL(SUM(d.LOCAL_INCOME_TAX_AMOUNT), 0) AS SUM_LOCAL_TAX, "
+                + "  COUNT(d.DAILY_WORK_RECORD_ID) AS REC_CNT "
+                + "FROM PAYROLL_EMPLOYEE pe JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
+                + "LEFT JOIN DAILY_WORK_RECORD d ON d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID "
+                + "WHERE pe.PAYROLL_EMPLOYEE_ID = ? "
+                + "GROUP BY e.EMPLOYMENT_TYPE";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, payrollEmployeeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) return null;
+
+                String employmentType = rs.getString("EMPLOYMENT_TYPE");
+                boolean isDaily = "일용직".equals(employmentType) || "DAILY".equals(employmentType);
+                if (!isDaily) return null;
+
+                PaymentMntDailyWorkSummary summary = new PaymentMntDailyWorkSummary();
+                summary.sumPay = rs.getLong("SUM_PAY");
+                summary.sumIncomeTax = rs.getLong("SUM_INCOME_TAX");
+                summary.sumLocalTax = rs.getLong("SUM_LOCAL_TAX");
+                summary.recordCount = rs.getLong("REC_CNT");
+                return summary;
+            }
+        }
+    }
+
+    /** 사원의 EMPLOYEE.BASE_WAGE_AMOUNT(기본급) 조회. 기본급은 급여차수마다 새로 입력할 값이 아니라
+     *  사원 마스터에 고정된 값이므로, 이 급여차수에 저장된 상세가 없을 때 기본값으로 채우기 위함. */
+    public Long selectEmployeeBaseWageAmount(Connection conn, Long payrollEmployeeId) throws SQLException {
+        String sql = "SELECT e.BASE_WAGE_AMOUNT FROM PAYROLL_EMPLOYEE pe "
+                + "JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
+                + "WHERE pe.PAYROLL_EMPLOYEE_ID = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, payrollEmployeeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    long amount = rs.getLong(1);
+                    return rs.wasNull() ? null : amount;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null) */
+    public Long selectDeductionItemIdByName(Connection conn, String deductionItemName) throws SQLException {
+        String sql = "SELECT DEDUCTION_ITEM_ID FROM DEDUCTION_ITEM WHERE DEDUCTION_ITEM_NAME = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, deductionItemName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    long id = rs.getLong(1);
+                    return rs.wasNull() ? null : id;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** 사원별급여(payrollEmployeeId) 하나의 "최종" 지급/공제 상세를 계산한다 - 저장된 값에 기본값 보정
+     *  (일용직은 근무기록 합계/기본급 대체로 '일용급여', 그 외는 '기본급', 공제내역은 최근 저장분 이월)까지 반영.
+     *  급여입력/관리 화면의 좌측 사원목록 총액과 우측 상세패널 총액이 항상 일치하도록, 두 곳 모두 이 메서드 하나만 쓴다. */
+    public PaymentMntEffectiveDetail computeEffectiveDetail(Connection conn, Long payrollEmployeeId) throws SQLException {
+        List<PaymentMntPayDetailDTO> payDetails = selectPayDetails(conn, payrollEmployeeId);
+        List<PaymentMntDeductionDetailDTO> deductionDetails = selectDeductionDetails(conn, payrollEmployeeId);
+        if (deductionDetails == null || deductionDetails.isEmpty()) {
+            deductionDetails = selectDefaultDeductionDetails(conn, payrollEmployeeId);
+        }
+
+        PaymentMntDailyWorkSummary dailySummary = selectDailyWorkSummary(conn, payrollEmployeeId);
+        if (dailySummary != null) {
+            Long dailyPayItemId = selectDailyPayItemId(conn);
+            if (dailyPayItemId != null) {
+                if (dailySummary.getRecordCount() > 0) {
+                    upsertPayDetailInList(payDetails, dailyPayItemId, dailySummary.getSumPay());
+
+                    Long incomeTaxItemId = selectDeductionItemIdByName(conn, "소득세");
+                    if (incomeTaxItemId != null) {
+                        upsertDeductionDetailInList(deductionDetails, incomeTaxItemId, dailySummary.getSumIncomeTax());
+                    }
+                    Long localTaxItemId = selectDeductionItemIdByName(conn, "지방소득세");
+                    if (localTaxItemId != null) {
+                        upsertDeductionDetailInList(deductionDetails, localTaxItemId, dailySummary.getSumLocalTax());
+                    }
+                } else if (!hasPayItem(payDetails, dailyPayItemId)) {
+                    Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
+                    if (baseWageAmount != null && baseWageAmount > 0) {
+                        upsertPayDetailInList(payDetails, dailyPayItemId, baseWageAmount);
+                    }
+                }
+            }
+        } else if (!hasPayItem(payDetails, 2801L)) {
+            Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
+            if (baseWageAmount != null && baseWageAmount > 0) {
+                upsertPayDetailInList(payDetails, 2801L, baseWageAmount);
+            }
+        }
+
+        // 식대처럼 지급항목 마스터(PAY_ITEM.BULK_PAY_AMOUNT)에 회사 공통 기본값이 있는 항목은, 화면에도
+        // 항상 그 기본값이 표시되므로(입력화면 렌더링 시 data-default), 저장된 상세가 없으면 여기서도 채워서
+        // 좌측 목록 합계와 우측 화면에 보이는 합계가 항상 일치하도록 한다.
+        for (Map.Entry<Long, Long> entry : selectPayItemBulkDefaults(conn).entrySet()) {
+            if (!hasPayItem(payDetails, entry.getKey())) {
+                upsertPayDetailInList(payDetails, entry.getKey(), entry.getValue());
+            }
+        }
+
+        long totalPay = 0;
+        for (PaymentMntPayDetailDTO p : payDetails) totalPay += (p.getAmount() == null ? 0 : p.getAmount());
+        long totalDeduction = 0;
+        for (PaymentMntDeductionDetailDTO d : deductionDetails) totalDeduction += (d.getAmount() == null ? 0 : d.getAmount());
+
+        PaymentMntEffectiveDetail result = new PaymentMntEffectiveDetail();
+        result.setPayDetails(payDetails);
+        result.setDeductionDetails(deductionDetails);
+        result.setTotalPayAmount(totalPay);
+        result.setTotalDeductionAmount(totalDeduction);
+        result.setNetPayAmount(totalPay - totalDeduction);
+        return result;
+    }
+
+    /** 지급항목 마스터 중 회사 공통 기본값(BULK_PAY_AMOUNT)이 설정된 항목들 (PAY_ITEM_ID -> 기본값) */
+    private Map<Long, Long> selectPayItemBulkDefaults(Connection conn) throws SQLException {
+        Map<Long, Long> map = new HashMap<>();
+        String sql = "SELECT PAY_ITEM_ID, BULK_PAY_AMOUNT FROM PAY_ITEM WHERE USE_YN = 'Y' AND BULK_PAY_AMOUNT > 0";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                map.put(rs.getLong("PAY_ITEM_ID"), rs.getLong("BULK_PAY_AMOUNT"));
+            }
+        }
+        return map;
+    }
+
+    private boolean hasPayItem(List<PaymentMntPayDetailDTO> payDetails, Long payItemId) {
+        for (PaymentMntPayDetailDTO p : payDetails) {
+            if (payItemId.equals(p.getPayItemId())) return true;
+        }
+        return false;
+    }
+
+    private void upsertPayDetailInList(List<PaymentMntPayDetailDTO> payDetails, Long payItemId, long amount) {
+        for (PaymentMntPayDetailDTO p : payDetails) {
+            if (payItemId.equals(p.getPayItemId())) {
+                p.setAmount(amount);
+                return;
+            }
+        }
+        PaymentMntPayDetailDTO added = new PaymentMntPayDetailDTO();
+        added.setPayItemId(payItemId);
+        added.setAmount(amount);
+        payDetails.add(added);
+    }
+
+    private void upsertDeductionDetailInList(List<PaymentMntDeductionDetailDTO> deductionDetails, Long deductionItemId, long amount) {
+        for (PaymentMntDeductionDetailDTO d : deductionDetails) {
+            if (deductionItemId.equals(d.getDeductionItemId())) {
+                d.setAmount(amount);
+                return;
+            }
+        }
+        PaymentMntDeductionDetailDTO added = new PaymentMntDeductionDetailDTO();
+        added.setDeductionItemId(deductionItemId);
+        added.setAmount(amount);
+        deductionDetails.add(added);
     }
 
     public List<PaymentMntEmployeeDTO> getModalEmployeeList(Connection conn, String keyword) throws SQLException {
@@ -250,42 +514,66 @@ public class PaymentMntDAO {
      // 2. PAYROLL_PAY_DETAIL 테이블에 지급항목 등록 (고용형태에 따라 분기)
      //    - DAILY(일용직) : '일용급여' 항목에 등록
      //    - 그 외(REGULAR/CONTRACT 등) : '기본급'(2801) 항목에 등록
+        // '일용급여' 항목 ID는 미리 한 번만 조회해서 바인드 파라미터로 넘긴다.
+        // (CASE 안에 스칼라 서브쿼리를 직접 넣으면, JOIN + correlated NOT EXISTS와 결합될 때
+        //  Oracle이 타입을 잘못 추론해 ORA-00932(inconsistent datatypes)가 발생한다)
+        Long dailyPayItemId = selectDailyPayItemId(conn);
+
         String insertPayDetailSql = "INSERT INTO PAYROLL_PAY_DETAIL ("
                    + "    payroll_pay_detail_id, payroll_employee_id, pay_item_id, amount, reg_id, mod_id"
                    + ") "
                    + "SELECT "
                    + "    (SELECT NVL(MAX(payroll_pay_detail_id), 0) FROM PAYROLL_PAY_DETAIL) + 1, "
                    + "    p.payroll_employee_id, "
-                   + "    CASE WHEN e.employment_type = 'DAILY' "
-                   + "         THEN (SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여') "
-                   + "         ELSE 2801 END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급(2801)
+                   + "    CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE 2801 END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급(2801) - 실데이터의 EMPLOYMENT_TYPE이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함
                    + "    e.base_wage_amount, "
                    + "    'admin', 'admin' "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
                    + "WHERE p.payroll_id = ? AND p.employee_id = ? "
-                   + "  AND NOT EXISTS (" 
+                   + "  AND NOT EXISTS ("
                    + "      SELECT 1 FROM PAYROLL_PAY_DETAIL d "
                    + "      WHERE d.payroll_employee_id = p.payroll_employee_id "
-                   + "        AND d.pay_item_id = CASE WHEN e.employment_type = 'DAILY' "
-                   + "             THEN (SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여') "
-                   + "             ELSE 2801 END"
+                   + "        AND d.pay_item_id = CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE 2801 END"
                    + "  )";
 
         try (PreparedStatement pstmtEmp = conn.prepareStatement(insertEmpSql);
              PreparedStatement pstmtDetail = conn.prepareStatement(insertPayDetailSql)) {
-            
+
             for (String empId : empIds) {
                 if (empId == null || empId.trim().isEmpty()) continue;
-                
-                pstmtEmp.setLong(1, payrollId);         
-                pstmtEmp.setString(2, empId.trim());    
-                pstmtEmp.setLong(3, payrollId);         
-                pstmtEmp.executeUpdate();  
 
-                pstmtDetail.setLong(1, payrollId);
-                pstmtDetail.setString(2, empId.trim());
+                pstmtEmp.setLong(1, payrollId);
+                pstmtEmp.setString(2, empId.trim());
+                pstmtEmp.setLong(3, payrollId);
+                pstmtEmp.executeUpdate();
+
+                setDailyPayItemIdParam(pstmtDetail, 1, dailyPayItemId);
+                pstmtDetail.setLong(2, payrollId);
+                pstmtDetail.setString(3, empId.trim());
+                setDailyPayItemIdParam(pstmtDetail, 4, dailyPayItemId);
                 pstmtDetail.executeUpdate();
             }
+        }
+    }
+
+    /** '일용급여' 지급항목의 PAY_ITEM_ID (없으면 null) */
+    public Long selectDailyPayItemId(Connection conn) throws SQLException {
+        String sql = "SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여'";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                long id = rs.getLong(1);
+                return rs.wasNull() ? null : id;
+            }
+        }
+        return null;
+    }
+
+    private void setDailyPayItemIdParam(PreparedStatement pstmt, int idx, Long dailyPayItemId) throws SQLException {
+        if (dailyPayItemId == null) {
+            pstmt.setNull(idx, Types.NUMERIC);
+        } else {
+            pstmt.setLong(idx, dailyPayItemId);
         }
     }
 
@@ -509,22 +797,35 @@ public class PaymentMntDAO {
     public PaymentMntSummaryDTO selectPayrollSummary(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         PaymentMntSummaryDTO summary = new PaymentMntSummaryDTO();
 
-        // 1. 월 합계 - 재직중인 사원 수 (별도 쿼리로 분리)
-        String countSql = "SELECT COUNT(*) AS TOTAL_COUNT FROM EMPLOYEE WHERE RESIGN_DATE IS NULL";
-        try (PreparedStatement pstmt = conn.prepareStatement(countSql);
-             ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
-                summary.setTotalCount(rs.getInt("TOTAL_COUNT"));
+        // 1. 월 합계 - 이 급여차수에 실제로 화면 목록에 뜨는 사원 수
+        //    (일용직/DAILY는 근무기록(DAILY_WORK_RECORD)이 있는 사람만 화면에 노출하므로, selectEmployeeList와 동일한 조건으로 카운트)
+        String countSql = "SELECT COUNT(*) AS TOTAL_COUNT "
+                   + "FROM PAYROLL_EMPLOYEE pe "
+                   + "JOIN PAYROLL pr ON pe.PAYROLL_ID = pr.PAYROLL_ID "
+                   + "JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
+                   + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ? "
+                   + "  AND (e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY') "
+                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID))";
+        try (PreparedStatement pstmt = conn.prepareStatement(countSql)) {
+            pstmt.setString(1, payYearMonth);
+            pstmt.setInt(2, paySequence);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    summary.setTotalCount(rs.getInt("TOTAL_COUNT"));
+                }
             }
         }
 
-        // 2. 지급/공제/실지급 총액 - 선택한 귀속연월+급여차수 기준 집계
+        // 2. 지급/공제/실지급 총액 - 선택한 귀속연월+급여차수 기준, 화면 목록과 동일한 대상으로 집계
         String sql = "SELECT "
                    + "    NVL(SUM(pe.TOTAL_PAY_AMOUNT), 0) AS TOTAL_GIVE_AMOUNT, "
                    + "    NVL(SUM(pe.TOTAL_DEDUCTION_AMOUNT), 0) AS TOTAL_DEDU_AMOUNT "
                    + "FROM PAYROLL_EMPLOYEE pe "
                    + "JOIN PAYROLL pr ON pe.PAYROLL_ID = pr.PAYROLL_ID "
-                   + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ?";
+                   + "JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
+                   + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ? "
+                   + "  AND (e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY') "
+                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID))";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, payYearMonth);
