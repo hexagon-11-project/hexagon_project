@@ -1,12 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%@ page import="config.model.AttendanceType"%>
+<%@ page import="config.model.DeductionItem"%>
 <%@ page import="config.model.PayItem"%>
 <%
 List<PayItem> payItemList = (List<PayItem>) request.getAttribute("payItemList");
 List<AttendanceType> attendanceTypeList = (List<AttendanceType>) request.getAttribute("attendanceTypeList");
+List<DeductionItem> deductionItemList = (List<DeductionItem>) request.getAttribute("deductionItemList");
 PayItem selected = (PayItem) request.getAttribute("selectedPayItem");
+DeductionItem selectedDeduction = (DeductionItem) request.getAttribute("selectedDeductionItem");
 boolean hasSelected = selected != null;
+boolean hasSelectedDeduction = selectedDeduction != null;
 String selectedAttendanceName = hasSelected && selected.getAttendancePayRule() != null ? selected.getAttendancePayRule()
 		: "";
 boolean selectedAttendanceInList = false;
@@ -74,6 +78,8 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 		<form id="payItemForm" method="post">
 			<input type="hidden" name="payItemId"
 				value="<%=hasSelected ? selected.getPayItemId() : ""%>">
+			<input type="hidden" name="nonTaxId"
+				value="<%=hasSelected && selected.getNonTaxId() != null ? selected.getNonTaxId() : ""%>">
 			<table class="source-form-table">
 				<tbody>
 					<tr>
@@ -86,7 +92,8 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 					<tr>
 						<th>과세여부</th>
 						<td class="span-3">
-							<div class="check-list">
+							<div class="check-list"
+								data-nontax-popup-url="<%=ctx%>/Config/nontaxdetailpopup.do">
 								<label> <input type="radio" name="taxableYn" value="Y"
 									<%=!hasSelected || !"N".equalsIgnoreCase(selected.getTaxableYn()) ? "checked" : ""%>>
 									전체과세
@@ -101,6 +108,7 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 						<th>비과세명</th>
 						<td class="span-3"><input type="text" class="input"
 							name="nonTaxCategory"
+							placeholder="팝업에서 선택하거나 직접입력하세요."
 							value="<%=hasSelected && selected.getNonTaxCategory() != null ? selected.getNonTaxCategory() : ""%>">
 						</td>
 					</tr>
@@ -109,6 +117,8 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 						<td class="span-3">
 							<div class="money-control">
 								<input type="text" class="input number" name="nonPayAmount"
+									inputmode="numeric" pattern="[0-9,]*"
+									placeholder="한도액을 입력하세요."
 									value="<%=hasSelected ? selected.getNonPayAmountLabel() : ""%>">
 								<span>원</span>
 							</div>
@@ -223,83 +233,96 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>국민연금</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
+					<%
+					if (deductionItemList != null) {
+						for (DeductionItem item : deductionItemList) {
+					%>
+					<tr style="cursor: pointer;"
+						onclick="location.href='<%=ctx%>/Config/deductionitemsetselect.do?deductionItemId=<%=item.getDeductionItemId()%>'">
+						<td><%=item.getDeductionItemName() != null ? item.getDeductionItemName() : ""%></td>
+						<td><%=item.getTruncationLabel()%></td>
+						<td><%=item.getUseLabel()%></td>
+						<td><%=item.getRemarkLabel()%></td>
 					</tr>
-					<tr>
-						<td>건강보험</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
-					</tr>
-					<tr>
-						<td>장기요양보험</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
-					</tr>
-					<tr>
-						<td>고용보험</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
-					</tr>
-					<tr>
-						<td>소득세</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
-					</tr>
-					<tr>
-						<td>지방소득세</td>
-						<td>10원 단위</td>
-						<td>사용</td>
-						<td>기본항목</td>
-					</tr>
+					<%
+						}
+					}
+					%>
 				</tbody>
 			</table>
 		</div>
 	</div>
 	<div class="source-config-editor">
 		<div class="source-editor-head">공제항목</div>
-		<table class="source-form-table">
-			<tbody>
-				<tr>
-					<th>공제항목</th>
-					<td class="span-3"><input type="text" class="input"
-						placeholder="공제 항목을 입력하세요."></td>
-				</tr>
-				<tr>
-					<th>절사단위</th>
-					<td class="span-3"><select class="select"><option
-								selected>없음</option>
-							<option>1원 단위</option>
-							<option>10원 단위</option>
-							<option>100원 단위</option></select></td>
-				</tr>
-				<tr>
-					<th>비고</th>
-					<td class="span-3"><input type="text" class="input"></td>
-				</tr>
-				<tr>
-					<th>사용여부</th>
-					<td class="span-3"><div class="check-list">
-							<label><input type="radio" name="ded-use" checked>
-								사용</label><label><input type="radio" name="ded-use">
-								사용안함</label>
-						</div></td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="source-editor-actions">
-			<button type="button" class="btn btn-primary">추가</button>
-			<button type="button" class="btn btn-blue">수정</button>
-			<button type="button" class="btn">삭제</button>
-			<button type="button" class="btn">내용 지우기</button>
-		</div>
+		<form id="deductionItemForm" method="post">
+			<input type="hidden" name="deductionItemId"
+				value="<%=hasSelectedDeduction ? selectedDeduction.getDeductionItemId() : ""%>">
+			<table class="source-form-table">
+				<tbody>
+					<tr>
+						<th>공제항목</th>
+						<td class="span-3"><input type="text" class="input"
+							name="deductionItemName" placeholder="공제 항목을 입력하세요."
+							value="<%=hasSelectedDeduction && selectedDeduction.getDeductionItemName() != null ? selectedDeduction.getDeductionItemName() : ""%>"></td>
+					</tr>
+					<tr>
+						<th>계산방법</th>
+						<td class="span-3"><input type="text" class="input"
+							name="deductionCalculationMethod" placeholder="계산방법을 입력하세요."
+							value="<%=hasSelectedDeduction && selectedDeduction.getCalculationMethod() != null ? selectedDeduction.getCalculationMethod() : ""%>"></td>
+					</tr>
+					<tr>
+						<th>절사단위</th>
+						<td class="span-3"><select class="select"
+							name="deductionTruncationUnit">
+								<option value="0"
+									<%=!hasSelectedDeduction || selectedDeduction.getTruncationUnit() == null || selectedDeduction.getTruncationUnit() == 0 ? "selected" : ""%>>없음</option>
+								<option value="1"
+									<%=hasSelectedDeduction && Integer.valueOf(1).equals(selectedDeduction.getTruncationUnit()) ? "selected" : ""%>>1원
+									단위</option>
+								<option value="10"
+									<%=hasSelectedDeduction && Integer.valueOf(10).equals(selectedDeduction.getTruncationUnit()) ? "selected" : ""%>>10원
+									단위</option>
+								<option value="100"
+									<%=hasSelectedDeduction && Integer.valueOf(100).equals(selectedDeduction.getTruncationUnit()) ? "selected" : ""%>>100원
+									단위</option>
+						</select></td>
+					</tr>
+					<tr>
+						<th>비고</th>
+						<td class="span-3"><input type="text" class="input"
+							name="remark"
+							value="<%=hasSelectedDeduction && selectedDeduction.getRemark() != null ? selectedDeduction.getRemark() : ""%>"></td>
+					</tr>
+					<tr>
+						<th>사용여부</th>
+						<td class="span-3">
+							<div class="check-list">
+								<label><input type="radio" name="deductionUseYn" value="Y"
+									<%=!hasSelectedDeduction || !"N".equalsIgnoreCase(selectedDeduction.getUseYn()) ? "checked" : ""%>>
+									사용</label> <label><input type="radio" name="deductionUseYn" value="N"
+									<%=hasSelectedDeduction && "N".equalsIgnoreCase(selectedDeduction.getUseYn()) ? "checked" : ""%>>
+									사용안함</label>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="source-editor-actions">
+				<button type="submit" class="btn btn-primary"
+					formaction="<%=ctx%>/Config/deductionitemsetinsert.do"
+					onclick="if (!document.querySelector('[name=deductionItemName]').value.trim()) { alert('공제항목을 입력하세요.'); return false; }">추가</button>
+				<button type="submit" class="btn btn-blue"
+					formaction="<%=ctx%>/Config/deductionitemsetupdate.do"
+					onclick="if (!document.querySelector('[name=deductionItemId]').value) { alert('수정할 항목을 리스트에서 선택하세요.'); return false; }">수정</button>
+				<button type="submit" class="btn"
+					formaction="<%=ctx%>/Config/deductionitemsetdelete.do"
+					onclick="if (!document.querySelector('[name=deductionItemId]').value) { alert('삭제할 항목을 리스트에서 선택하세요.'); return false; } return confirm('선택한 공제항목을 삭제하시겠습니까?');">삭제</button>
+				<button type="button" class="btn"
+					onclick="location.href='<%=ctx%>/Config/deductionitemsetclear.do'">내용
+					지우기</button>
+			</div>
+		</form>
 	</div>
 </section>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
