@@ -62,7 +62,7 @@ request.setAttribute("pageTitle", "급여항목 구성 통계");
 request.setAttribute("pageSection", "급여통계");
 request.setAttribute("pageDescription", "귀속연월·사원별 지급항목 금액과 구성비를 원형 그래프와 표로 확인합니다.");
 request.setAttribute("activeKey", "item-composition");
-request.setAttribute("pageCss", "statistics.css?v=matrix1");
+request.setAttribute("pageCss", "statistics.css?v=matrix2");
 request.setAttribute("pageJs", "charts.js?v=donut3");
 
 Integer selectedYear = (Integer) request.getAttribute("year");
@@ -81,16 +81,22 @@ String errorMessageJs = errorMessage == null
 		: errorMessage.replace("\\", "\\\\").replace("'", "\\'").replace("\r", "").replace("\n", "\\n");
 
 EmployeeSalaryStatistics stats = (EmployeeSalaryStatistics) request.getAttribute("employeeSalaryStatistics");
-List<SalaryItemStatistics> payItems = stats != null && stats.getPayItems() != null
-		? stats.getPayItems()
-		: new ArrayList<SalaryItemStatistics>();
-List<SalaryItemStatistics> deductionItems = stats != null && stats.getDeductionItems() != null
-		? stats.getDeductionItems()
-		: new ArrayList<SalaryItemStatistics>();
+@SuppressWarnings("unchecked")
+List<SalaryItemStatistics> payItems = (List<SalaryItemStatistics>) request.getAttribute("payItemColumns");
+if (payItems == null) {
+	payItems = new ArrayList<SalaryItemStatistics>();
+}
+@SuppressWarnings("unchecked")
+List<SalaryItemStatistics> deductionItems = (List<SalaryItemStatistics>) request.getAttribute("deductionItemColumns");
+if (deductionItems == null) {
+	deductionItems = new ArrayList<SalaryItemStatistics>();
+}
 DecimalFormat moneyFormat = new DecimalFormat("#,###");
 int itemColCount = Math.max(payItems.size(), deductionItems.size());
-int payColspan = itemColCount + 2;
-int deductionColspan = itemColCount + 3;
+boolean hasResult = stats != null;
+long totalPayAmount = hasResult ? stats.getTotalPayAmount() : 0L;
+long totalDeductionAmount = hasResult ? stats.getTotalDeductionAmount() : 0L;
+long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
@@ -199,6 +205,18 @@ int deductionColspan = itemColCount + 3;
 	<div class="card-body">
 		<div class="table-wrap">
 			<table class="data-table stats-matrix item-composition-matrix">
+				<colgroup>
+					<col class="col-label-w">
+					<%
+					for (int i = 0; i < itemColCount; i++) {
+					%>
+					<col class="col-item-w">
+					<%
+					}
+					%>
+					<col class="col-total-w">
+					<col class="col-net-w">
+				</colgroup>
 				<thead>
 					<tr>
 						<th class="col-label">지급항목</th>
@@ -211,24 +229,10 @@ int deductionColspan = itemColCount + 3;
 						}
 						%>
 						<th>합계</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					<%
-					if (errorMessage != null) {
-					%>
-					<tr>
-						<td colspan="<%=payColspan%>" class="center"><%=esc(errorMessage)%></td>
-					</tr>
-					<%
-					} else if (stats == null) {
-					%>
-					<tr>
-						<td colspan="<%=Math.max(payColspan, 2)%>" class="center">사원과 귀속연월을 선택해 조회하세요.</td>
-					</tr>
-					<%
-					} else {
-					%>
 					<tr>
 						<th class="col-label sub-label">ㄴ 금액(원)</th>
 						<%
@@ -239,7 +243,8 @@ int deductionColspan = itemColCount + 3;
 						<%
 						}
 						%>
-						<td><%=moneyFormat.format(stats.getTotalPayAmount())%></td>
+						<td><%=moneyFormat.format(totalPayAmount)%></td>
+						<td></td>
 					</tr>
 					<tr>
 						<th class="col-label sub-label">ㄴ 구성비율</th>
@@ -251,14 +256,24 @@ int deductionColspan = itemColCount + 3;
 						<%
 						}
 						%>
-						<td>100.0%</td>
+						<td><%=hasResult ? "100.0%" : "0.0%"%></td>
+						<td></td>
 					</tr>
-					<%
-					}
-					%>
 				</tbody>
 			</table>
 			<table class="data-table stats-matrix item-composition-matrix deduction-matrix">
+				<colgroup>
+					<col class="col-label-w">
+					<%
+					for (int i = 0; i < itemColCount; i++) {
+					%>
+					<col class="col-item-w">
+					<%
+					}
+					%>
+					<col class="col-total-w">
+					<col class="col-net-w">
+				</colgroup>
 				<thead>
 					<tr>
 						<th class="col-label">공제항목</th>
@@ -275,21 +290,6 @@ int deductionColspan = itemColCount + 3;
 					</tr>
 				</thead>
 				<tbody>
-					<%
-					if (errorMessage != null) {
-					%>
-					<tr>
-						<td colspan="<%=deductionColspan%>" class="center"><%=esc(errorMessage)%></td>
-					</tr>
-					<%
-					} else if (stats == null) {
-					%>
-					<tr>
-						<td colspan="<%=Math.max(deductionColspan, 3)%>" class="center">사원과 귀속연월을 선택해 조회하세요.</td>
-					</tr>
-					<%
-					} else {
-					%>
 					<tr>
 						<th class="col-label sub-label">ㄴ 금액(원)</th>
 						<%
@@ -300,8 +300,8 @@ int deductionColspan = itemColCount + 3;
 						<%
 						}
 						%>
-						<td><%=moneyFormat.format(stats.getTotalDeductionAmount())%></td>
-						<td class="net-pay-value" rowspan="2"><%=moneyFormat.format(stats.getNetPayAmount())%></td>
+						<td><%=moneyFormat.format(totalDeductionAmount)%></td>
+						<td class="net-pay-value" rowspan="2"><%=moneyFormat.format(netPayAmount)%></td>
 					</tr>
 					<tr>
 						<th class="col-label sub-label">ㄴ 구성비율</th>
@@ -313,11 +313,8 @@ int deductionColspan = itemColCount + 3;
 						<%
 						}
 						%>
-						<td>100.0%</td>
+						<td><%=hasResult ? "100.0%" : "0.0%"%></td>
 					</tr>
-					<%
-					}
-					%>
 				</tbody>
 			</table>
 		</div>

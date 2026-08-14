@@ -135,6 +135,7 @@
 }
 
 .item-composition-matrix {
+	table-layout: fixed;
 	min-width: 980px;
 	width: 100%;
 	border-top: 2px solid #5b9bd5;
@@ -147,10 +148,28 @@
 	margin-top: -1px
 }
 
+.item-composition-matrix col.col-label-w {
+	width: 118px
+}
+
+.item-composition-matrix col.col-item-w,
+.item-composition-matrix col.col-total-w {
+	width: auto
+}
+
+.item-composition-matrix col.col-net-w {
+	width: 118px
+}
+
+.item-composition-matrix thead th {
+	white-space: normal;
+	word-break: keep-all;
+	overflow: hidden
+}
+
 .item-composition-matrix .net-pay-head {
 	background: #5b9bd5;
-	color: #fff;
-	min-width: 110px
+	color: #fff
 }
 
 .item-composition-matrix .net-pay-value {

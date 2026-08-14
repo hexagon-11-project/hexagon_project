@@ -2,12 +2,15 @@ package statistics.paymentstatisticspayitems.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import config.employee.model.Employee;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 import statistics.model.EmployeeSalaryStatistics;
+import statistics.model.SalaryItemStatistics;
 import statistics.paymentstatisticspayitems.dao.PaymentStatisticsPayItemsDao;
 
 /**
@@ -30,6 +33,55 @@ public class PaymentStatisticsPayItemsService {
 			throw new RuntimeException("사원 목록 조회 중 DB 오류 발생", e);
 		} finally {
 			JdbcUtil.close(conn);
+		}
+	}
+
+	/**
+	 * 표 헤더용 지급항목 목록. 조회 전에는 금액 0으로 둔다.
+	 */
+	public List<SalaryItemStatistics> getPayItemColumns(int companyId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return paymentStatisticsPayItemsDao.selectPayItemColumns(conn, companyId);
+		} catch (SQLException e) {
+			throw new RuntimeException("지급항목 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/**
+	 * 표 헤더용 공제항목 목록. 조회 전에는 금액 0으로 둔다.
+	 */
+	public List<SalaryItemStatistics> getDeductionItemColumns(int companyId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return paymentStatisticsPayItemsDao.selectDeductionItemColumns(conn, companyId);
+		} catch (SQLException e) {
+			throw new RuntimeException("공제항목 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/**
+	 * 마스터 항목 목록에 실제 조회 금액을 채운다.
+	 */
+	public void fillItemAmounts(List<SalaryItemStatistics> columns, List<SalaryItemStatistics> actuals, long total) {
+		Map<Long, Long> amountById = new HashMap<>();
+		if (actuals != null) {
+			for (SalaryItemStatistics actual : actuals) {
+				if (actual.getItemId() != null) {
+					amountById.put(actual.getItemId(), actual.getAmount());
+				}
+			}
+		}
+		for (SalaryItemStatistics column : columns) {
+			long amount = amountById.getOrDefault(column.getItemId(), 0L);
+			column.setAmount(amount);
+			column.setCompositionRatio(total == 0L ? 0D : (amount * 100D) / total);
 		}
 	}
 

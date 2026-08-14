@@ -85,6 +85,68 @@ public class PaymentStatisticsPayItemsDao {
 		return result;
 	}
 
+	/** 사용 중인 지급항목 마스터를 표시 순서대로 조회한다. */
+	public List<SalaryItemStatistics> selectPayItemColumns(Connection conn, int companyId) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = "SELECT PAY_ITEM_ID AS ITEM_ID, PAY_ITEM_NAME AS ITEM_NAME "
+					+ "FROM PAY_ITEM "
+					+ "WHERE COMPANY_ID = ? AND USE_YN = 'Y' "
+					+ "ORDER BY DISPLAY_ORDER, PAY_ITEM_ID";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, companyId);
+			rs = pstmt.executeQuery();
+
+			List<SalaryItemStatistics> result = new ArrayList<>();
+			while (rs.next()) {
+				SalaryItemStatistics item = new SalaryItemStatistics();
+				item.setItemId(rs.getLong("ITEM_ID"));
+				item.setItemName(rs.getString("ITEM_NAME"));
+				item.setAmount(0L);
+				item.setCompositionRatio(0D);
+				result.add(item);
+			}
+			return result;
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
+	/** 사용 중인 공제항목 마스터를 표시 순서대로 조회한다. */
+	public List<SalaryItemStatistics> selectDeductionItemColumns(Connection conn, int companyId) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = "SELECT DEDUCTION_ITEM_ID AS ITEM_ID, DEDUCTION_ITEM_NAME AS ITEM_NAME "
+					+ "FROM DEDUCTION_ITEM "
+					+ "WHERE COMPANY_ID = ? AND USE_YN = 'Y' "
+					+ "ORDER BY DISPLAY_ORDER, DEDUCTION_ITEM_ID";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, companyId);
+			rs = pstmt.executeQuery();
+
+			List<SalaryItemStatistics> result = new ArrayList<>();
+			while (rs.next()) {
+				SalaryItemStatistics item = new SalaryItemStatistics();
+				item.setItemId(rs.getLong("ITEM_ID"));
+				item.setItemName(rs.getString("ITEM_NAME"));
+				item.setAmount(0L);
+				item.setCompositionRatio(0D);
+				result.add(item);
+			}
+			return result;
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
 	/** 사원 식별 정보와 지급/공제/실지급 합계를 조회한다. 동명이인이면 EMPLOYEE_ID 오름차순 1명만 사용한다. */
 	private EmployeeSalaryStatistics selectHeader(Connection conn, int companyId, String payYearMonth,
 			String employeeName) throws SQLException {

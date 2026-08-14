@@ -3,12 +3,14 @@ package statistics.paymentstatisticspayitems.command;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
 import statistics.model.EmployeeSalaryStatistics;
+import statistics.model.SalaryItemStatistics;
 import statistics.paymentstatisticspayitems.service.EmployeeSalaryNotFoundException;
 import statistics.paymentstatisticspayitems.service.PaymentStatisticsPayItemsService;
 
@@ -42,11 +44,24 @@ public class PaymentStatisticsPayItemsHandler implements CommandHandler {
 			}
 		}
 
+		List<SalaryItemStatistics> payItemColumns = paymentStatisticsPayItemsService.getPayItemColumns(companyId);
+		List<SalaryItemStatistics> deductionItemColumns =
+				paymentStatisticsPayItemsService.getDeductionItemColumns(companyId);
+		if (employeeSalaryStatistics != null) {
+			paymentStatisticsPayItemsService.fillItemAmounts(payItemColumns,
+					employeeSalaryStatistics.getPayItems(), employeeSalaryStatistics.getTotalPayAmount());
+			paymentStatisticsPayItemsService.fillItemAmounts(deductionItemColumns,
+					employeeSalaryStatistics.getDeductionItems(),
+					employeeSalaryStatistics.getTotalDeductionAmount());
+		}
+
 		req.setAttribute("year", year);
 		req.setAttribute("month", month);
 		req.setAttribute("yearMonth", String.format("%04d-%02d", year, month));
 		req.setAttribute("employeeName", employeeName);
 		req.setAttribute("employeeSalaryStatistics", employeeSalaryStatistics);
+		req.setAttribute("payItemColumns", payItemColumns);
+		req.setAttribute("deductionItemColumns", deductionItemColumns);
 		return FORM_VIEW;
 	}
 
