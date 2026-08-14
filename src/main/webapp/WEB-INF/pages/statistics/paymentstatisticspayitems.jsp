@@ -6,12 +6,19 @@ request.setAttribute("pageDescription", "귀속연월·사원별 지급항목 �
 request.setAttribute("activeKey", "item-composition");
 request.setAttribute("pageCss", "statistics.css");
 request.setAttribute("pageJs", "charts.js");
+
+Integer selectedYear = (Integer) request.getAttribute("year");
+Integer selectedMonth = (Integer) request.getAttribute("month");
+java.time.YearMonth selectedYearMonth = (selectedYear != null && selectedMonth != null)
+		? java.time.YearMonth.of(selectedYear, selectedMonth)
+		: java.time.YearMonth.now();
+String yearMonthValue = selectedYearMonth.toString();
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
 <section class="filter-bar">
 	<div class="field ">
-		<label>귀속연월</label><input type="month" class="input" value="2026-08">
+		<label>귀속연월</label><input type="month" class="input" name="yearMonth" value="<%=yearMonthValue%>">
 	</div>
 	<div class="field ">
 		<label>사원</label><select class="select"><option
