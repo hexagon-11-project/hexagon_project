@@ -723,31 +723,81 @@ public class PaymentMntDAO {
         }
     }
 
-    // 2. 복사 후 쿼리가 적용된 개수(행의 수) 반환
+    // 2. 이전 급여차수의 사원을 복사. PAYROLL_EMPLOYEE 총액만 복사하면 지급/공제 항목별 상세(기본급/식대/일용급여,
+    //    국민연금/소득세 등)가 빠져서 급여대장 등에서 항목별 금액이 0으로 보이므로, 사원별로 새 PAYROLL_EMPLOYEE 행을
+    //    만든 뒤 PAYROLL_PAY_DETAIL/PAYROLL_DEDUCTION_DETAIL 상세행까지 함께 복사한다.
     public int copyPreviousEmployeesCount(Connection conn, String prevYearMonth, int prevSeq, String currYearMonth, int currSeq) throws SQLException {
+        Long currPayrollId = selectPayrollId(conn, currYearMonth, currSeq);
+        if (currPayrollId == null) { return 0; }
+
+        List<Object[]> prevEmployees = new ArrayList<>(); // [PAYROLL_EMPLOYEE_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, TOTAL_PAY, TOTAL_DED, NET_PAY]
+        String selectSql = "SELECT prev_e.PAYROLL_EMPLOYEE_ID, prev_e.EMPLOYEE_ID, prev_e.EMPLOYMENT_TYPE, prev_e.INCOME_TYPE, "
+                          + "prev_e.TOTAL_PAY_AMOUNT, prev_e.TOTAL_DEDUCTION_AMOUNT, prev_e.NET_PAY_AMOUNT "
+                          + "FROM PAYROLL_EMPLOYEE prev_e JOIN PAYROLL prev_p ON prev_e.PAYROLL_ID = prev_p.PAYROLL_ID "
+                          + "WHERE prev_p.PAY_YEAR_MONTH = ? AND prev_p.PAY_SEQUENCE = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
+            pstmt.setString(1, prevYearMonth);
+            pstmt.setInt(2, prevSeq);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    prevEmployees.add(new Object[] {
+                        rs.getLong("PAYROLL_EMPLOYEE_ID"), rs.getString("EMPLOYEE_ID"),
+                        rs.getString("EMPLOYMENT_TYPE"), rs.getString("INCOME_TYPE"),
+                        rs.getLong("TOTAL_PAY_AMOUNT"), rs.getLong("TOTAL_DEDUCTION_AMOUNT"), rs.getLong("NET_PAY_AMOUNT")
+                    });
+                }
+            }
+        }
+
+        int count = 0;
+        for (Object[] row : prevEmployees) {
+            Long prevPayrollEmployeeId = (Long) row[0];
+            String employeeId = (String) row[1];
+            String employmentType = (String) row[2];
+            String incomeType = (String) row[3];
+            long totalPay = (Long) row[4];
+            long totalDed = (Long) row[5];
+            long netPay = (Long) row[6];
+
+            Long newPayrollEmployeeId = insertPayrollEmployeeCopy(conn, currPayrollId, employeeId, employmentType, incomeType, totalPay, totalDed, netPay);
+
+            for (PaymentMntPayDetailDTO detail : selectPayDetails(conn, prevPayrollEmployeeId)) {
+                upsertPayDetail(conn, newPayrollEmployeeId, detail.getPayItemId().intValue(), detail.getAmount());
+            }
+            for (PaymentMntDeductionDetailDTO detail : selectDeductionDetails(conn, prevPayrollEmployeeId)) {
+                upsertDeductionDetail(conn, newPayrollEmployeeId, detail.getDeductionItemId().intValue(), detail.getAmount());
+            }
+
+            count++;
+        }
+        return count;
+    }
+
+    private Long insertPayrollEmployeeCopy(Connection conn, Long payrollId, String employeeId, String employmentType,
+            String incomeType, long totalPay, long totalDed, long netPay) throws SQLException {
+        long newId;
+        try (PreparedStatement idStmt = conn.prepareStatement("SELECT NVL(MAX(PAYROLL_EMPLOYEE_ID), 0) + 1 FROM PAYROLL_EMPLOYEE");
+             ResultSet rs = idStmt.executeQuery()) {
+            rs.next();
+            newId = rs.getLong(1);
+        }
+
         String sql = "INSERT INTO PAYROLL_EMPLOYEE ("
                    + "    PAYROLL_EMPLOYEE_ID, PAYROLL_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, "
                    + "    TOTAL_PAY_AMOUNT, TOTAL_DEDUCTION_AMOUNT, NET_PAY_AMOUNT, REG_ID, MOD_ID"
-                   + ") "
-                   + "SELECT "
-                   + "    (SELECT NVL(MAX(PAYROLL_EMPLOYEE_ID), 0) FROM PAYROLL_EMPLOYEE) + ROWNUM, "
-                   + "    curr_p.PAYROLL_ID, prev_e.EMPLOYEE_ID, prev_e.EMPLOYMENT_TYPE, prev_e.INCOME_TYPE, "
-                   + "    prev_e.TOTAL_PAY_AMOUNT, prev_e.TOTAL_DEDUCTION_AMOUNT, prev_e.NET_PAY_AMOUNT, "
-                   + "    'admin', 'admin' "
-                   + "FROM PAYROLL_EMPLOYEE prev_e "
-                   + "JOIN PAYROLL prev_p ON prev_e.PAYROLL_ID = prev_p.PAYROLL_ID "
-                   + "JOIN PAYROLL curr_p ON curr_p.PAY_YEAR_MONTH = ? AND curr_p.PAY_SEQUENCE = ? "
-                   + "WHERE prev_p.PAY_YEAR_MONTH = ? AND prev_p.PAY_SEQUENCE = ?";
-
+                   + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'admin', 'admin')";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, currYearMonth);
-            pstmt.setInt(2, currSeq);
-            pstmt.setString(3, prevYearMonth);
-            pstmt.setInt(4, prevSeq);
-            
-            // executeUpdate()는 DB에 삽입된 행(row)의 개수를 정수로 반환합니다 (이것이 8건의 정체입니다)
-            return pstmt.executeUpdate(); 
+            pstmt.setLong(1, newId);
+            pstmt.setLong(2, payrollId);
+            pstmt.setString(3, employeeId);
+            pstmt.setString(4, employmentType);
+            pstmt.setString(5, incomeType);
+            pstmt.setLong(6, totalPay);
+            pstmt.setLong(7, totalDed);
+            pstmt.setLong(8, netPay);
+            pstmt.executeUpdate();
         }
+        return newId;
     }
     
  // ★ 급여 마스터(PAYROLL) 테이블에 해당 연월 폴더가 없으면 새로 생성해주는 메서드

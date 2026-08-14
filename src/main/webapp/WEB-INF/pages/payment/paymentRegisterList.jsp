@@ -16,7 +16,8 @@ body { min-width: 1200px; background: #fff; }
 .prl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .prl-table th { background: #f4f6f9; color: #337ab7; border: 1px solid #ddd; padding: 8px 6px; text-align: center; }
 .prl-table td { border: 1px solid #ddd; padding: 8px 6px; text-align: center; }
-.prl-table tbody tr:hover { background: #f8fafc; }
+.prl-table tbody tr.prl-row { cursor: pointer; }
+.prl-table tbody tr.prl-row:hover { background: #e8f1fb; }
 .prl-table a.seq-link { color: #337ab7; font-weight: bold; text-decoration: none; }
 .prl-table a.seq-link:hover { text-decoration: underline; }
 .prl-table tr.prl-total-row td { background: #fcf8e3; font-weight: bold; }
@@ -72,10 +73,15 @@ body { min-width: 1200px; background: #fff; }
 			<tbody>
 				<c:forEach var="row" items="${payrollList}">
 					<fmt:formatNumber value="${row.paySequence}" pattern="00" var="paySeqPadded" />
-					<tr data-payroll-id="${row.payrollId}">
+					<c:url var="rowDetailUrl" value="/Payment/paymentRegisterListDetail.do">
+						<c:param name="payYear" value="${fn:substring(row.payYearMonth, 0, 4)}" />
+						<c:param name="payMonth" value="${fn:substring(row.payYearMonth, 4, 6)}" />
+						<c:param name="paySequence" value="${paySeqPadded}" />
+					</c:url>
+					<tr class="prl-row" data-payroll-id="${row.payrollId}" data-href="${rowDetailUrl}" onclick="goRowDetail(event, this)">
 						<td>${fn:substring(row.payYearMonth, 0, 4)}-${fn:substring(row.payYearMonth, 4, 6)}</td>
 						<td>
-							<a class="seq-link" href="${pageContext.request.contextPath}/Payment/paymentMnt.do?payYear=${fn:substring(row.payYearMonth, 0, 4)}&payMonth=${fn:substring(row.payYearMonth, 4, 6)}&paySequence=${paySeqPadded}">
+							<a class="seq-link" href="${rowDetailUrl}">
 								<fmt:formatNumber value="${row.paySequence}" pattern="'급여-'00'차'" />
 							</a>
 						</td>
@@ -85,7 +91,7 @@ body { min-width: 1200px; background: #fff; }
 						<td style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${row.totalPayAmount}" pattern="#,###" /></td>
 						<td style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${row.totalDeductionAmount}" pattern="#,###" /></td>
 						<td style="text-align: right;"><fmt:formatNumber value="${row.netPayAmount}" pattern="#,###" /></td>
-						<td><button type="button" class="prl-btn-del" onclick="deletePayroll(${row.payrollId}, ${row.employeeCount})">✕ 삭제</button></td>
+						<td><button type="button" class="prl-btn-del" onclick="event.stopPropagation(); deletePayroll(${row.payrollId}, ${row.employeeCount})">✕ 삭제</button></td>
 					</tr>
 				</c:forEach>
 				<tr class="prl-total-row">
@@ -113,6 +119,12 @@ body { min-width: 1200px; background: #fff; }
 
 	function reloadPayrollData() {
 	    document.getElementById("searchForm").submit();
+	}
+
+	function goRowDetail(evt, tr) {
+	    if (evt.target.closest("a, button")) return;
+	    var href = tr.getAttribute("data-href");
+	    if (href) { location.href = href; }
 	}
 
 	function deletePayroll(payrollId, employeeCount) {
