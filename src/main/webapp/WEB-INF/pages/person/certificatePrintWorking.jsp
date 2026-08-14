@@ -22,52 +22,57 @@ request.setAttribute("pageJs", null);
 <div class="certificate-source-layout">
 	<section class="source-list-panel">
 		<div class="source-list-search">
-			<input class="input" type="text" placeholder="검색어 입력">
-			<button class="btn btn-primary" type="button" onclick="location.href='${pageContext.request.contextPath}/Person/certificatePrintWorking.do'">전체보기</button>
-		</div>
+	<!-- 검색 폼 추가: GET 방식으로 검색어(searchName) 전송 -->
+	<form action="${pageContext.request.contextPath}/Person/certificatePrintWorking.do" method="GET" style="display: flex; gap: 5px; width: 100%;">
+		<!-- 선택된 사원 정보와 증명서 타입 유지를 위한 hidden 필드 -->
+		<input type="hidden" name="employeeNo" value="${selectedEmpNo}">
+		<input type="hidden" name="certType" value="${selectedCertType}">
+		
+		<input class="input" type="text" name="searchName" placeholder="이름 입력" value="${param.searchName}">
+		<button class="btn btn-primary" type="submit">검색</button>
+		<button class="btn btn-primary" type="button" onclick="location.href='${pageContext.request.contextPath}/Person/certificatePrintWorking.do'" style="background-color: #6c757d; border-color: #6c757d;">전체보기</button>
+	</form>
+</div>
 		<div class="table-wrap">
-			<table class="data-table source-data-table compact-list">
-				<thead>
-					<tr>
-
-						<th>구분</th>
-						<th>사원번호</th>
-						<th>성명</th>
-						<th>부서</th>
-						<th>직위</th>
-						<th>상태</th>
-						<!--  상태 컬럼 추가 -->
-					</tr>
-				</thead>
-				<tbody>
-					<!--  서버에서 넘겨받은 사원 리스트 반복 출력 -->
-					<c:forEach var="emp" items="${empList}">
-						<!-- 선택된 사원의 행(tr) 배경색을 살짝 다르게 표시 (선택사항) -->
-						<tr
-							<c:if test="${emp.employeeNo == selectedEmpNo}">style="background-color: #f0f8ff;"</c:if>>
-							<!-- <td><input type="checkbox"...></td> 삭제됨 -->
-							<td>${emp.employmentType}</td>
-							<td>${emp.employeeNo}</td>s
-							<!--  a태그의 href 경로를 반드시 본인의 프로젝트 환경에 맞게 수정해야 합니다! -->
-							<td><a
-								href="${pageContext.request.contextPath}/Person/certificatePrintWorking.do?employeeNo=${emp.employeeNo}&certType=${selectedCertType}"
-								style="color: #0056b3; text-decoration: underline; font-weight: bold;">
-									${emp.employeeName} </a></td>
-							<td>${emp.department}</td>
-							<td>${emp.position}</td>
-							<td><c:choose>
-									<c:when test="${emp.retirementYn == 'Y'}">
-										<span style="color: gray;">퇴직</span>
-									</c:when>
-									<c:otherwise>
-										<span style="color: blue;">재직</span>
-									</c:otherwise>
-								</c:choose></td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-		</div>
+	<table class="data-table source-data-table compact-list">
+		<thead>
+			<tr>
+				<th>구분</th>
+				<th>사원번호</th>
+				<th>성명</th>
+				<th>부서</th>
+				<th>직위</th>
+				<th>상태</th>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach var="emp" items="${empList}">
+				<tr <c:if test="${emp.employeeNo == selectedEmpNo}">style="background-color: #f0f8ff;"</c:if>>
+					<td>${emp.employmentType}</td>
+					<td>${emp.employeeNo}</td> <!-- 끝에 있던 's' 오타 삭제됨 -->
+					<td>
+						<a href="${pageContext.request.contextPath}/Person/certificatePrintWorking.do?employeeNo=${emp.employeeNo}&certType=${selectedCertType}&searchName=${param.searchName}"
+							style="color: #0056b3; text-decoration: underline; font-weight: bold;">
+							${emp.employeeName}
+						</a>
+					</td>
+					<td>${emp.department}</td>
+					<td>${emp.position}</td>
+					<td>
+						<c:choose>
+							<c:when test="${emp.retirementYn == 'Y'}">
+								<span style="color: gray;">퇴직</span>
+							</c:when>
+							<c:otherwise>
+								<span style="color: blue;">재직</span>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</div>
 	</section>
 
 	<section class="certificate-workspace">

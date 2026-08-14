@@ -19,13 +19,13 @@ public class CertificatePrintWorkingReadHandler implements CommandHandler {
         
         String employeeNo = req.getParameter("employeeNo");
         String certType = req.getParameter("certType");
-        
+        String searchName = req.getParameter("searchName"); // 검색어 파라미터
         if (certType == null || certType.trim().isEmpty()) {
             certType = "재직증명서"; 
         }
 
         // 1. 좌측 리스트 세팅
-        List<Employee> empList = certService.getEmployeeList();
+        List<Employee> empList = certService.getEmployeeList(searchName);
         req.setAttribute("empList", empList);
 
         // 2. 우측 상세 데이터 세팅

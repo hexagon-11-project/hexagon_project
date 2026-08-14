@@ -13,39 +13,50 @@ import person.model.CertificatePrintWorkingModel;
 
 public class CertificatePrintWorkingDao {
     
-    public List<Employee> selectEmployeeList(Connection conn) throws SQLException {
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<Employee> list = new ArrayList<>();
-        
-        try {
-            // employee_no는 식별용으로 유지
-            String sql = "SELECT employee_no, employment_type, employee_name, "
-                       + "department, position, retirement_yn "
-                       + "FROM employee "
-                       + "ORDER BY employee_no DESC";
-                       
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
-            
-            while (rs.next()) {
-                Employee emp = new Employee();
-                emp.setEmployeeNo(rs.getString("employee_no"));       // 숨겨진 식별자용
-                emp.setEmploymentType(rs.getString("employment_type")); // 구분
-                emp.setEmployeeName(rs.getString("employee_name"));     // 성명
-                emp.setDepartment(rs.getString("department"));          // 부서
-                emp.setPosition(rs.getString("position"));              // 직위
-                emp.setRetirementYn(rs.getString("retirement_yn"));   // 상태(재직여부) 추가  
-                
-                list.add(emp);
-            }
-            return list;
-        } finally {
-            JdbcUtil.close(rs);
-            JdbcUtil.close(pstmt);
-        }
-    }
-
+	public List<Employee> selectEmployeeList(Connection conn, String searchName) throws SQLException {
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    List<Employee> list = new ArrayList<>();
+	    
+	    try {
+	       
+	        String sql = "SELECT employee_no, employment_type, employee_name, "
+	                   + "department, position, retirement_yn "
+	                   + "FROM employee ";
+	        
+	        // 검색어가 넘어온 경우 WHERE 조건 추가
+	        if (searchName != null && !searchName.trim().isEmpty()) {
+	            sql += "WHERE employee_name LIKE ? ";
+	        }
+	        
+	        sql += "ORDER BY employee_no DESC";
+	                   
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        // 검색어가 있을 때만 파라미터 세팅
+	        if (searchName != null && !searchName.trim().isEmpty()) {
+	            pstmt.setString(1, "%" + searchName.trim() + "%");
+	        }
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            Employee emp = new Employee();
+	            emp.setEmployeeNo(rs.getString("employee_no"));
+	            emp.setEmploymentType(rs.getString("employment_type"));
+	            emp.setEmployeeName(rs.getString("employee_name"));
+	            emp.setDepartment(rs.getString("department"));
+	            emp.setPosition(rs.getString("position"));
+	            emp.setRetirementYn(rs.getString("retirement_yn"));
+	            
+	            list.add(emp);
+	        }
+	        return list;
+	    } finally {
+	        JdbcUtil.close(rs);
+	        JdbcUtil.close(pstmt);
+	    }
+	}
     public Employee selectEmployeeDetail(Connection conn, String employeeNo) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -108,7 +119,7 @@ public class CertificatePrintWorkingDao {
 
             pstmt = conn.prepareStatement(sql);
             
-            // 쿼리의 물음표(?) 순서에 맞게 Model의 값을 세팅합니다.
+           
             pstmt.setString(1, model.getCertificateTypeCode()); 
             pstmt.setString(2, model.getPurpose());             
             pstmt.setString(3, model.getSubmissionTarget());    
@@ -118,7 +129,7 @@ public class CertificatePrintWorkingDao {
             result = pstmt.executeUpdate();
             
         } finally {
-            JdbcUtil.close(pstmt); // 기존 코드의 자원 반납 방식 사용
+            JdbcUtil.close(pstmt); 
         }
         
         return result;
