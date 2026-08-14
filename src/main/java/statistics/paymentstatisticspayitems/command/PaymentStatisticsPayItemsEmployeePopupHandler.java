@@ -18,7 +18,24 @@ public class PaymentStatisticsPayItemsEmployeePopupHandler implements CommandHan
 
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		req.setAttribute("employeeList", paymentStatisticsPayItemsService.getEmployeeList(DEFAULT_COMPANY_ID));
+		String empName = trimToNull(req.getParameter("empName"));
+		String department = trimToNull(req.getParameter("department"));
+		String status = trimToNull(req.getParameter("status"));
+
+		req.setAttribute("employeeList",
+				paymentStatisticsPayItemsService.getEmployeeList(DEFAULT_COMPANY_ID, empName, department, status));
+		req.setAttribute("deptList", paymentStatisticsPayItemsService.getDepartmentList(DEFAULT_COMPANY_ID));
+		req.setAttribute("empName", empName == null ? "" : empName);
+		req.setAttribute("selectedDept", department == null ? "" : department);
+		req.setAttribute("selectedStatus", status == null ? "" : status);
 		return POPUP_VIEW;
+	}
+
+	private String trimToNull(String value) {
+		if (value == null) {
+			return null;
+		}
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
 	}
 }

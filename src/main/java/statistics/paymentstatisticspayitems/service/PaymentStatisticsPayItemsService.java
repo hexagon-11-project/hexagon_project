@@ -24,13 +24,26 @@ public class PaymentStatisticsPayItemsService {
 	/**
 	 * 사원 선택 팝업용 목록 조회.
 	 */
-	public List<Employee> getEmployeeList(int companyId) {
+	public List<Employee> getEmployeeList(int companyId, String employeeName, String department, String status) {
 		Connection conn = null;
 		try {
 			conn = ConnectionProvider.getConnection();
-			return paymentStatisticsPayItemsDao.selectEmployeeList(conn, companyId);
+			return paymentStatisticsPayItemsDao.selectEmployeeList(conn, companyId, employeeName, department, status);
 		} catch (SQLException e) {
 			throw new RuntimeException("사원 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/** 사원 선택 팝업의 부서 필터 목록. */
+	public List<String> getDepartmentList(int companyId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return paymentStatisticsPayItemsDao.selectDepartmentList(conn, companyId);
+		} catch (SQLException e) {
+			throw new RuntimeException("부서 목록 조회 중 DB 오류 발생", e);
 		} finally {
 			JdbcUtil.close(conn);
 		}

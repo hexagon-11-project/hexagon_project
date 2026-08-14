@@ -24,20 +24,41 @@ public class PaymentStatisticsPayItemsDao {
 	/**
 	 * 사원 선택 팝업용 목록을 조회한다.
 	 * 사원 구분, 사원번호, 이름, 부서, 직위, 재직상태를 반환한다.
+	 * employeeName / department / status가 있으면 해당 조건으로 필터한다.
 	 */
-	public List<Employee> selectEmployeeList(Connection conn, int companyId) throws SQLException {
+	public List<Employee> selectEmployeeList(Connection conn, int companyId, String employeeName,
+			String department, String status) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		try {
-			String sql = "SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYMENT_TYPE, EMPLOYEE_NAME, "
-					+ "DEPARTMENT, POSITION, RETIREMENT_YN "
-					+ "FROM EMPLOYEE "
-					+ "WHERE COMPANY_ID = ? "
-					+ "ORDER BY EMPLOYEE_NAME, EMPLOYEE_NO";
+			StringBuilder sql = new StringBuilder();
+			sql.append("SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYMENT_TYPE, EMPLOYEE_NAME, ");
+			sql.append("DEPARTMENT, POSITION, RETIREMENT_YN ");
+			sql.append("FROM EMPLOYEE ");
+			sql.append("WHERE COMPANY_ID = ? ");
+			if (hasText(employeeName)) {
+				sql.append("AND EMPLOYEE_NAME LIKE ? ");
+			}
+			if (hasText(department)) {
+				sql.append("AND DEPARTMENT = ? ");
+			}
+			if ("재직".equals(status)) {
+				sql.append("AND (RETIREMENT_YN IS NULL OR RETIREMENT_YN <> 'Y') ");
+			} else if ("퇴직".equals(status)) {
+				sql.append("AND RETIREMENT_YN = 'Y' ");
+			}
+			sql.append("ORDER BY EMPLOYEE_NAME, EMPLOYEE_NO");
 
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, companyId);
+			pstmt = conn.prepareStatement(sql.toString());
+			int index = 1;
+			pstmt.setInt(index++, companyId);
+			if (hasText(employeeName)) {
+				pstmt.setString(index++, "%" + employeeName.trim() + "%");
+			}
+			if (hasText(department)) {
+				pstmt.setString(index++, department.trim());
+			}
 			rs = pstmt.executeQuery();
 
 			List<Employee> result = new ArrayList<>();
@@ -57,6 +78,34 @@ public class PaymentStatisticsPayItemsDao {
 			JdbcUtil.close(rs);
 			JdbcUtil.close(pstmt);
 		}
+	}
+
+	/** 사원 선택 팝업의 부서 필터 목록. */
+	public List<String> selectDepartmentList(Connection conn, int companyId) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = "SELECT DISTINCT DEPARTMENT FROM EMPLOYEE "
+					+ "WHERE COMPANY_ID = ? AND DEPARTMENT IS NOT NULL AND DEPARTMENT <> '' "
+					+ "ORDER BY DEPARTMENT";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, companyId);
+			rs = pstmt.executeQuery();
+
+			List<String> result = new ArrayList<>();
+			while (rs.next()) {
+				result.add(rs.getString("DEPARTMENT"));
+			}
+			return result;
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
+	private boolean hasText(String value) {
+		return value != null && !value.trim().isEmpty();
 	}
 
 	/**
