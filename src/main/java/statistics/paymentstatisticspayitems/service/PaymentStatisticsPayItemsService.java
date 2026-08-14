@@ -2,7 +2,9 @@ package statistics.paymentstatisticspayitems.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
+import config.employee.model.Employee;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 import statistics.model.EmployeeSalaryStatistics;
@@ -15,6 +17,21 @@ import statistics.paymentstatisticspayitems.dao.PaymentStatisticsPayItemsDao;
 public class PaymentStatisticsPayItemsService {
 
 	private PaymentStatisticsPayItemsDao paymentStatisticsPayItemsDao = new PaymentStatisticsPayItemsDao();
+
+	/**
+	 * 사원 선택 팝업용 목록 조회.
+	 */
+	public List<Employee> getEmployeeList(int companyId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return paymentStatisticsPayItemsDao.selectEmployeeList(conn, companyId);
+		} catch (SQLException e) {
+			throw new RuntimeException("사원 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
 
 	/**
 	 * 연도, 월, 사원이름으로 해당 사원의 월 급여 항목 통계를 조회한다.

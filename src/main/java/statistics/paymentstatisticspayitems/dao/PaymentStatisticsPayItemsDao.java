@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import config.employee.model.Employee;
 import jdbc.JdbcUtil;
 import statistics.model.EmployeeSalaryStatistics;
 import statistics.model.SalaryItemStatistics;
@@ -19,6 +20,44 @@ import statistics.model.SalaryItemStatistics;
  * 같은 월에 급여차수가 여러 건이면 항목별 금액을 합산한다.
  */
 public class PaymentStatisticsPayItemsDao {
+
+	/**
+	 * 사원 선택 팝업용 목록을 조회한다.
+	 * 사원 구분, 사원번호, 이름, 부서, 직위, 재직상태를 반환한다.
+	 */
+	public List<Employee> selectEmployeeList(Connection conn, int companyId) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			String sql = "SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYMENT_TYPE, EMPLOYEE_NAME, "
+					+ "DEPARTMENT, POSITION, RETIREMENT_YN "
+					+ "FROM EMPLOYEE "
+					+ "WHERE COMPANY_ID = ? "
+					+ "ORDER BY EMPLOYEE_NAME, EMPLOYEE_NO";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, companyId);
+			rs = pstmt.executeQuery();
+
+			List<Employee> result = new ArrayList<>();
+			while (rs.next()) {
+				Employee emp = new Employee();
+				emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+				emp.setEmployeeNo(rs.getString("EMPLOYEE_NO"));
+				emp.setEmploymentType(rs.getString("EMPLOYMENT_TYPE"));
+				emp.setEmployeeName(rs.getString("EMPLOYEE_NAME"));
+				emp.setDepartment(rs.getString("DEPARTMENT"));
+				emp.setPosition(rs.getString("POSITION"));
+				emp.setRetirementYn(rs.getString("RETIREMENT_YN"));
+				result.add(emp);
+			}
+			return result;
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
 
 	/**
 	 * 연도, 월, 사원이름으로 해당 사원의 월 급여 항목 통계를 조회한다.
