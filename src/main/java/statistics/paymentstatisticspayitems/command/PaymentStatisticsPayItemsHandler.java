@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
 import statistics.model.EmployeeSalaryStatistics;
+import statistics.paymentstatisticspayitems.service.EmployeeSalaryNotFoundException;
 import statistics.paymentstatisticspayitems.service.PaymentStatisticsPayItemsService;
 
 /**
@@ -33,8 +34,12 @@ public class PaymentStatisticsPayItemsHandler implements CommandHandler {
 
 		EmployeeSalaryStatistics employeeSalaryStatistics = null;
 		if (employeeName != null) {
-			employeeSalaryStatistics = paymentStatisticsPayItemsService
-					.getEmployeeSalaryStatistics(companyId, year, month, employeeName);
+			try {
+				employeeSalaryStatistics = paymentStatisticsPayItemsService
+						.getEmployeeSalaryStatistics(companyId, year, month, employeeName);
+			} catch (EmployeeSalaryNotFoundException e) {
+				req.setAttribute("errorMessage", e.getMessage());
+			}
 		}
 
 		req.setAttribute("year", year);

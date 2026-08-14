@@ -95,10 +95,83 @@
 	align-items: center
 }
 
+.donut-triple {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px;
+	align-items: start
+}
+
+.donut-panel {
+	min-width: 0
+}
+
+.donut-triple canvas[data-chart="donut"] {
+	width: 100%;
+	height: 240px;
+	display: block
+}
+
+.donut-legend {
+	list-style: none;
+	margin: 8px 0 0;
+	padding: 0;
+	font-size: 12px;
+	color: #44505c;
+	line-height: 1.65
+}
+
+.donut-legend li {
+	display: flex;
+	align-items: center;
+	gap: 6px
+}
+
+.donut-legend .swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	flex-shrink: 0
+}
+
+.item-composition-matrix {
+	min-width: 980px;
+	width: 100%;
+	border-top: 2px solid #5b9bd5;
+	border-bottom: none
+}
+
+.item-composition-matrix.deduction-matrix {
+	border-top: 0;
+	border-bottom: 2px solid #5b9bd5;
+	margin-top: -1px
+}
+
+.item-composition-matrix .net-pay-head {
+	background: #5b9bd5;
+	color: #fff;
+	min-width: 110px
+}
+
+.item-composition-matrix .net-pay-value {
+	font-weight: 700;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 15px;
+	background: #fff;
+	color: #1f2937
+}
+
 .chart-note {
 	text-align: center;
 	color: var(--muted);
 	margin-top: 7px
+}
+
+@media ( max-width :1100px) {
+	.donut-triple {
+		grid-template-columns: 1fr
+	}
 }
 
 @media ( max-width :900px) {

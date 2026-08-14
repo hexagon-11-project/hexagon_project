@@ -52,32 +52,51 @@
 	function donut(canvas) {
 		const ctx = canvas.getContext('2d');
 		const values = JSON.parse(canvas.getAttribute('data-values') || '[]');
+		const center = canvas.getAttribute('data-center') || '';
 		const ratio = dpr();
-		const cssW = Math.max(canvas.clientWidth || canvas.parentElement.clientWidth || 300, 300);
+		const cssW = Math.max(canvas.clientWidth || canvas.parentElement.clientWidth || 240, 200);
+		const cssH = Math.max(canvas.clientHeight || 240, 200);
 		canvas.width = cssW * ratio;
-		canvas.height = 300 * ratio;
+		canvas.height = cssH * ratio;
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		const cx = cssW / 2, cy = 150, r = 105;
-		const total = values.reduce((a, b) => a + b, 0) || 1;
-		let start = -Math.PI / 2;
-		values.forEach((v, i) => {
-			const end = start + Math.PI * 2 * v / total;
+		ctx.clearRect(0, 0, cssW, cssH);
+		const cx = cssW / 2, cy = cssH / 2;
+		const r = Math.min(cssW, cssH) * 0.38;
+		const inner = r * 0.52;
+		const total = values.reduce((a, b) => a + Number(b || 0), 0);
+		if (total <= 0) {
 			ctx.beginPath();
-			ctx.moveTo(cx, cy);
-			ctx.arc(cx, cy, r, start, end);
-			ctx.closePath();
-			ctx.fillStyle = palette[i % palette.length];
+			ctx.arc(cx, cy, r, 0, Math.PI * 2);
+			ctx.fillStyle = '#e8eef3';
 			ctx.fill();
-			start = end;
-		});
+		} else {
+			let start = -Math.PI / 2;
+			values.forEach((v, i) => {
+				const amount = Number(v || 0);
+				if (amount <= 0) {
+					return;
+				}
+				const end = start + Math.PI * 2 * amount / total;
+				ctx.beginPath();
+				ctx.moveTo(cx, cy);
+				ctx.arc(cx, cy, r, start, end);
+				ctx.closePath();
+				ctx.fillStyle = palette[i % palette.length];
+				ctx.fill();
+				start = end;
+			});
+		}
 		ctx.beginPath();
-		ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+		ctx.arc(cx, cy, inner, 0, Math.PI * 2);
 		ctx.fillStyle = '#fff';
 		ctx.fill();
-		ctx.fillStyle = '#263445';
-		ctx.font = '700 15px sans-serif';
-		ctx.textAlign = 'center';
-		ctx.fillText('지급항목', cx, cy + 5);
+		if (center) {
+			ctx.fillStyle = '#263445';
+			ctx.font = '700 14px sans-serif';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillText(center, cx, cy);
+		}
 	}
 
 	function formatNumber(n) {
