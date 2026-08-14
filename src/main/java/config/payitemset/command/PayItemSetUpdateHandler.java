@@ -56,6 +56,14 @@ public class PayItemSetUpdateHandler implements CommandHandler {
 			item.setBulkPayAmount(null);
 		}
 
+		if ("N".equalsIgnoreCase(item.getTaxableYn())) {
+			item.setNonTaxId(parseIntOrNull(req.getParameter("nonTaxId")));
+		} else {
+			item.setNonTaxId(null);
+			item.setNonPayAmount(null);
+			item.setNonTaxCategory(null);
+		}
+
 		updateService.update(item);
 
 		res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
@@ -85,6 +93,18 @@ public class PayItemSetUpdateHandler implements CommandHandler {
 		}
 
 		return Integer.parseInt(value);
+
+	}
+
+	private Integer parseIntOrNull(String value) {
+
+		if (value == null || value.isBlank()) {
+
+			return null;
+
+		}
+
+		return Integer.parseInt(value.trim());
 
 	}
 

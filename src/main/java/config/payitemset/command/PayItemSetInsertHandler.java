@@ -34,6 +34,7 @@ public class PayItemSetInsertHandler implements CommandHandler {
 		item.setAttendancePayRule(emptyToNull(req.getParameter("attendancePayRule")));
 		item.setUseYn(req.getParameter("useYn"));
 		item.setNonPayAmount(parseLongOrNull(req.getParameter("nonPayAmount")));
+		item.setNonTaxCategory(emptyToNull(req.getParameter("nonTaxCategory")));
 
 		item.setCompanyId(1001);
 		if (item.getCalculationMethod() == null) {
@@ -49,7 +50,14 @@ public class PayItemSetInsertHandler implements CommandHandler {
 		item.setDisplayOrder(0);
 		item.setRegId("SYSTEM");
 		item.setModId("SYSTEM");
-		item.setNonTaxId(null);
+
+		if ("N".equalsIgnoreCase(item.getTaxableYn())) {
+			item.setNonTaxId(parseIntOrNull(req.getParameter("nonTaxId")));
+		} else {
+			item.setNonTaxId(null);
+			item.setNonPayAmount(null);
+			item.setNonTaxCategory(null);
+		}
 
 		insertService.insert(item);
 		res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
@@ -68,6 +76,13 @@ public class PayItemSetInsertHandler implements CommandHandler {
 			return defaultValue;
 		}
 		return Integer.parseInt(value);
+	}
+
+	private Integer parseIntOrNull(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return null;
+		}
+		return Integer.parseInt(value.trim());
 	}
 
 	private String emptyToNull(String value) {
