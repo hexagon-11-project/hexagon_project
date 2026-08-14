@@ -53,6 +53,39 @@ private String toItemValuesJson(List<SalaryItemStatistics> items) {
 	return sb.toString();
 }
 
+private String escJson(String value) {
+	if (value == null) {
+		return "";
+	}
+	return value.replace("\\", "\\\\").replace("\"", "\\\"");
+}
+
+private String toLabelsJson(String... labels) {
+	StringBuilder sb = new StringBuilder("[");
+	for (int i = 0; i < labels.length; i++) {
+		if (i > 0) {
+			sb.append(',');
+		}
+		sb.append('"').append(escJson(labels[i])).append('"');
+	}
+	sb.append(']');
+	return sb.toString();
+}
+
+private String toItemLabelsJson(List<SalaryItemStatistics> items) {
+	StringBuilder sb = new StringBuilder("[");
+	if (items != null) {
+		for (int i = 0; i < items.size(); i++) {
+			if (i > 0) {
+				sb.append(',');
+			}
+			sb.append('"').append(escJson(nvl(items.get(i).getItemName()))).append('"');
+		}
+	}
+	sb.append(']');
+	return sb.toString();
+}
+
 private String paletteColor(int index) {
 	return DONUT_PALETTE[index % DONUT_PALETTE.length];
 }
@@ -62,8 +95,8 @@ request.setAttribute("pageTitle", "급여항목 구성 통계");
 request.setAttribute("pageSection", "급여통계");
 request.setAttribute("pageDescription", "귀속연월·사원별 지급항목 금액과 구성비를 원형 그래프와 표로 확인합니다.");
 request.setAttribute("activeKey", "item-composition");
-request.setAttribute("pageCss", "statistics.css?v=matrix2");
-request.setAttribute("pageJs", "charts.js?v=donut3");
+request.setAttribute("pageCss", "statistics.css?v=matrix3");
+request.setAttribute("pageJs", "charts.js?v=donutTip1");
 
 Integer selectedYear = (Integer) request.getAttribute("year");
 Integer selectedMonth = (Integer) request.getAttribute("month");
@@ -135,9 +168,13 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 		%>
 		<div class="donut-triple">
 			<div class="donut-panel">
-				<canvas data-chart="donut"
-					data-center="지급/공제"
-					data-values="<%=toValuesJson(totalPay, totalDeduction)%>"></canvas>
+				<div class="chart-canvas-wrap">
+					<canvas data-chart="donut"
+						data-center="지급/공제"
+						data-labels='<%=toLabelsJson("지급항목", "공제항목")%>'
+						data-values="<%=toValuesJson(totalPay, totalDeduction)%>"></canvas>
+					<div class="chart-tooltip" hidden></div>
+				</div>
 				<p class="chart-note">지급항목 + 공제항목</p>
 				<ul class="donut-legend">
 					<li><span class="swatch" style="background:<%=paletteColor(0)%>"></span>
@@ -147,9 +184,13 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 				</ul>
 			</div>
 			<div class="donut-panel">
-				<canvas data-chart="donut"
-					data-center="지급항목"
-					data-values="<%=toItemValuesJson(payItems)%>"></canvas>
+				<div class="chart-canvas-wrap">
+					<canvas data-chart="donut"
+						data-center="지급항목"
+						data-labels='<%=toItemLabelsJson(payItems)%>'
+						data-values="<%=toItemValuesJson(payItems)%>"></canvas>
+					<div class="chart-tooltip" hidden></div>
+				</div>
 				<p class="chart-note">지급 세부항목</p>
 				<ul class="donut-legend">
 					<%
@@ -170,9 +211,13 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 				</ul>
 			</div>
 			<div class="donut-panel">
-				<canvas data-chart="donut"
-					data-center="공제항목"
-					data-values="<%=toItemValuesJson(deductionItems)%>"></canvas>
+				<div class="chart-canvas-wrap">
+					<canvas data-chart="donut"
+						data-center="공제항목"
+						data-labels='<%=toItemLabelsJson(deductionItems)%>'
+						data-values="<%=toItemValuesJson(deductionItems)%>"></canvas>
+					<div class="chart-tooltip" hidden></div>
+				</div>
 				<p class="chart-note">공제 세부항목</p>
 				<ul class="donut-legend">
 					<%

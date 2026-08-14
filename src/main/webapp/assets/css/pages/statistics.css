@@ -102,8 +102,9 @@
 	align-items: start
 }
 
-.donut-panel {
-	min-width: 0
+.donut-panel .chart-canvas-wrap {
+	position: relative;
+	width: 100%
 }
 
 .donut-triple canvas[data-chart="donut"] {
