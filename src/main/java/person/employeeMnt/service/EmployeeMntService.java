@@ -62,12 +62,11 @@ public class EmployeeMntService {
     }
     private int size = 30; //  한 페이지에 보여줄 개수 (30개 고정)
 
-	public EmployeePage getEmployeePage(int pageNum) {
+	public EmployeePage getEmployeePage(int pageNum, String searchType, String keyword) {
 		try (Connection conn = connection.ConnectionProvider.getConnection()) {
 			
 			// 1. 전체 사원 수 구하기 (기존 통합 카운트 메서드의 total 값 활용 또는 별도 count 쿼리)
-			int total = employeeDao.getAllCounts(conn).get("total"); 
-			
+			int total = employeeDao.getSearchCount(conn, searchType, keyword);
 			List<Employee> content = null;
 			if (total > 0) {
 				// 오라클 ROWNUM에 맞게 범위 계산
@@ -75,7 +74,7 @@ public class EmployeeMntService {
 				int endRow = firstRow + size - 1;
 				
 				// 2. 30개만 잘라오기
-				content = employeeDao.selectListByPaging(conn, firstRow, endRow);
+				content = employeeDao.selectListByPaging(conn, firstRow, endRow, searchType, keyword);
 				
 				// 3. 주민번호 -> 생년월일 가공 로직 적용
 				for (Employee emp : content) {

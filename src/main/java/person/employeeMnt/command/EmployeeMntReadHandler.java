@@ -22,10 +22,13 @@ public class EmployeeMntReadHandler implements CommandHandler {
         if (pageVal != null && !pageVal.isEmpty()) {
             pageNum = Integer.parseInt(pageVal);
         }
+        // 검색 파라미터 추줄 
+        String searchType = req.getParameter("searchType");
+        String keyword = req.getParameter("keyword");
         
         try {
             // 1. 30개씩 잘린 데이터 상자 가져오기 (페이징 정보 포함)
-            EmployeePage employeePage = employeeService.getEmployeePage(pageNum);
+        	EmployeePage employeePage = employeeService.getEmployeePage(pageNum, searchType, keyword);
             
             // 2. 상단 상태별 카운트 버튼 정보 가져오기
             java.util.Map<String, Integer> countMap = employeeService.getEmployeeCounts();

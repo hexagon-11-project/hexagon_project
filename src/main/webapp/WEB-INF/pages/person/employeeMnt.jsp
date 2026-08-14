@@ -37,15 +37,22 @@ request.setAttribute("pageJs", null);
 
 <!-- 오타(ass="...") 수정 완료 -->
 <div class="employee-list-tools"> 
-	<div class="search-strip">
-		<select class="select">
-			<option>성명</option>
-			<option>사원번호</option>
-			<option>부서</option>
-		</select>
-		<input class="input" type="text" placeholder="검색어 입력">
-		<button type="button" class="btn btn-primary">전체보기</button>
-	</div>
+
+	<form action="${pageContext.request.contextPath}/Person/employeeMnt.do" method="GET" style="display:inline;">
+		<div class="search-strip">
+			<select class="select" name="searchType">
+				<option value="name" ${param.searchType == 'name' ? 'selected' : ''}>성명</option>
+				<option value="empNo" ${param.searchType == 'empNo' ? 'selected' : ''}>사원번호</option>
+				<option value="dept" ${param.searchType == 'dept' ? 'selected' : ''}>부서</option>
+			</select>
+			<input class="input" type="text" name="keyword" value="${param.keyword}" placeholder="검색어 입력">
+			
+			<!--  전체보기 옆에 검색 버튼 추가 -->
+			<button type="submit" class="btn btn-primary">검색</button>
+			<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/Person/employeeMnt.do'">전체보기</button>
+		</div>
+	</form>
+
 	<div class="search-strip">
 		<select class="select"><option>고용형태별</option></select>
 		<select class="select"><option>상태별</option></select>
@@ -54,8 +61,7 @@ request.setAttribute("pageJs", null);
 	</div>
 </div>
 
-<!-- ⭐️ 추가됨: 삭제할 데이터를 서버로 보내기 위해 Table 전체를 form으로 감쌉니다 -->
-
+<!--  삭제할 데이터를 서버로 보내기 위해 Table 전체를 form으로 감쌉니다 -->
 <form id="deleteForm" action="${pageContext.request.contextPath}/Person/employeeMntDelete.do" method="POST">
 	<div class="table-wrap">
 		<table class="data-table source-data-table employee-master-table">
@@ -77,9 +83,9 @@ request.setAttribute("pageJs", null);
 			<tbody>
 				<c:forEach var="emp" items="${employeePage.content}">
 					<tr>
-						<!-- ⭐️ 추가됨: 체크박스에 name과 value(사번) 부여 -->
+						<!-- 체크박스에 name과 value(사번) 부여 -->
 						<td><input type="checkbox" name="empId" value="${emp.employeeId}"></td>
-<%-- <td><input type="checkbox" name="empId" value="${emp.employeeNo}"></td> --%>
+
 						<td>${emp.employmentType}</td>
 						<td>${emp.employeeNo}</td>
 						<td><strong>${emp.employeeName}</strong></td>
@@ -100,12 +106,14 @@ request.setAttribute("pageJs", null);
 			</tbody>
 		</table>
 	</div>
-</form> <!-- form 끝 -->
+</form> 
 
 <div class="source-pagination">
+	<!--  페이지 이동 시에도 검색된 상태가 풀리지 않도록 파라미터(&searchType=...&keyword=...) 유지 -->
+	
 	<!-- 이전 구간으로 이동 (‹ 이전페이지) -->
 	<c:if test="${employeePage.startPage > 5}">
-		<a href="employeeMnt.do?page=${employeePage.startPage - 5}">‹ 이전페이지</a>
+		<a href="employeeMnt.do?page=${employeePage.startPage - 5}&searchType=${param.searchType}&keyword=${param.keyword}">‹ 이전페이지</a>
 	</c:if>
 
 	<!-- 페이지 번호 출력 -->
@@ -115,24 +123,23 @@ request.setAttribute("pageJs", null);
 				<strong>${pNo}</strong>
 			</c:when>
 			<c:otherwise>
-				<a href="employeeMnt.do?page=${pNo}">${pNo}</a>
+				<a href="employeeMnt.do?page=${pNo}&searchType=${param.searchType}&keyword=${param.keyword}">${pNo}</a>
 			</c:otherwise>
 		</c:choose>
 	</c:forEach>
 
 	<!-- 다음 구간으로 이동 (다음페이지 ›) -->
 	<c:if test="${employeePage.endPage < employeePage.totalPages}">
-		<a href="employeeMnt.do?page=${employeePage.startPage + 5}">다음페이지 ›</a>
+		<a href="employeeMnt.do?page=${employeePage.startPage + 5}&searchType=${param.searchType}&keyword=${param.keyword}">다음페이지 ›</a>
 	</c:if>
 </div>
 
 <div class="source-bottom-actions">
 	<button type="button" class="btn btn-primary"
 		onclick="location.href='${pageContext.request.contextPath}/Config/employeeIns1.do'">신규사원등록</button>
-	<!-- ⭐️ 추가됨: 버튼 클릭 시 자바스크립트 함수 호출 -->
+	<!--  버튼 클릭 시 자바스크립트 함수 호출 -->
 	<!-- <button type="submit" class="btn">선택 삭제</button> -->
 	<button type="submit" form="deleteForm" class="btn">선택 삭제</button>
 </div>
-
 
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
