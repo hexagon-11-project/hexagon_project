@@ -80,7 +80,7 @@
 			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
 			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
 			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/item-ledger.jsp"><span
+			href="<%=ctx%>/Payment/paymentPayItemPart.do"><span
 			class="nav-icon">□</span><span>항목별 대장</span></a><a
 			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/payroll/insurance-deduction.jsp"><span

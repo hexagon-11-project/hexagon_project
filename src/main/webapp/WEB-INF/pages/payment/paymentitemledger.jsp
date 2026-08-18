@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 request.setAttribute("pageTitle", "항목별 대장");
 request.setAttribute("pageSection", "급여관리");
@@ -9,74 +11,90 @@ request.setAttribute("pageJs", null);
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
-<section class="filter-bar">
-	<div class="field ">
-		<label>조회기간</label>
-		<div class="range">
-			<input type="month" class="input" value="2026-01"><span>~</span><input
-				type="month" class="input" value="2026-08">
+<form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get">
+	<input type="hidden" name="search" value="Y">
+	<section class="filter-bar">
+		<div class="field">
+			<label>조회기간</label>
+			<div class="range">
+				<input type="month" class="input" name="startYearMonth" value="${startYearMonth}">
+				<span>~</span>
+				<input type="month" class="input" name="endYearMonth" value="${endYearMonth}">
+			</div>
 		</div>
-	</div>
-	<div class="field ">
-		<label>항목</label><select class="select"><option value="기본급"
-				selected>기본급</option>
-			<option value="식대">식대</option>
-			<option value="연장근로수당">연장근로수당</option>
-			<option value="국민연금">국민연금</option>
-			<option value="건강보험">건강보험</option></select>
-	</div>
-	<div class="actions">
-		<button type="button" class="btn btn-primary">조회</button>
-		<button type="button" class="btn ">인쇄</button>
-	</div>
-</section>
-<section class="card ">
+		<div class="field">
+			<label>항목</label>
+			<select class="select" name="itemSelectValue">
+				<c:forEach var="item" items="${itemList}">
+					<option value="${item.selectValue}" ${item.selectValue == itemSelectValue ? 'selected' : ''}>${item.itemName}</option>
+				</c:forEach>
+			</select>
+		</div>
+		<div class="actions">
+			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="button" class="btn">인쇄</button>
+		</div>
+	</section>
+</form>
+<section class="card">
 	<div class="card-header">
-		<h2 class="section-title">기본급 항목별 대장</h2>
+		<h2 class="section-title">
+			<c:choose>
+				<c:when test="${not empty selectedItemName}">${selectedItemName} 항목별 대장</c:when>
+				<c:otherwise>항목별 대장</c:otherwise>
+			</c:choose>
+		</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
-			<table class="data-table ">
+			<table class="data-table">
 				<thead>
 					<tr>
-						<th>귀속연월</th>
-						<th>사번</th>
+						<th>구분</th>
 						<th>성명</th>
 						<th>부서</th>
-						<th>항목명</th>
+						<th>직위</th>
+						<th>귀속연월</th>
 						<th>금액</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>2026-08</td>
-						<td>No-140031</td>
-						<td>김민준</td>
-						<td>기획전략팀</td>
-						<td>기본급</td>
-						<td>4,200,000</td>
-					</tr>
-					<tr>
-						<td>2026-08</td>
-						<td>No-140032</td>
-						<td>박서연</td>
-						<td>콘텐츠팀</td>
-						<td>기본급</td>
-						<td>3,200,000</td>
-					</tr>
-					<tr>
-						<td>2026-08</td>
-						<td>No-140033</td>
-						<td>이도윤</td>
-						<td>개발팀</td>
-						<td>기본급</td>
-						<td>2,400,000</td>
-					</tr>
+					<c:choose>
+						<c:when test="${not searched}">
+							<tr>
+								<td colspan="6" style="text-align:center;">조회기간과 항목을 선택한 뒤 조회하세요.</td>
+							</tr>
+						</c:when>
+						<c:when test="${empty employeeList}">
+							<tr>
+								<td colspan="6" style="text-align:center;">조회된 내역이 없습니다.</td>
+							</tr>
+						</c:when>
+						<c:otherwise>
+							<c:forEach var="emp" items="${employeeList}">
+								<c:forEach var="detail" items="${emp.details}">
+									<tr>
+										<td>${empty emp.employmentType ? '-' : emp.employmentType}</td>
+										<td>${empty emp.employeeName ? '-' : emp.employeeName}</td>
+										<td>${empty emp.department ? '-' : emp.department}</td>
+										<td>${empty emp.position ? '-' : emp.position}</td>
+										<td>${detail.year}-<fmt:formatNumber value="${detail.month}" pattern="00"/></td>
+										<td><fmt:formatNumber value="${detail.amount}" pattern="#,###"/></td>
+									</tr>
+								</c:forEach>
+								<tr>
+									<td colspan="5" style="text-align:right;">${emp.employeeName} 합계</td>
+									<td><fmt:formatNumber value="${emp.totalAmount}" pattern="#,###"/></td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 		</div>
 		<div class="tfoot-summary">
-			<span>항목 합계 9,800,000원</span>
+			<span>조회 인원 ${targetCount}명</span>
+			<span>항목 합계 <fmt:formatNumber value="${totalAmount}" pattern="#,###"/>원</span>
 		</div>
 	</div>
 </section>
