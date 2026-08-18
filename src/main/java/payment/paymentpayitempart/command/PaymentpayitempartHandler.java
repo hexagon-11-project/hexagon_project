@@ -38,9 +38,14 @@ public class PaymentpayitempartHandler implements CommandHandler {
 
 		List<PaymentItemLedger> itemList = paymentpayitempartService.getItemList(companyId);
 		String payItemKey = parseItemSelectValue(req.getParameter("payItemKey"));
+		boolean keepSelection = searched;
+		String errorMessage = null;
 
 		List<PaymentItemLedger> employeeList = Collections.emptyList();
-		if (searched) {
+		if (searched && isPeriodOver12Months(startYearMonth, endYearMonth)) {
+			errorMessage = "조회기간은 12개월을 초과할 수 없습니다.";
+			searched = false;
+		} else if (searched) {
 			employeeList = paymentpayitempartService.getEmployeeItemLedger(companyId,
 					startYearMonth.getYear(), startYearMonth.getMonthValue(),
 					endYearMonth.getYear(), endYearMonth.getMonthValue(),
@@ -49,10 +54,11 @@ public class PaymentpayitempartHandler implements CommandHandler {
 
 		req.setAttribute("startYearMonth", startYearMonth.toString());
 		req.setAttribute("endYearMonth", endYearMonth.toString());
-		req.setAttribute("payItemKey", searched ? payItemKey : "");
+		req.setAttribute("payItemKey", keepSelection ? payItemKey : "");
 		req.setAttribute("itemList", itemList);
 		req.setAttribute("selectedItemName", searched ? findItemName(itemList, payItemKey) : "");
 		req.setAttribute("searched", searched);
+		req.setAttribute("errorMessage", errorMessage);
 		req.setAttribute("employeeList", employeeList);
 		req.setAttribute("targetCount", employeeList.size());
 		req.setAttribute("totalAmount", paymentpayitempartService.sumTotalAmount(employeeList));
@@ -78,6 +84,13 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		} catch (DateTimeParseException e) {
 			return defaultValue;
 		}
+	}
+
+	/** 시작~종료 연월이 12개월을 넘으면 true. 같은 달부터 12개월(예: 1월~12월)은 허용한다. */
+	private boolean isPeriodOver12Months(YearMonth startYearMonth, YearMonth endYearMonth) {
+		int monthCount = (endYearMonth.getYear() - startYearMonth.getYear()) * 12
+				+ (endYearMonth.getMonthValue() - startYearMonth.getMonthValue()) + 1;
+		return monthCount > 12;
 	}
 
 	/** 항목을 고르지 않았으면 기본값(급여항목 선택)을 유지한다. */

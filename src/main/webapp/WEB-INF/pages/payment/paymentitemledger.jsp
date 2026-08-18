@@ -21,7 +21,8 @@ boolean selectPlaceholder = selectedPayItemKey.isEmpty();
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
-<form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get" autocomplete="off">
+<form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get" autocomplete="off"
+	onsubmit="return checkLedgerPeriod(this);">
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
 		<div class="field">
@@ -118,4 +119,34 @@ if (ledgerItemList != null) {
 		</div>
 	</div>
 </section>
+<script>
+function checkLedgerPeriod(form) {
+	var startValue = form.startYearMonth.value;
+	var endValue = form.endYearMonth.value;
+	if (!startValue || !endValue) {
+		return true;
+	}
+	var startParts = startValue.split('-');
+	var endParts = endValue.split('-');
+	var startYear = parseInt(startParts[0], 10);
+	var startMonth = parseInt(startParts[1], 10);
+	var endYear = parseInt(endParts[0], 10);
+	var endMonth = parseInt(endParts[1], 10);
+	var monthCount = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+	if (monthCount > 12) {
+		alert('조회기간은 12개월을 초과할 수 없습니다.');
+		return false;
+	}
+	return true;
+}
+</script>
+<%
+String errorMessage = (String) request.getAttribute("errorMessage");
+if (errorMessage != null) {
+	String errorMessageJs = errorMessage.replace("\\", "\\\\").replace("'", "\\'").replace("\r", "").replace("\n", "\\n");
+%>
+<script>alert('<%=errorMessageJs%>');</script>
+<%
+}
+%>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
