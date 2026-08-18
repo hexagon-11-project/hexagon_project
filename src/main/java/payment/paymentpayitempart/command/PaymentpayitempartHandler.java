@@ -3,6 +3,7 @@ package payment.paymentpayitempart.command;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class PaymentpayitempartHandler implements CommandHandler {
 
 	private static final String FORM_VIEW = "/WEB-INF/pages/payment/paymentitemledger.jsp";
 	private static final int DEFAULT_COMPANY_ID = 1001;
+	private static final int MAX_MONTHS = 12;
 
 	private PaymentpayitempartService paymentpayitempartService = new PaymentpayitempartService();
 
@@ -59,6 +61,7 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		req.setAttribute("selectedItemName", searched ? findItemName(itemList, payItemKey) : "");
 		req.setAttribute("searched", searched);
 		req.setAttribute("errorMessage", errorMessage);
+		req.setAttribute("monthColumns", toMonthColumns(startYearMonth, endYearMonth));
 		req.setAttribute("employeeList", employeeList);
 		req.setAttribute("targetCount", employeeList.size());
 		req.setAttribute("totalAmount", paymentpayitempartService.sumTotalAmount(employeeList));
@@ -88,9 +91,30 @@ public class PaymentpayitempartHandler implements CommandHandler {
 
 	/** 시작~종료 연월이 12개월을 넘으면 true. 같은 달부터 12개월(예: 1월~12월)은 허용한다. */
 	private boolean isPeriodOver12Months(YearMonth startYearMonth, YearMonth endYearMonth) {
-		int monthCount = (endYearMonth.getYear() - startYearMonth.getYear()) * 12
+		return monthCount(startYearMonth, endYearMonth) > MAX_MONTHS;
+	}
+
+	/** 조회기간 시작~종료의 연월 목록. 경고 기준과 같이 최대 12개월만 표시한다. */
+	private List<String> toMonthColumns(YearMonth startYearMonth, YearMonth endYearMonth) {
+		List<String> months = new ArrayList<>();
+		if (startYearMonth == null || endYearMonth == null || startYearMonth.isAfter(endYearMonth)) {
+			return months;
+		}
+		YearMonth cursor = startYearMonth;
+		YearMonth cappedEnd = startYearMonth.plusMonths(MAX_MONTHS - 1);
+		if (endYearMonth.isBefore(cappedEnd)) {
+			cappedEnd = endYearMonth;
+		}
+		while (!cursor.isAfter(cappedEnd) && months.size() < MAX_MONTHS) {
+			months.add(String.format("%04d.%02d", cursor.getYear(), cursor.getMonthValue()));
+			cursor = cursor.plusMonths(1);
+		}
+		return months;
+	}
+
+	private int monthCount(YearMonth startYearMonth, YearMonth endYearMonth) {
+		return (endYearMonth.getYear() - startYearMonth.getYear()) * 12
 				+ (endYearMonth.getMonthValue() - startYearMonth.getMonthValue()) + 1;
-		return monthCount > 12;
 	}
 
 	/** 항목을 고르지 않았으면 기본값(급여항목 선택)을 유지한다. */

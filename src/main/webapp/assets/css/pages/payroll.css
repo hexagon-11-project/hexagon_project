@@ -82,3 +82,33 @@
 		grid-template-columns: repeat(2, 1fr)
 	}
 }
+
+.item-ledger-table {
+	min-width: 1100px;
+	border-top: 2px solid #2f7eb6
+}
+
+.item-ledger-table th.month-col {
+	color: #2f7eb6
+}
+
+.item-ledger-table th.row-total {
+	background: #1f1f1f;
+	color: #fff
+}
+
+.item-ledger-table td.amount {
+	text-align: center
+}
+
+.item-ledger-table td.row-total {
+	background: #f0f0f0;
+	font-weight: 700;
+	text-align: right
+}
+
+.item-ledger-table tfoot td {
+	background: #fff8d6;
+	font-weight: 700;
+	text-align: center
+}

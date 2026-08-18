@@ -206,4 +206,32 @@ public class PaymentItemLedger {
 	public void setTotalAmount(long totalAmount) {
 		this.totalAmount = totalAmount;
 	}
+
+	/** 해당 연월 금액. yearMonthLabel 형식은 YYYY.MM (예: 2026.01). */
+	public long getAmountOf(String yearMonthLabel) {
+		if (yearMonthLabel == null || yearMonthLabel.length() < 7) {
+			return 0L;
+		}
+		try {
+			int year = Integer.parseInt(yearMonthLabel.substring(0, 4));
+			int month = Integer.parseInt(yearMonthLabel.substring(5, 7));
+			return getAmountByYearMonth(year, month);
+		} catch (NumberFormatException e) {
+			return 0L;
+		}
+	}
+
+	/** 해당 연월 금액. 같은 달에 차수가 여러 건이면 합산한다. */
+	public long getAmountByYearMonth(int year, int month) {
+		long sum = 0L;
+		if (details == null) {
+			return sum;
+		}
+		for (PaymentItemLedger detail : details) {
+			if (detail.getYear() == year && detail.getMonth() == month) {
+				sum += detail.getAmount();
+			}
+		}
+		return sum;
+	}
 }
