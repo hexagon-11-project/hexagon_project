@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import config.employee.model.Employee;
 import jdbc.JdbcUtil;
@@ -41,12 +43,10 @@ public class PaymentStatisticsPayItemsDao {
 				sql.append("AND EMPLOYEE_NAME LIKE ? ");
 			}
 			if (hasText(department)) {
-				sql.append("AND DEPARTMENT = ? ");
+				sql.append("AND TRIM(DEPARTMENT) = ? ");
 			}
-			if ("재직".equals(status)) {
-				sql.append("AND (RETIREMENT_YN IS NULL OR RETIREMENT_YN <> 'Y') ");
-			} else if ("퇴직".equals(status)) {
-				sql.append("AND RETIREMENT_YN = 'Y' ");
+			if (hasText(status)) {
+				sql.append("AND CASE WHEN NVL(RETIREMENT_YN, 'N') = 'Y' THEN '퇴직' ELSE '재직' END = ? ");
 			}
 			sql.append("ORDER BY EMPLOYEE_NAME, EMPLOYEE_NO");
 
@@ -58,6 +58,9 @@ public class PaymentStatisticsPayItemsDao {
 			}
 			if (hasText(department)) {
 				pstmt.setString(index++, department.trim());
+			}
+			if (hasText(status)) {
+				pstmt.setString(index++, status.trim());
 			}
 			rs = pstmt.executeQuery();
 
@@ -80,22 +83,54 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 사원 선택 팝업의 부서 필터 목록. */
-	public List<String> selectDepartmentList(Connection conn, int companyId) throws SQLException {
+	/** 사원등록 화면과 동일한 기본 부서. 사원이 없는 부서도 필터에 보이게 한다. */
+	private static final String[] DEFAULT_DEPARTMENTS = {
+			"사장실", "개발팀", "업무지원팀", "디자인팀", "관리팀", "기획전략팀", "콘텐츠팀"
+	};
+
+	/** 사원 선택 팝업의 부서 필터 목록. 기본 부서 + EMPLOYEE에 있는 부서. */
+	public List<String> selectDepartmentList(Connection conn) throws SQLException {
+		Set<String> result = new LinkedHashSet<String>();
+		for (String dept : DEFAULT_DEPARTMENTS) {
+			result.add(dept);
+		}
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			String sql = "SELECT DISTINCT TRIM(DEPARTMENT) AS DEPARTMENT FROM EMPLOYEE "
+					+ "WHERE DEPARTMENT IS NOT NULL "
+					+ "ORDER BY TRIM(DEPARTMENT)";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				String dept = rs.getString("DEPARTMENT");
+				if (dept != null && !dept.isEmpty()) {
+					result.add(dept);
+				}
+			}
+			return new ArrayList<String>(result);
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
+	/** 사원 선택 팝업의 상태 필터 목록. EMPLOYEE 재직여부를 재직/퇴직으로 가져온다. */
+	public List<String> selectStatusList(Connection conn) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		try {
-			String sql = "SELECT DISTINCT DEPARTMENT FROM EMPLOYEE "
-					+ "WHERE COMPANY_ID = ? AND DEPARTMENT IS NOT NULL AND DEPARTMENT <> '' "
-					+ "ORDER BY DEPARTMENT";
+			String sql = "SELECT DISTINCT CASE WHEN NVL(RETIREMENT_YN, 'N') = 'Y' THEN '퇴직' ELSE '재직' END AS EMP_STATUS "
+					+ "FROM EMPLOYEE "
+					+ "ORDER BY EMP_STATUS";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, companyId);
 			rs = pstmt.executeQuery();
 
 			List<String> result = new ArrayList<>();
 			while (rs.next()) {
-				result.add(rs.getString("DEPARTMENT"));
+				result.add(rs.getString("EMP_STATUS"));
 			}
 			return result;
 		} finally {

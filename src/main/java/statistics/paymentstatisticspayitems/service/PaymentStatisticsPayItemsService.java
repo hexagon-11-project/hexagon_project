@@ -37,13 +37,26 @@ public class PaymentStatisticsPayItemsService {
 	}
 
 	/** 사원 선택 팝업의 부서 필터 목록. */
-	public List<String> getDepartmentList(int companyId) {
+	public List<String> getDepartmentList() {
 		Connection conn = null;
 		try {
 			conn = ConnectionProvider.getConnection();
-			return paymentStatisticsPayItemsDao.selectDepartmentList(conn, companyId);
+			return paymentStatisticsPayItemsDao.selectDepartmentList(conn);
 		} catch (SQLException e) {
 			throw new RuntimeException("부서 목록 조회 중 DB 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/** 사원 선택 팝업의 상태 필터 목록. */
+	public List<String> getStatusList() {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			return paymentStatisticsPayItemsDao.selectStatusList(conn);
+		} catch (SQLException e) {
+			throw new RuntimeException("상태 목록 조회 중 DB 오류 발생", e);
 		} finally {
 			JdbcUtil.close(conn);
 		}

@@ -24,7 +24,8 @@ public class PaymentStatisticsPayItemsEmployeePopupHandler implements CommandHan
 
 		req.setAttribute("employeeList",
 				paymentStatisticsPayItemsService.getEmployeeList(DEFAULT_COMPANY_ID, empName, department, status));
-		req.setAttribute("deptList", paymentStatisticsPayItemsService.getDepartmentList(DEFAULT_COMPANY_ID));
+		req.setAttribute("deptList", paymentStatisticsPayItemsService.getDepartmentList());
+		req.setAttribute("statusList", paymentStatisticsPayItemsService.getStatusList());
 		req.setAttribute("empName", empName == null ? "" : empName);
 		req.setAttribute("selectedDept", department == null ? "" : department);
 		req.setAttribute("selectedStatus", status == null ? "" : status);
