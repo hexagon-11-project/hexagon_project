@@ -37,21 +37,21 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		YearMonth endYearMonth = parseYearMonth(req.getParameter("endYearMonth"), current);
 
 		List<PaymentItemLedger> itemList = paymentpayitempartService.getItemList(companyId);
-		String itemSelectValue = parseItemSelectValue(req.getParameter("itemSelectValue"), itemList);
+		String payItemKey = parseItemSelectValue(req.getParameter("payItemKey"));
 
 		List<PaymentItemLedger> employeeList = Collections.emptyList();
 		if (searched) {
 			employeeList = paymentpayitempartService.getEmployeeItemLedger(companyId,
 					startYearMonth.getYear(), startYearMonth.getMonthValue(),
 					endYearMonth.getYear(), endYearMonth.getMonthValue(),
-					itemSelectValue);
+					payItemKey);
 		}
 
 		req.setAttribute("startYearMonth", startYearMonth.toString());
 		req.setAttribute("endYearMonth", endYearMonth.toString());
-		req.setAttribute("itemSelectValue", itemSelectValue);
+		req.setAttribute("payItemKey", searched ? payItemKey : "");
 		req.setAttribute("itemList", itemList);
-		req.setAttribute("selectedItemName", findItemName(itemList, itemSelectValue));
+		req.setAttribute("selectedItemName", searched ? findItemName(itemList, payItemKey) : "");
 		req.setAttribute("searched", searched);
 		req.setAttribute("employeeList", employeeList);
 		req.setAttribute("targetCount", employeeList.size());
@@ -80,15 +80,12 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		}
 	}
 
-	/** 선택한 항목이 목록에 없으면 첫 항목 value를 사용한다. */
-	private String parseItemSelectValue(String itemSelectValue, List<PaymentItemLedger> itemList) {
-		if (itemSelectValue != null && !itemSelectValue.trim().isEmpty()) {
-			return itemSelectValue.trim();
+	/** 항목을 고르지 않았으면 기본값(급여항목 선택)을 유지한다. */
+	private String parseItemSelectValue(String itemSelectValue) {
+		if (itemSelectValue == null || itemSelectValue.trim().isEmpty()) {
+			return "";
 		}
-		if (itemList == null || itemList.isEmpty()) {
-			return null;
-		}
-		return itemList.get(0).getSelectValue();
+		return itemSelectValue.trim();
 	}
 
 	private String findItemName(List<PaymentItemLedger> itemList, String itemSelectValue) {

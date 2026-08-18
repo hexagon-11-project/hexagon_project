@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List"%>
+<%@ page import="payment.model.PaymentItemLedger"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
@@ -8,10 +10,18 @@ request.setAttribute("pageDescription", "조회기간과 지급·공제항목을
 request.setAttribute("activeKey", "item-ledger");
 request.setAttribute("pageCss", "payroll.css");
 request.setAttribute("pageJs", null);
+
+@SuppressWarnings("unchecked")
+List<PaymentItemLedger> ledgerItemList = (List<PaymentItemLedger>) request.getAttribute("itemList");
+String selectedPayItemKey = (String) request.getAttribute("payItemKey");
+if (selectedPayItemKey == null) {
+	selectedPayItemKey = "";
+}
+boolean selectPlaceholder = selectedPayItemKey.isEmpty();
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
-<form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get">
+<form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get" autocomplete="off">
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
 		<div class="field">
@@ -24,10 +34,20 @@ request.setAttribute("pageJs", null);
 		</div>
 		<div class="field">
 			<label>항목</label>
-			<select class="select" name="itemSelectValue">
-				<c:forEach var="item" items="${itemList}">
-					<option value="${item.selectValue}" ${item.selectValue == itemSelectValue ? 'selected' : ''}>${item.itemName}</option>
-				</c:forEach>
+			<select class="select" name="payItemKey" autocomplete="off">
+				<option value="" <%=selectPlaceholder ? "selected=\"selected\"" : ""%>>급여항목 선택</option>
+<%
+if (ledgerItemList != null) {
+	for (PaymentItemLedger payItem : ledgerItemList) {
+		String optionValue = payItem.getSelectValue();
+		String optionName = payItem.getItemName() == null ? "" : payItem.getItemName();
+		boolean optionSelected = !selectPlaceholder && selectedPayItemKey.equals(optionValue);
+%>
+				<option value="<%=optionValue%>" <%=optionSelected ? "selected=\"selected\"" : ""%>><%=optionName%></option>
+<%
+	}
+}
+%>
 			</select>
 		</div>
 		<div class="actions">
