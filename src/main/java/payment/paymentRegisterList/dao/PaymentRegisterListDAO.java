@@ -69,20 +69,27 @@ public class PaymentRegisterListDAO {
             p2.setLong(1, payrollId);
             p2.executeUpdate();
         }
+        // ★ 지급 상세내역(PAYROLL_PAY_DETAIL)도 함께 삭제해야 한다 - 빠지면 PAYROLL_EMPLOYEE 삭제 시 FK 오류가
+        //   나거나, 삭제되지 않은 상세행이 그대로 남아 "전부 삭제"가 아니게 된다.
         try (PreparedStatement p3 = conn.prepareStatement(
-                "DELETE FROM PAYROLL_TRANSFER_REQUEST WHERE PAYROLL_ID = ?")) {
+                "DELETE FROM PAYROLL_PAY_DETAIL WHERE PAYROLL_EMPLOYEE_ID IN " + empSubSelect)) {
             p3.setLong(1, payrollId);
             p3.executeUpdate();
         }
         try (PreparedStatement p4 = conn.prepareStatement(
-                "DELETE FROM PAYROLL_EMPLOYEE WHERE PAYROLL_ID = ?")) {
+                "DELETE FROM PAYROLL_TRANSFER_REQUEST WHERE PAYROLL_ID = ?")) {
             p4.setLong(1, payrollId);
             p4.executeUpdate();
         }
         try (PreparedStatement p5 = conn.prepareStatement(
-                "DELETE FROM PAYROLL WHERE PAYROLL_ID = ?")) {
+                "DELETE FROM PAYROLL_EMPLOYEE WHERE PAYROLL_ID = ?")) {
             p5.setLong(1, payrollId);
             p5.executeUpdate();
+        }
+        try (PreparedStatement p6 = conn.prepareStatement(
+                "DELETE FROM PAYROLL WHERE PAYROLL_ID = ?")) {
+            p6.setLong(1, payrollId);
+            p6.executeUpdate();
         }
     }
 }

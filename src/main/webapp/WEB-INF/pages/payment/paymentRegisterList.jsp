@@ -78,7 +78,9 @@ body { min-width: 1200px; background: #fff; }
 						<c:param name="payMonth" value="${fn:substring(row.payYearMonth, 4, 6)}" />
 						<c:param name="paySequence" value="${paySeqPadded}" />
 					</c:url>
-					<tr class="prl-row" data-payroll-id="${row.payrollId}" data-href="${rowDetailUrl}" onclick="goRowDetail(event, this)">
+					<tr class="prl-row" data-payroll-id="${row.payrollId}" data-href="${rowDetailUrl}"
+						data-pay="${row.totalPayAmount}" data-ded="${row.totalDeductionAmount}" data-net="${row.netPayAmount}"
+						onclick="goRowDetail(event, this)">
 						<td>${fn:substring(row.payYearMonth, 0, 4)}-${fn:substring(row.payYearMonth, 4, 6)}</td>
 						<td>
 							<a class="seq-link" href="${rowDetailUrl}">
@@ -91,15 +93,15 @@ body { min-width: 1200px; background: #fff; }
 						<td style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${row.totalPayAmount}" pattern="#,###" /></td>
 						<td style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${row.totalDeductionAmount}" pattern="#,###" /></td>
 						<td style="text-align: right;"><fmt:formatNumber value="${row.netPayAmount}" pattern="#,###" /></td>
-						<td><button type="button" class="prl-btn-del" onclick="event.stopPropagation(); deletePayroll(${row.payrollId}, ${row.employeeCount})">✕ 삭제</button></td>
+						<td><button type="button" class="prl-btn-del" onclick="event.stopPropagation(); deletePayroll(this)">✕ 삭제</button></td>
 					</tr>
 				</c:forEach>
 				<tr class="prl-total-row">
 					<td colspan="4">합계</td>
 					<td></td>
-					<td style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${totalPay}" pattern="#,###" /></td>
-					<td style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${totalDeduction}" pattern="#,###" /></td>
-					<td style="text-align: right;"><fmt:formatNumber value="${totalNet}" pattern="#,###" /></td>
+					<td id="prlTotalPay" style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${totalPay}" pattern="#,###" /></td>
+					<td id="prlTotalDed" style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${totalDeduction}" pattern="#,###" /></td>
+					<td id="prlTotalNet" style="text-align: right;"><fmt:formatNumber value="${totalNet}" pattern="#,###" /></td>
 					<td></td>
 				</tr>
 			</tbody>
@@ -127,9 +129,15 @@ body { min-width: 1200px; background: #fff; }
 	    if (href) { location.href = href; }
 	}
 
-	function deletePayroll(payrollId, employeeCount) {
-	    if (!payrollId || !employeeCount) { alert("등록된 급여 데이터가 없어 삭제할 항목이 없습니다."); return; }
-	    if (!confirm("해당 급여차수를 삭제하시겠습니까? 관련된 급여 데이터가 모두 삭제됩니다.")) return;
+	function deletePayroll(btn) {
+	    var tr = btn.closest("tr");
+	    var payrollId = tr.getAttribute("data-payroll-id");
+	    if (!payrollId) { alert("등록된 급여 데이터가 없어 삭제할 항목이 없습니다."); return; }
+
+	    var noticeMsg = "[필독] - [삭제기능]\n\n선택하신 급여차수에 해당하는\n\n급여데이터가 전부 삭제됩니다.\n\n"
+	                   + "삭제된 급여대장 및 급여데이터는\n\n복구가 불가능 하오니 다시한번 확인하시고 삭제해주세요.";
+	    if (!confirm(noticeMsg)) return;
+	    if (!confirm("[경고] 정말 삭제하시겠습니까?")) return;
 
 	    var formData = new URLSearchParams();
 	    formData.append("payrollId", payrollId);
@@ -140,10 +148,32 @@ body { min-width: 1200px; background: #fff; }
 	        body: formData.toString()
 	    }).then(function (res) { return res.text(); })
 	      .then(function (result) {
-	          if (result === "SUCCESS") { location.reload(); }
-	          else { alert("삭제 중 문제가 발생했습니다."); }
+	          if (result === "SUCCESS") {
+	              alert("삭제 되었습니다.");
+	              removeRowAndRecalcTotals(tr);
+	          } else {
+	              alert("삭제 중 문제가 발생했습니다.");
+	          }
 	      })
 	      .catch(function () { alert("서버 통신에 실패했습니다."); });
+	}
+
+	// 삭제된 급여차수는 달력처럼 항상 채워지는 목록이라 새로고침해도 그 자리에 빈 줄로 다시 나타나므로,
+	// 화면에서 줄 자체를 완전히 지우고 합계도 즉시 다시 계산한다.
+	function removeRowAndRecalcTotals(tr) {
+	    tr.parentNode.removeChild(tr);
+
+	    var rows = document.querySelectorAll(".prl-row");
+	    var totalPay = 0, totalDed = 0, totalNet = 0;
+	    rows.forEach(function (row) {
+	        totalPay += Number(row.getAttribute("data-pay")) || 0;
+	        totalDed += Number(row.getAttribute("data-ded")) || 0;
+	        totalNet += Number(row.getAttribute("data-net")) || 0;
+	    });
+
+	    document.getElementById("prlTotalPay").textContent = totalPay.toLocaleString("en-US");
+	    document.getElementById("prlTotalDed").textContent = totalDed.toLocaleString("en-US");
+	    document.getElementById("prlTotalNet").textContent = totalNet.toLocaleString("en-US");
 	}
 	</script>
 </body>

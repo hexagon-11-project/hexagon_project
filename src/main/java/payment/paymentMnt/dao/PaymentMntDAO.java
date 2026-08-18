@@ -4,11 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import payment.paymentMnt.dto.PaymentMntDailyWorkSummary;
 import payment.paymentMnt.dto.PaymentMntDeductionDetailDTO;
@@ -282,7 +285,10 @@ public class PaymentMntDAO {
 
     /** 사원별급여(payrollEmployeeId) 하나의 "최종" 지급/공제 상세를 계산한다 - 저장된 값에 기본값 보정
      *  (일용직은 근무기록 합계/기본급 대체로 '일용급여', 그 외는 '기본급', 공제내역은 최근 저장분 이월)까지 반영.
-     *  급여입력/관리 화면의 좌측 사원목록 총액과 우측 상세패널 총액이 항상 일치하도록, 두 곳 모두 이 메서드 하나만 쓴다. */
+     *  급여입력/관리 화면의 좌측 사원목록 총액과 우측 상세패널 총액이 항상 일치하도록, 두 곳 모두 이 메서드 하나만 쓴다.
+     *  ★ 여기서 보정(대체/기본값 채움)된 항목은 화면에 "저장된 것처럼" 보이므로, 실제로도 즉시 DB에 반영해둔다.
+     *  그렇지 않으면 급여대장/지난급여 불러오기처럼 PAYROLL_PAY_DETAIL을 직접 조회하는 화면에서는 0으로 보이는
+     *  화면-DB 불일치가 생긴다. */
     public PaymentMntEffectiveDetail computeEffectiveDetail(Connection conn, Long payrollEmployeeId) throws SQLException {
         List<PaymentMntPayDetailDTO> payDetails = selectPayDetails(conn, payrollEmployeeId);
         List<PaymentMntDeductionDetailDTO> deductionDetails = selectDeductionDetails(conn, payrollEmployeeId);
@@ -290,25 +296,32 @@ public class PaymentMntDAO {
             deductionDetails = selectDefaultDeductionDetails(conn, payrollEmployeeId);
         }
 
+        Set<Long> touchedPayItemIds = new HashSet<>();
+        Set<Long> touchedDeductionItemIds = new HashSet<>();
+
         PaymentMntDailyWorkSummary dailySummary = selectDailyWorkSummary(conn, payrollEmployeeId);
         if (dailySummary != null) {
             Long dailyPayItemId = selectDailyPayItemId(conn);
             if (dailyPayItemId != null) {
                 if (dailySummary.getRecordCount() > 0) {
                     upsertPayDetailInList(payDetails, dailyPayItemId, dailySummary.getSumPay());
+                    touchedPayItemIds.add(dailyPayItemId);
 
                     Long incomeTaxItemId = selectDeductionItemIdByName(conn, "소득세");
                     if (incomeTaxItemId != null) {
                         upsertDeductionDetailInList(deductionDetails, incomeTaxItemId, dailySummary.getSumIncomeTax());
+                        touchedDeductionItemIds.add(incomeTaxItemId);
                     }
                     Long localTaxItemId = selectDeductionItemIdByName(conn, "지방소득세");
                     if (localTaxItemId != null) {
                         upsertDeductionDetailInList(deductionDetails, localTaxItemId, dailySummary.getSumLocalTax());
+                        touchedDeductionItemIds.add(localTaxItemId);
                     }
                 } else if (!hasPayItem(payDetails, dailyPayItemId)) {
                     Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
                     if (baseWageAmount != null && baseWageAmount > 0) {
                         upsertPayDetailInList(payDetails, dailyPayItemId, baseWageAmount);
+                        touchedPayItemIds.add(dailyPayItemId);
                     }
                 }
             }
@@ -316,6 +329,7 @@ public class PaymentMntDAO {
             Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
             if (baseWageAmount != null && baseWageAmount > 0) {
                 upsertPayDetailInList(payDetails, 2801L, baseWageAmount);
+                touchedPayItemIds.add(2801L);
             }
         }
 
@@ -325,6 +339,7 @@ public class PaymentMntDAO {
         for (Map.Entry<Long, Long> entry : selectPayItemBulkDefaults(conn).entrySet()) {
             if (!hasPayItem(payDetails, entry.getKey())) {
                 upsertPayDetailInList(payDetails, entry.getKey(), entry.getValue());
+                touchedPayItemIds.add(entry.getKey());
             }
         }
 
@@ -332,6 +347,22 @@ public class PaymentMntDAO {
         for (PaymentMntPayDetailDTO p : payDetails) totalPay += (p.getAmount() == null ? 0 : p.getAmount());
         long totalDeduction = 0;
         for (PaymentMntDeductionDetailDTO d : deductionDetails) totalDeduction += (d.getAmount() == null ? 0 : d.getAmount());
+
+        // ★ 화면 표시값과 DB를 일치시키기 위해, 위에서 보정/대체된 항목만 실제로 저장한다
+        //   (사용자가 직접 저장한 값은 손대지 않고, 화면에만 보이던 기본값/근무기록 합계만 반영).
+        if (!touchedPayItemIds.isEmpty() || !touchedDeductionItemIds.isEmpty()) {
+            for (PaymentMntPayDetailDTO p : payDetails) {
+                if (touchedPayItemIds.contains(p.getPayItemId())) {
+                    upsertPayDetail(conn, payrollEmployeeId, p.getPayItemId().intValue(), p.getAmount());
+                }
+            }
+            for (PaymentMntDeductionDetailDTO d : deductionDetails) {
+                if (touchedDeductionItemIds.contains(d.getDeductionItemId())) {
+                    upsertDeductionDetail(conn, payrollEmployeeId, d.getDeductionItemId().intValue(), d.getAmount());
+                }
+            }
+            updateEmployeeTotals(conn, payrollEmployeeId, totalPay, totalDeduction, totalPay - totalDeduction);
+        }
 
         PaymentMntEffectiveDetail result = new PaymentMntEffectiveDetail();
         result.setPayDetails(payDetails);
@@ -730,9 +761,8 @@ public class PaymentMntDAO {
         Long currPayrollId = selectPayrollId(conn, currYearMonth, currSeq);
         if (currPayrollId == null) { return 0; }
 
-        List<Object[]> prevEmployees = new ArrayList<>(); // [PAYROLL_EMPLOYEE_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, TOTAL_PAY, TOTAL_DED, NET_PAY]
-        String selectSql = "SELECT prev_e.PAYROLL_EMPLOYEE_ID, prev_e.EMPLOYEE_ID, prev_e.EMPLOYMENT_TYPE, prev_e.INCOME_TYPE, "
-                          + "prev_e.TOTAL_PAY_AMOUNT, prev_e.TOTAL_DEDUCTION_AMOUNT, prev_e.NET_PAY_AMOUNT "
+        List<Object[]> prevEmployees = new ArrayList<>(); // [PAYROLL_EMPLOYEE_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE]
+        String selectSql = "SELECT prev_e.PAYROLL_EMPLOYEE_ID, prev_e.EMPLOYEE_ID, prev_e.EMPLOYMENT_TYPE, prev_e.INCOME_TYPE "
                           + "FROM PAYROLL_EMPLOYEE prev_e JOIN PAYROLL prev_p ON prev_e.PAYROLL_ID = prev_p.PAYROLL_ID "
                           + "WHERE prev_p.PAY_YEAR_MONTH = ? AND prev_p.PAY_SEQUENCE = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
@@ -742,8 +772,7 @@ public class PaymentMntDAO {
                 while (rs.next()) {
                     prevEmployees.add(new Object[] {
                         rs.getLong("PAYROLL_EMPLOYEE_ID"), rs.getString("EMPLOYEE_ID"),
-                        rs.getString("EMPLOYMENT_TYPE"), rs.getString("INCOME_TYPE"),
-                        rs.getLong("TOTAL_PAY_AMOUNT"), rs.getLong("TOTAL_DEDUCTION_AMOUNT"), rs.getLong("NET_PAY_AMOUNT")
+                        rs.getString("EMPLOYMENT_TYPE"), rs.getString("INCOME_TYPE")
                     });
                 }
             }
@@ -755,16 +784,20 @@ public class PaymentMntDAO {
             String employeeId = (String) row[1];
             String employmentType = (String) row[2];
             String incomeType = (String) row[3];
-            long totalPay = (Long) row[4];
-            long totalDed = (Long) row[5];
-            long netPay = (Long) row[6];
 
-            Long newPayrollEmployeeId = insertPayrollEmployeeCopy(conn, currPayrollId, employeeId, employmentType, incomeType, totalPay, totalDed, netPay);
+            // ★ 저장된 상세만 그대로 읽지 않고, 급여입력/관리 화면에 실제로 보이는 "최종" 금액(기본급/식대
+            //   기본값 보정, 근무기록 합계 대체 포함)을 기준으로 복사한다. 이전 달 사원이 화면에는 금액이
+            //   보였지만 상세행이 실제로 저장된 적은 없는 경우(예: 신규 사원목록 표시 - 저장 미클릭)까지
+            //   포함해서 선택한 귀속연월 데이터와 완전히 동일하게 불러오기 위함이다.
+            PaymentMntEffectiveDetail prevEffective = computeEffectiveDetail(conn, prevPayrollEmployeeId);
 
-            for (PaymentMntPayDetailDTO detail : selectPayDetails(conn, prevPayrollEmployeeId)) {
+            Long newPayrollEmployeeId = insertPayrollEmployeeCopy(conn, currPayrollId, employeeId, employmentType, incomeType,
+                    prevEffective.getTotalPayAmount(), prevEffective.getTotalDeductionAmount(), prevEffective.getNetPayAmount());
+
+            for (PaymentMntPayDetailDTO detail : prevEffective.getPayDetails()) {
                 upsertPayDetail(conn, newPayrollEmployeeId, detail.getPayItemId().intValue(), detail.getAmount());
             }
-            for (PaymentMntDeductionDetailDTO detail : selectDeductionDetails(conn, prevPayrollEmployeeId)) {
+            for (PaymentMntDeductionDetailDTO detail : prevEffective.getDeductionDetails()) {
                 upsertDeductionDetail(conn, newPayrollEmployeeId, detail.getDeductionItemId().intValue(), detail.getAmount());
             }
 
@@ -773,31 +806,42 @@ public class PaymentMntDAO {
         return count;
     }
 
+    // ★ PAYROLL_EMPLOYEE_ID를 시퀀스가 아니라 MAX+1로 채번하다 보니, 같은 순간 두 요청(예: 불러오기 버튼
+    //   연속 클릭)이 동시에 같은 다음 번호를 계산해서 PK 충돌(ORA-00001)이 날 수 있다. 충돌 시 번호를 다시
+    //   계산해서 몇 번 재시도하면 대부분 해결되므로, 채번-삽입을 통째로 재시도한다.
     private Long insertPayrollEmployeeCopy(Connection conn, Long payrollId, String employeeId, String employmentType,
             String incomeType, long totalPay, long totalDed, long netPay) throws SQLException {
-        long newId;
-        try (PreparedStatement idStmt = conn.prepareStatement("SELECT NVL(MAX(PAYROLL_EMPLOYEE_ID), 0) + 1 FROM PAYROLL_EMPLOYEE");
-             ResultSet rs = idStmt.executeQuery()) {
-            rs.next();
-            newId = rs.getLong(1);
-        }
-
         String sql = "INSERT INTO PAYROLL_EMPLOYEE ("
                    + "    PAYROLL_EMPLOYEE_ID, PAYROLL_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, "
                    + "    TOTAL_PAY_AMOUNT, TOTAL_DEDUCTION_AMOUNT, NET_PAY_AMOUNT, REG_ID, MOD_ID"
                    + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'admin', 'admin')";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setLong(1, newId);
-            pstmt.setLong(2, payrollId);
-            pstmt.setString(3, employeeId);
-            pstmt.setString(4, employmentType);
-            pstmt.setString(5, incomeType);
-            pstmt.setLong(6, totalPay);
-            pstmt.setLong(7, totalDed);
-            pstmt.setLong(8, netPay);
-            pstmt.executeUpdate();
+
+        final int maxAttempts = 5;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            long newId;
+            try (PreparedStatement idStmt = conn.prepareStatement("SELECT NVL(MAX(PAYROLL_EMPLOYEE_ID), 0) + 1 FROM PAYROLL_EMPLOYEE");
+                 ResultSet rs = idStmt.executeQuery()) {
+                rs.next();
+                newId = rs.getLong(1);
+            }
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setLong(1, newId);
+                pstmt.setLong(2, payrollId);
+                pstmt.setString(3, employeeId);
+                pstmt.setString(4, employmentType);
+                pstmt.setString(5, incomeType);
+                pstmt.setLong(6, totalPay);
+                pstmt.setLong(7, totalDed);
+                pstmt.setLong(8, netPay);
+                pstmt.executeUpdate();
+                return newId;
+            } catch (SQLIntegrityConstraintViolationException dup) {
+                if (attempt == maxAttempts) { throw dup; }
+                // 번호가 겹쳤을 뿐이니 다음 반복에서 MAX를 다시 읽어 새 번호로 재시도
+            }
         }
-        return newId;
+        throw new SQLException("PAYROLL_EMPLOYEE_ID 채번에 반복적으로 실패했습니다.");
     }
     
  // ★ 급여 마스터(PAYROLL) 테이블에 해당 연월 폴더가 없으면 새로 생성해주는 메서드
