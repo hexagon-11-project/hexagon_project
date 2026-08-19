@@ -60,9 +60,9 @@ public class AttendanceRecordDao {
 
 			pstmt = conn.prepareStatement("INSERT INTO ATTENDANCE_RECORD ("
 					+ "ATTENDANCE_ID, EMPLOYEE_ID, ATTENDANCE_TYPE_ID, START_DATE, END_DATE, "
-					+ "START_TIME, END_TIME, DAY_COUNT, HOUR_COUNT, DESCRIPTION, "
+					+ "START_TIME, END_TIME, DAY_COUNT, HOUR_COUNT, ALLOWANCE_AMOUNT, DESCRIPTION, "
 					+ "REG_ID, MOD_ID, CREATED_AT, UPDATED_AT" + ") VALUES ("
-					+ "ATTENDANCE_RECORD_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE, SYSDATE" + ")");
+					+ "ATTENDANCE_RECORD_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE, SYSDATE" + ")");
 
 			pstmt.setInt(1, item.getEmployeeId());
 			pstmt.setInt(2, item.getAttendanceTypeId());
@@ -72,9 +72,10 @@ public class AttendanceRecordDao {
 			pstmt.setString(6, item.getEndTime());
 			setBigDecimalOrNull(pstmt, 7, item.getDayCount());
 			setBigDecimalOrNull(pstmt, 8, item.getHourCount());
-			pstmt.setString(9, item.getDescription());
-			pstmt.setString(10, "SYSTEM");
+			setBigDecimalOrNull(pstmt, 9, item.getAllowanceAmount());
+			pstmt.setString(10, item.getDescription());
 			pstmt.setString(11, "SYSTEM");
+			pstmt.setString(12, "SYSTEM");
 
 			pstmt.executeUpdate();
 
@@ -105,7 +106,7 @@ public class AttendanceRecordDao {
 		try {
 
 			pstmt = conn.prepareStatement("SELECT r.ATTENDANCE_ID, r.EMPLOYEE_ID, r.ATTENDANCE_TYPE_ID, "
-					+ "r.START_DATE, r.END_DATE, r.START_TIME, r.END_TIME, r.DAY_COUNT, r.HOUR_COUNT, "
+					+ "r.START_DATE, r.END_DATE, r.START_TIME, r.END_TIME, r.DAY_COUNT, r.HOUR_COUNT, r.ALLOWANCE_AMOUNT, "
 					+ "r.DESCRIPTION, r.CREATED_AT, a.ATTENDANCE_NAME, a.UNIT_CODE, a.LEAVE_TYPE_ID "
 					+ "FROM ATTENDANCE_RECORD r " + "JOIN ATTENDANCE_TYPE a ON r.ATTENDANCE_TYPE_ID = a.ATTENDANCE_TYPE_ID "
 					+ "WHERE r.EMPLOYEE_ID = ? " + "ORDER BY r.START_DATE DESC, r.ATTENDANCE_ID DESC");
@@ -134,7 +135,7 @@ public class AttendanceRecordDao {
 		try {
 
 			pstmt = conn.prepareStatement("SELECT r.ATTENDANCE_ID, r.EMPLOYEE_ID, r.ATTENDANCE_TYPE_ID, "
-					+ "r.START_DATE, r.END_DATE, r.START_TIME, r.END_TIME, r.DAY_COUNT, r.HOUR_COUNT, "
+					+ "r.START_DATE, r.END_DATE, r.START_TIME, r.END_TIME, r.DAY_COUNT, r.HOUR_COUNT, r.ALLOWANCE_AMOUNT, "
 					+ "r.DESCRIPTION, r.CREATED_AT, a.ATTENDANCE_NAME, a.UNIT_CODE, a.LEAVE_TYPE_ID "
 					+ "FROM ATTENDANCE_RECORD r " + "JOIN ATTENDANCE_TYPE a ON r.ATTENDANCE_TYPE_ID = a.ATTENDANCE_TYPE_ID "
 					+ "WHERE r.ATTENDANCE_ID = ?");
@@ -160,7 +161,7 @@ public class AttendanceRecordDao {
 		try {
 
 			pstmt = conn.prepareStatement("UPDATE ATTENDANCE_RECORD SET "
-					+ "ATTENDANCE_TYPE_ID = ?, START_DATE = ?, END_DATE = ?, DAY_COUNT = ?, HOUR_COUNT = ?, "
+					+ "ATTENDANCE_TYPE_ID = ?, START_DATE = ?, END_DATE = ?, DAY_COUNT = ?, HOUR_COUNT = ?, ALLOWANCE_AMOUNT = ?, "
 					+ "DESCRIPTION = ?, MOD_ID = ?, UPDATED_AT = SYSDATE " + "WHERE ATTENDANCE_ID = ?");
 
 			pstmt.setInt(1, item.getAttendanceTypeId());
@@ -168,9 +169,10 @@ public class AttendanceRecordDao {
 			pstmt.setDate(3, item.getEndDate());
 			setBigDecimalOrNull(pstmt, 4, item.getDayCount());
 			setBigDecimalOrNull(pstmt, 5, item.getHourCount());
-			pstmt.setString(6, item.getDescription());
-			pstmt.setString(7, "SYSTEM");
-			pstmt.setInt(8, item.getAttendanceId());
+			setBigDecimalOrNull(pstmt, 6, item.getAllowanceAmount());
+			pstmt.setString(7, item.getDescription());
+			pstmt.setString(8, "SYSTEM");
+			pstmt.setInt(9, item.getAttendanceId());
 
 			pstmt.executeUpdate();
 
@@ -200,6 +202,7 @@ public class AttendanceRecordDao {
 		item.setEndTime(rs.getString("END_TIME"));
 		item.setDayCount(rs.getBigDecimal("DAY_COUNT"));
 		item.setHourCount(rs.getBigDecimal("HOUR_COUNT"));
+		item.setAllowanceAmount(rs.getBigDecimal("ALLOWANCE_AMOUNT"));
 		item.setDescription(rs.getString("DESCRIPTION"));
 		item.setCreatedAt(rs.getDate("CREATED_AT"));
 		item.setAttendanceName(rs.getString("ATTENDANCE_NAME"));

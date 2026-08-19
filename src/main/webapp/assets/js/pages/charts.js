@@ -52,32 +52,162 @@
 	function donut(canvas) {
 		const ctx = canvas.getContext('2d');
 		const values = JSON.parse(canvas.getAttribute('data-values') || '[]');
+		let labels = [];
+		try {
+			labels = JSON.parse(canvas.getAttribute('data-labels') || '[]');
+		} catch (e) {
+			labels = [];
+		}
+		const center = canvas.getAttribute('data-center') || '';
 		const ratio = dpr();
-		const cssW = Math.max(canvas.clientWidth || canvas.parentElement.clientWidth || 300, 300);
+		const cssW = Math.max(canvas.clientWidth || canvas.parentElement.clientWidth || 240, 200);
+		const cssH = Math.max(canvas.clientHeight || 240, 200);
 		canvas.width = cssW * ratio;
-		canvas.height = 300 * ratio;
+		canvas.height = cssH * ratio;
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		const cx = cssW / 2, cy = 150, r = 105;
-		const total = values.reduce((a, b) => a + b, 0) || 1;
-		let start = -Math.PI / 2;
-		values.forEach((v, i) => {
-			const end = start + Math.PI * 2 * v / total;
+		ctx.clearRect(0, 0, cssW, cssH);
+		const cx = cssW / 2, cy = cssH / 2;
+		const r = Math.min(cssW, cssH) * 0.38;
+		const inner = r * 0.52;
+		const total = values.reduce((a, b) => a + Number(b || 0), 0);
+		const slices = [];
+		if (total <= 0) {
 			ctx.beginPath();
-			ctx.moveTo(cx, cy);
-			ctx.arc(cx, cy, r, start, end);
-			ctx.closePath();
-			ctx.fillStyle = palette[i % palette.length];
+			ctx.arc(cx, cy, r, 0, Math.PI * 2);
+			ctx.fillStyle = '#e8eef3';
 			ctx.fill();
-			start = end;
-		});
+		} else {
+			let start = -Math.PI / 2;
+			let offset = 0;
+			values.forEach((v, i) => {
+				const amount = Number(v || 0);
+				if (amount <= 0) {
+					return;
+				}
+				const sweep = Math.PI * 2 * amount / total;
+				const end = start + sweep;
+				ctx.beginPath();
+				ctx.moveTo(cx, cy);
+				ctx.arc(cx, cy, r, start, end);
+				ctx.closePath();
+				ctx.fillStyle = palette[i % palette.length];
+				ctx.fill();
+				slices.push({
+					startOffset: offset,
+					endOffset: offset + sweep,
+					label: labels[i] || ('항목 ' + (i + 1)),
+					amount: amount,
+					ratio: ((amount / total) * 100).toFixed(1) + '%',
+					color: palette[i % palette.length]
+				});
+				start = end;
+				offset += sweep;
+			});
+		}
 		ctx.beginPath();
-		ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+		ctx.arc(cx, cy, inner, 0, Math.PI * 2);
 		ctx.fillStyle = '#fff';
 		ctx.fill();
-		ctx.fillStyle = '#263445';
-		ctx.font = '700 15px sans-serif';
-		ctx.textAlign = 'center';
-		ctx.fillText('지급항목', cx, cy + 5);
+		if (center) {
+			ctx.fillStyle = '#263445';
+			ctx.font = '700 14px sans-serif';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillText(center, cx, cy);
+		}
+		canvas._donutGeo = { cx: cx, cy: cy, r: r, inner: inner };
+		canvas._donutSlices = slices;
+		bindDonutTooltip(canvas);
+	}
+
+	function ensureDonutTooltip(canvas) {
+		let wrap = canvas.parentElement;
+		if (!wrap || !wrap.classList.contains('chart-canvas-wrap')) {
+			wrap = document.createElement('div');
+			wrap.className = 'chart-canvas-wrap';
+			canvas.parentNode.insertBefore(wrap, canvas);
+			wrap.appendChild(canvas);
+		}
+		let tip = wrap.querySelector('.chart-tooltip');
+		if (!tip) {
+			tip = document.createElement('div');
+			tip.className = 'chart-tooltip';
+			tip.hidden = true;
+			wrap.appendChild(tip);
+		}
+		return tip;
+	}
+
+	function findDonutSlice(canvas, x, y) {
+		const geo = canvas._donutGeo;
+		const slices = canvas._donutSlices || [];
+		if (!geo || slices.length === 0) {
+			return null;
+		}
+		const dx = x - geo.cx;
+		const dy = y - geo.cy;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+		if (dist < geo.inner || dist > geo.r) {
+			return null;
+		}
+		let fromStart = Math.atan2(dy, dx) + Math.PI / 2;
+		if (fromStart < 0) {
+			fromStart += Math.PI * 2;
+		}
+		for (let i = 0; i < slices.length; i++) {
+			if (fromStart >= slices[i].startOffset && fromStart < slices[i].endOffset) {
+				return slices[i];
+			}
+		}
+		return slices[slices.length - 1];
+	}
+
+	function bindDonutTooltip(canvas) {
+		if (canvas._donutTipBound) {
+			return;
+		}
+		const tip = ensureDonutTooltip(canvas);
+
+		canvas.addEventListener('mousemove', function (e) {
+			const rect = canvas.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			const slice = findDonutSlice(canvas, x, y);
+			if (!slice) {
+				tip.hidden = true;
+				canvas.style.cursor = 'default';
+				return;
+			}
+			canvas.style.cursor = 'pointer';
+			tip.innerHTML =
+				'<div class="chart-tooltip-title">' + slice.label + '</div>' +
+				'<div class="chart-tooltip-row"><span class="dot" style="background:' + slice.color + '"></span>금액 : <strong>' +
+				formatNumber(slice.amount) + '</strong>원</div>' +
+				'<div class="chart-tooltip-row">구성비 : <strong>' + slice.ratio + '</strong></div>';
+			tip.hidden = false;
+			const tipW = tip.offsetWidth || 160;
+			const tipH = tip.offsetHeight || 70;
+			let left = x + 14;
+			let top = y - tipH - 10;
+			if (left + tipW > rect.width) {
+				left = x - tipW - 14;
+			}
+			if (top < 0) {
+				top = y + 16;
+			}
+			if (left < 0) {
+				left = 8;
+			}
+			tip.style.left = left + 'px';
+			tip.style.top = top + 'px';
+		});
+
+		canvas.addEventListener('mouseleave', function () {
+			tip.hidden = true;
+			canvas.style.cursor = 'default';
+		});
+
+		canvas._donutTipBound = true;
 	}
 
 	function formatNumber(n) {

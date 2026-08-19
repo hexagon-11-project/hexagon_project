@@ -140,7 +140,8 @@ request.setAttribute("pageJs", null);
 					<tr>
 						<th>금액(수당)</th>
 						<td class="span-3"><div class="money-control">
-								<input class="input number" type="text" name="amount"><span>원</span>
+								<input class="input number" type="text" name="amount"
+									value="<%=isEditing && editRecord.getAllowanceAmount() != null ? editRecord.getAllowanceAmount().stripTrailingZeros().toPlainString() : ""%>"><span>원</span>
 							</div></td>
 					</tr>
 					<tr>
@@ -231,7 +232,7 @@ request.setAttribute("pageJs", null);
 							<td><%=rec.getAttendanceName()%></td>
 							<td><%=periodLabel%></td>
 							<td><%=countLabel%></td>
-							<td>0</td>
+							<td><%=rec.getAllowanceAmountValue()%></td>
 							<td><%=rec.getDescription() == null ? "" : rec.getDescription()%></td>
 							<td>
 								<a class="btn btn-sm"
