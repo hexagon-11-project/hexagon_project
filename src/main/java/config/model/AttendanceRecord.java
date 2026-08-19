@@ -14,6 +14,7 @@ public class AttendanceRecord {
 	private String endTime;
 	private BigDecimal dayCount;
 	private BigDecimal hourCount;
+	private BigDecimal allowanceAmount; // 금액(수당)
 	private String description;
 	private Date createdAt; // 입력일자 (등록된 시각)
 
@@ -21,6 +22,24 @@ public class AttendanceRecord {
 	private String attendanceName;
 	private String unitCode;
 	private Integer leaveTypeId;
+	private String employeeName; // 근태조회 화면용
+	private String department;   // 근태조회 화면용
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
 
 	public Integer getAttendanceId() {
 		return attendanceId;
@@ -94,6 +113,14 @@ public class AttendanceRecord {
 		this.hourCount = hourCount;
 	}
 
+	public BigDecimal getAllowanceAmount() {
+		return allowanceAmount;
+	}
+
+	public void setAllowanceAmount(BigDecimal allowanceAmount) {
+		this.allowanceAmount = allowanceAmount;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -132,5 +159,25 @@ public class AttendanceRecord {
 
 	public void setLeaveTypeId(Integer leaveTypeId) {
 		this.leaveTypeId = leaveTypeId;
+	}
+
+	// ===== 화면 표시용 헬퍼 =====
+
+	// 근태조회 화면 "일수/시간" 컬럼 - 단위(unitCode)에 맞는 값 + 단위 라벨을 붙여서 반환
+	// 근태조회/근태기록 화면 "금액(수당)" 컬럼 - 천단위 콤마, 값 없으면 "-"
+	public String getAllowanceAmountValue() {
+		if (allowanceAmount == null) {
+			return "-";
+		}
+		return String.format("%,d", allowanceAmount.longValue());
+	}
+
+	public String getCountDisplayValue() {
+		BigDecimal count = "HOUR".equalsIgnoreCase(unitCode) ? hourCount : dayCount;
+		if (count == null) {
+			return "-";
+		}
+		String suffix = "HOUR".equalsIgnoreCase(unitCode) ? "시간" : "일";
+		return count.stripTrailingZeros().toPlainString() + suffix;
 	}
 }
