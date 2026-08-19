@@ -12,6 +12,9 @@ public class RetirementProcessModel {
     private String workYears;              // 근속연수 (ex: "8년")
     private String interimSettlementYn;    // 중간정산 여부 (Y/N)
     private String retirementSettlementYn; // 퇴직정산 여부 (Y/N)
+    private String retirementTypeCode;  // 퇴직구분코드
+    private String retirementReason;    // 퇴직사유
+    private String postRetirementPhone; // 퇴직 후 연락처
 
     
     public String getRetirementYn() { return retirementYn; }
@@ -43,4 +46,24 @@ public class RetirementProcessModel {
 
     public String getRetirementSettlementYn() { return retirementSettlementYn; }
     public void setRetirementSettlementYn(String retirementSettlementYn) { this.retirementSettlementYn = retirementSettlementYn; }
+	public String getRetirementTypeCode() {
+		return retirementTypeCode;
+	}
+	public void setRetirementTypeCode(String retirementTypeCode) {
+		this.retirementTypeCode = retirementTypeCode;
+	}
+	public String getRetirementReason() {
+		return retirementReason;
+	}
+	public void setRetirementReason(String retirementReason) {
+		this.retirementReason = retirementReason;
+	}
+	public String getPostRetirementPhone() {
+		return postRetirementPhone;
+	}
+	public void setPostRetirementPhone(String postRetirementPhone) {
+		this.postRetirementPhone = postRetirementPhone;
+	}
+
+    
 }

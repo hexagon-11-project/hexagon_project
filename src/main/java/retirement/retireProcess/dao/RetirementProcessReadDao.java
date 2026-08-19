@@ -78,4 +78,34 @@ public class RetirementProcessReadDao {
             JdbcUtil.close(pstmt);
         }
     }
+       
+
+            public int updateRetirementProcess(Connection conn, RetirementProcessModel model) throws SQLException {
+                PreparedStatement pstmt = null;
+                int result = 0;
+
+                try {
+                    // 사원이 이미 존재하므로 UPDATE 쿼리 사용
+                    String sql = "UPDATE employee SET "
+                               + "retirement_yn = 'Y', "                     // 상태를 퇴직으로 변경
+                               + "retirement_type_code = ?, "                // 퇴직구분
+                               + "resign_date = TO_DATE(?, 'yyyy-mm-dd'), "  // 퇴직일자
+                               + "retirement_reason = ?, "                   // 퇴직사유
+                               + "post_retirement_phone = ? "                // 퇴직 후 연락처
+                               + "WHERE employee_no = ?";                    // 사원번호 조건
+
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, model.getRetirementTypeCode());
+                    pstmt.setString(2, model.getResignDate());
+                    pstmt.setString(3, model.getRetirementReason());
+                    pstmt.setString(4, model.getPostRetirementPhone());
+                    pstmt.setString(5, model.getEmployeeNo());
+
+                    result = pstmt.executeUpdate();
+                    return result;
+                } finally {
+                    JdbcUtil.close(pstmt);
+                }
+            }
+    
 }
