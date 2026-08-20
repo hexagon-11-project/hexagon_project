@@ -107,7 +107,7 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 					<tr>
 						<th>非課税項目名</th>
 						<td class="span-3"><input type="text" class="input"
-							name="nonTaxCategory" placeholder="ポップアップから選択するか、直接入力してください。"
+							name="nonTaxCategory" placeholder="入力してください。"
 							value="<%=hasSelected && selected.getNonTaxCategory() != null ? selected.getNonTaxCategory() : ""%>">
 						</td>
 					</tr>
