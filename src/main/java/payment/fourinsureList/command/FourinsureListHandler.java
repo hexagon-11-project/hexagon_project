@@ -57,6 +57,7 @@ public class FourinsureListHandler implements CommandHandler {
 		req.setAttribute("searched", searched);
 		req.setAttribute("ledger", ledger);
 		req.setAttribute("employeeList", employeeList);
+		req.setAttribute("columnTotals", fourinsureListService.sumColumnTotals(employeeList));
 		req.setAttribute("targetCount", employeeList.size());
 		req.setAttribute("totalAmount", fourinsureListService.sumInsuranceAmount(employeeList));
 		req.setAttribute("errorMessage", errorMessage);

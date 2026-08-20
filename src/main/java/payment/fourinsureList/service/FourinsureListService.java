@@ -54,15 +54,30 @@ public class FourinsureListService {
 		return year + month;
 	}
 
-	/** 사원별 4대보험 합계를 모두 더한 전체 합계. */
+	/** 사원별 4대보험 총합계(사업주+근로자)를 모두 더한 전체 합계. */
 	public long sumInsuranceAmount(List<PaymentInsuranceLedger> employeeList) {
 		long sum = 0L;
 		if (employeeList == null) {
 			return sum;
 		}
 		for (PaymentInsuranceLedger row : employeeList) {
-			sum += row.getInsuranceTotal();
+			sum += row.getGrandTotal();
 		}
 		return sum;
+	}
+
+	/** 항목별 전 사원 합계. 사업주/근로자 칸에 넣을 조회 금액만 합산한다. */
+	public PaymentInsuranceLedger sumColumnTotals(List<PaymentInsuranceLedger> employeeList) {
+		PaymentInsuranceLedger totals = new PaymentInsuranceLedger();
+		if (employeeList == null) {
+			return totals;
+		}
+		for (PaymentInsuranceLedger row : employeeList) {
+			totals.setNationalPension(totals.getNationalPension() + row.getNationalPension());
+			totals.setHealthInsurance(totals.getHealthInsurance() + row.getHealthInsurance());
+			totals.setLongTermCare(totals.getLongTermCare() + row.getLongTermCare());
+			totals.setEmploymentInsurance(totals.getEmploymentInsurance() + row.getEmploymentInsurance());
+		}
+		return totals;
 	}
 }
