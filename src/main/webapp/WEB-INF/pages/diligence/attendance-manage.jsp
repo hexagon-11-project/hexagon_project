@@ -5,9 +5,11 @@
 <%@ page import="config.model.AttendanceType"%>
 <%@ page import="config.model.AttendanceRecord"%>
 <%@ page import="config.model.EmployeeLeaveStatus"%>
+<%@ page import="config.model.LeaveType"%>
 <%
 List<EmployeeLeave> employeeList = (List<EmployeeLeave>) request.getAttribute("employeeList");
 List<AttendanceType> attendanceTypeList = (List<AttendanceType>) request.getAttribute("attendanceTypeList");
+List<LeaveType> leaveOnlyTypeList = (List<LeaveType>) request.getAttribute("leaveOnlyTypeList");
 EmployeeLeave selectedEmployee = (EmployeeLeave) request.getAttribute("selectedEmployee");
 List<AttendanceRecord> recordList = (List<AttendanceRecord>) request.getAttribute("recordList");
 AttendanceRecord editRecord = (AttendanceRecord) request.getAttribute("editRecord");
@@ -113,15 +115,22 @@ request.setAttribute("pageJs", null);
 								<%
 									}
 								}
+								if (leaveOnlyTypeList != null) {
+									for (LeaveType leaveType : leaveOnlyTypeList) {
+								%>
+								<option value="leave-<%=leaveType.getLeaveTypeId()%>" data-unit="DAY"><%=leaveType.getLeaveName()%></option>
+								<%
+									}
+								}
 								%>
 						</select></td>
 					</tr>
 					<tr>
 						<th>기간</th>
 						<td class="span-3"><div class="range">
-								<input class="input" type="date" name="startDate"
+								<input class="input" type="date" name="startDate" id="startDateInput"
 									value="<%=isEditing && editRecord.getStartDate() != null ? editRecord.getStartDate().toString() : ""%>"><span>~</span><input
-									class="input" type="date" name="endDate"
+									class="input" type="date" name="endDate" id="endDateInput"
 									value="<%=isEditing && editRecord.getEndDate() != null ? editRecord.getEndDate().toString() : ""%>">
 							</div></td>
 					</tr>
@@ -340,12 +349,18 @@ request.setAttribute("pageJs", null);
 	var countLabelTh = document.getElementById('countLabelTh');
 	var countInput = document.getElementById('countInput');
 	var countUnitSuffix = document.getElementById('countUnitSuffix');
+	var startDateInput = document.getElementById('startDateInput');
+	var endDateInput = document.getElementById('endDateInput');
 	if (!typeSelect || !countLabelTh) return;
 
-	function applyUnitLabel() {
+	function isHourUnit() {
 		var selected = typeSelect.options[typeSelect.selectedIndex];
 		var unit = selected ? selected.getAttribute('data-unit') : 'DAY';
-		var isHour = unit === 'HOUR';
+		return unit === 'HOUR';
+	}
+
+	function applyUnitLabel() {
+		var isHour = isHourUnit();
 		var label = isHour ? '근태시간' : '근태일수';
 
 		countLabelTh.textContent = label;
@@ -353,7 +368,27 @@ request.setAttribute("pageJs", null);
 		if (countUnitSuffix) countUnitSuffix.textContent = isHour ? '시간' : '일';
 	}
 
-	typeSelect.addEventListener('change', applyUnitLabel);
+	// 시작일~종료일을 정하면 근태일수를 자동 계산 (일 단위 항목만 - 시간 단위는 날짜만으로 알 수 없어 직접 입력)
+	function recalcDayCount() {
+		if (isHourUnit() || !countInput) return;
+		if (!startDateInput || !endDateInput || !startDateInput.value || !endDateInput.value) return;
+
+		var start = new Date(startDateInput.value);
+		var end = new Date(endDateInput.value);
+		var diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+		if (diffDays > 0) {
+			countInput.value = diffDays;
+		}
+	}
+
+	typeSelect.addEventListener('change', function() {
+		applyUnitLabel();
+		recalcDayCount();
+	});
+	if (startDateInput) startDateInput.addEventListener('change', recalcDayCount);
+	if (endDateInput) endDateInput.addEventListener('change', recalcDayCount);
+
 	applyUnitLabel();
 })();
 

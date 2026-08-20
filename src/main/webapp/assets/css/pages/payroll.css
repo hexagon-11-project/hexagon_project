@@ -112,3 +112,87 @@
 	font-weight: 700;
 	text-align: center
 }
+
+.four-insure-tables {
+	display: flex;
+	align-items: stretch;
+	border: 1px solid var(--line);
+	overflow: hidden
+}
+
+.four-insure-fixed {
+	flex: 0 0 auto;
+	background: #fff;
+	z-index: 2;
+	box-shadow: 2px 0 6px rgba(0, 0, 0, .12)
+}
+
+.four-insure-scroll {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-x: auto
+}
+
+.four-insure-fixed .data-table,
+.four-insure-scroll .data-table {
+	min-width: 0;
+	width: max-content;
+	border-collapse: collapse
+}
+
+.four-insure-scroll .data-table {
+	min-width: 1280px
+}
+
+.four-insure-tables th,
+.four-insure-tables td {
+	height: 34px;
+	box-sizing: border-box
+}
+
+.four-insure-tables thead tr:first-child th {
+	height: 32px
+}
+
+.four-insure-tables td.center {
+	text-align: center
+}
+
+.four-insure-tables td.amount {
+	text-align: right
+}
+
+.four-insure-emp-head {
+	background: #d6eaf8;
+	color: #1f4e79
+}
+
+.four-insure-np-head {
+	background: #fdebd0;
+	color: #7d4e00
+}
+
+.four-insure-hi-head {
+	background: #f5c6cb;
+	color: #7b1e2c
+}
+
+.four-insure-ltc-head {
+	background: #f8d7da;
+	color: #7b1e2c
+}
+
+.four-insure-ei-head {
+	background: #d6eaf8;
+	color: #1f4e79
+}
+
+.four-insure-grand-head {
+	background: #1f1f1f;
+	color: #fff
+}
+
+.four-insure-tables tfoot td {
+	background: #fff8d6;
+	font-weight: 700
+}
