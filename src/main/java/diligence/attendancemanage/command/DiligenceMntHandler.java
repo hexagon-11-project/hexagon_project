@@ -18,8 +18,11 @@ public class DiligenceMntHandler implements CommandHandler {
 
 		int companyId = 1001;
 
+		java.util.List<config.model.AttendanceType> attendanceTypeList = attendanceTypeListService.getListForEntryForm(companyId);
+
 		req.setAttribute("employeeList", attendanceRecordListService.getEmployeeList(companyId));
-		req.setAttribute("attendanceTypeList", attendanceTypeListService.getAllList(companyId));
+		req.setAttribute("attendanceTypeList", attendanceTypeList);
+		req.setAttribute("leaveOnlyTypeList", attendanceTypeListService.getLeaveOnlyOptions(companyId, attendanceTypeList));
 		req.setAttribute("selectedEmployee", null);
 		req.setAttribute("recordList", null);
 
