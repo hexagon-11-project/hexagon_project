@@ -47,7 +47,6 @@ request.setAttribute("pageJs", null);
                 <th>입사일</th>
                 <th>퇴직일</th>
                 <th>근속연수</th>
-                <th>중간정산</th>
                 <th>퇴직정산</th>
             </tr>
         </thead>
@@ -56,7 +55,7 @@ request.setAttribute("pageJs", null);
             <c:choose>
                 <c:when test="${empty retirementList}">
                     <tr>
-                        <td colspan="11" style="text-align: center; padding: 20px;">조회된 사원 데이터가 없습니다.</td>
+                        <td colspan="10" style="text-align: center; padding: 20px;">조회된 사원 데이터가 없습니다.</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -91,10 +90,7 @@ request.setAttribute("pageJs", null);
                             <!-- 9. 근속연수 -->
                             <td>${emp.workYears}</td>
                             
-                            <!-- 10. 중간정산: Y/N 값을 '●'/'×' 기호로 변환 -->
-                            <td>${emp.interimSettlementYn == 'Y' ? '●' : '×'}</td>
-                            
-                            <!-- 11. 퇴직정산: Y/N 값을 '●'/'×' 기호로 변환 -->
+                            <!-- 10. 퇴직정산: Y/N 값을 '●'/'×' 기호로 변환 -->
                             <td>${emp.retirementSettlementYn == 'Y' ? '●' : '×'}</td>
                         </tr>
                     </c:forEach>
@@ -132,7 +128,6 @@ request.setAttribute("pageJs", null);
                         <option value="정리해고">정리해고</option>
                         <option value="자발적 퇴직">자발적 퇴직</option>
                         <option value="임원퇴직">임원퇴직</option>
-                        <option value="중간정산">중간정산</option>
                         <option value="기타">기타</option>
                     </select>
                 </td>
@@ -162,12 +157,12 @@ request.setAttribute("pageJs", null);
 <script>
     // 모달 띄우기 (데이터 세팅 포함)
     function openRetireModal(empNo, empName) {
+        // 폼 초기화 (이전 입력값 삭제) - 위치 수정!
+        document.querySelector("#retireModal form").reset();
+        
         // 모달창 내부의 태그에 사번과 이름 세팅
         document.getElementById("modalEmployeeNo").value = empNo;
         document.getElementById("modalEmpName").innerText = "(" + empName + ")";
-        
-        // 폼 초기화 (이전 입력값 삭제)
-        document.querySelector("#retireModal form").reset();
         
         // 화면에 모달 및 오버레이 노출
         document.getElementById("retireModal").style.display = "block";
