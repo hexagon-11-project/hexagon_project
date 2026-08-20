@@ -1058,6 +1058,11 @@ body {
             formData.append("prevYearMonth", prevYearMonth);
             formData.append("prevSeq", prevSeq);
 
+            // 연속 클릭(더블클릭)으로 같은 요청이 두 번 나가면 PAYROLL_EMPLOYEE_ID 채번이 겹쳐
+            // DB 에러가 날 수 있으므로, 요청이 끝날 때까지 버튼을 잠가둔다.
+            var btn = document.getElementById("btnExecuteLoadPrev");
+            btn.disabled = true;
+
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -1071,11 +1076,13 @@ body {
                     location.reload(); // 성공 후 화면 갱신
                 } else {
                     alert("불러오기 중 오류가 발생했습니다.");
+                    btn.disabled = false;
                 }
             })
             .catch(error => {
                 console.error("통신 에러:", error);
                 alert("서버 통신에 실패했습니다.");
+                btn.disabled = false;
             });
         }
     }
@@ -1090,7 +1097,7 @@ body {
             <option value="">귀속연월 차수 선택</option>
             <!-- 자바스크립트가 이전 달 목록을 여기에 자동으로 채워줍니다 -->
         </select>
-        <button type="button" class="btn btn-primary" onclick="executeLoadPrev()" style="width: 100%; background: #337ab7; border: none; padding: 10px; font-weight: bold;">급여정보 불러오기</button>
+        <button type="button" id="btnExecuteLoadPrev" class="btn btn-primary" onclick="executeLoadPrev()" style="width: 100%; background: #337ab7; border: none; padding: 10px; font-weight: bold;">급여정보 불러오기</button>
         <button type="button" class="btn btn-default" onclick="closeLoadPrevModal()" style="width: 100%; margin-top: 8px; padding: 10px;">취소</button>
     </div>
 </div>
