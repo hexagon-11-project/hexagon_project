@@ -109,7 +109,8 @@ public class FourinsureListDao {
 				row.setNationalPension(rs.getLong("NATIONAL_PENSION"));
 				row.setHealthInsurance(rs.getLong("HEALTH_INSURANCE"));
 				row.setLongTermCare(rs.getLong("LONG_TERM_CARE"));
-				row.setEmploymentInsurance(rs.getLong("EMPLOYMENT_INSURANCE"));
+				long employmentInsurance = rs.getLong("EMPLOYMENT_INSURANCE");
+				row.setEmploymentInsurance(row.isPresident() ? 0L : employmentInsurance);
 				employees.add(row);
 			}
 			return employees;

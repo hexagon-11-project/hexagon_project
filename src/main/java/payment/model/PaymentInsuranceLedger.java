@@ -16,6 +16,7 @@ public class PaymentInsuranceLedger {
 	public static final String DEDUCTION_HEALTH_INSURANCE = "건강보험";
 	public static final String DEDUCTION_LONG_TERM_CARE = "장기요양보험";
 	public static final String DEDUCTION_EMPLOYMENT_INSURANCE = "고용보험";
+	public static final String POSITION_PRESIDENT = "사장";
 
 	/** 급여아이디 */
 	private int payrollId;
@@ -187,6 +188,11 @@ public class PaymentInsuranceLedger {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+	/** 직위가 사장이면 고용보험은 0원이다. */
+	public boolean isPresident() {
+		return POSITION_PRESIDENT.equals(position == null ? null : position.trim());
 	}
 
 	public long getNationalPension() {
