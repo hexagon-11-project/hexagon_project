@@ -20,7 +20,7 @@
 			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/payitemsetlist.do"><span
-			class="nav-icon">□</span><span>급여항목 설정</span></a>
+			class="nav-icon">□</span><span>給与項目設定</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">인사관리</div>
@@ -75,16 +75,16 @@
 			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransfer.do"><span
-			class="nav-icon">□</span><span>급여이체 신청</span></a><a
+			class="nav-icon">□</span><span>給与振込申請</span></a><a
 			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
-			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
+			class="nav-icon">□</span><span>給与振込結果照会</span></a><a
 			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentPayItemPart.do"><span
-			class="nav-icon">□</span><span>항목별 대장</span></a><a
+			class="nav-icon">□</span><span>項目別台帳</span></a><a
 			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/fourinsureList.do"><span
-			class="nav-icon">□</span><span>4대보험 공제내역</span></a>
+			class="nav-icon">□</span><span>4大保険控除内訳</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">급여통계</div>
@@ -97,13 +97,13 @@
 			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
 			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
-			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
+			class="nav-icon">□</span><span>年度別給与総額統計</span></a><a
 			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAllMonth.do"><span
-			class="nav-icon">□</span><span>월별 전체급여 통계</span></a><a
+			class="nav-icon">□</span><span>月別給与総額統計</span></a><a
 			class="nav-item <%="item-composition".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsPayItems.do"><span
-			class="nav-icon">□</span><span>급여항목 구성 통계</span></a>
+			class="nav-icon">□</span><span>給与項目構成統計</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">퇴직관리</div>
