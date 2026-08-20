@@ -9,7 +9,7 @@ public class RetirementProcessModel {
     private String position;               // 직위
     private String hireDate;               // 입사일 (yyyy-MM-dd)
     private String resignDate;             // 퇴직일 (yyyy-MM-dd 또는 null)
-    private String workYears;              // 근속연수 (ex: "8년")
+    private String workYears;              // 근속연수 
     private String interimSettlementYn;    // 중간정산 여부 (Y/N)
     private String retirementSettlementYn; // 퇴직정산 여부 (Y/N)
     private String retirementTypeCode;  // 퇴직구분코드
