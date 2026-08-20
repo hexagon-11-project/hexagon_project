@@ -34,8 +34,11 @@ public class DiligenceMntSelectHandler implements CommandHandler {
 			}
 		}
 
+		List<config.model.AttendanceType> attendanceTypeList = attendanceTypeListService.getListForEntryForm(companyId);
+
 		req.setAttribute("employeeList", employeeList);
-		req.setAttribute("attendanceTypeList", attendanceTypeListService.getAllList(companyId));
+		req.setAttribute("attendanceTypeList", attendanceTypeList);
+		req.setAttribute("leaveOnlyTypeList", attendanceTypeListService.getLeaveOnlyOptions(companyId, attendanceTypeList));
 		req.setAttribute("selectedEmployee", selectedEmployee);
 		req.setAttribute("recordList", attendanceRecordManageService.getListByEmployeeId(employeeId));
 

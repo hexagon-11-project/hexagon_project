@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import config.dnLItemSet.service.AttendanceTypeListService;
 import config.dnLItemSet.service.EmployeeLeaveManageService;
+import config.model.AttendanceType;
 import config.model.EmployeeLeave;
 import config.model.EmployeeLeaveStatus;
 import diligence.attendancemanage.service.AttendanceRecordListService;
@@ -41,8 +42,10 @@ public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 
 		if (employeeIds.isEmpty()) {
 			// 사원을 먼저 선택하지 않고 버튼을 누른 경우 - 조회 없이 목록만 다시 보여준다.
+			List<AttendanceType> attendanceTypeList = attendanceTypeListService.getListForEntryForm(companyId);
 			req.setAttribute("employeeList", employeeList);
-			req.setAttribute("attendanceTypeList", attendanceTypeListService.getAllList(companyId));
+			req.setAttribute("attendanceTypeList", attendanceTypeList);
+			req.setAttribute("leaveOnlyTypeList", attendanceTypeListService.getLeaveOnlyOptions(companyId, attendanceTypeList));
 			req.setAttribute("leaveStatusMessage", "사원을 먼저 선택해주세요.");
 			return "/WEB-INF/pages/diligence/attendance-manage.jsp";
 		}
@@ -63,8 +66,11 @@ public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 			leaveStatusList.addAll(employeeLeaveManageService.getStatusByEmployeeId(employeeId));
 		}
 
+		List<AttendanceType> attendanceTypeList = attendanceTypeListService.getListForEntryForm(companyId);
+
 		req.setAttribute("employeeList", employeeList);
-		req.setAttribute("attendanceTypeList", attendanceTypeListService.getAllList(companyId));
+		req.setAttribute("attendanceTypeList", attendanceTypeList);
+		req.setAttribute("leaveOnlyTypeList", attendanceTypeListService.getLeaveOnlyOptions(companyId, attendanceTypeList));
 		req.setAttribute("selectedEmployee", selectedEmployee);
 		req.setAttribute("recordList", attendanceRecordManageService.getListByEmployeeId(primaryEmployeeId));
 		req.setAttribute("leaveStatusList", leaveStatusList);

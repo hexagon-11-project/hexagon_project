@@ -25,4 +25,18 @@ public class AttendanceTypeSelectService {
 			JdbcUtil.close(conn);
 		}
 	}
+
+	public AttendanceType getByLeaveTypeId(int companyId, int leaveTypeId) {
+
+		Connection conn = null;
+
+		try {
+			conn = ConnectionProvider.getConnection();
+			return attendanceTypeDao.selectByLeaveTypeId(conn, companyId, leaveTypeId);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
 }

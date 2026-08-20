@@ -65,6 +65,32 @@ public class AttendanceTypeDao {
 		}
 	}
 
+	// 특정 휴가항목(LEAVE_TYPE)에 이미 연결된 근태항목이 있는지 조회 (없으면 null)
+	public AttendanceType selectByLeaveTypeId(Connection conn, int companyId, int leaveTypeId) throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			pstmt = conn.prepareStatement(
+					baseSelectSql() + "WHERE a.COMPANY_ID = ? AND a.LEAVE_TYPE_ID = ? " + "ORDER BY a.ATTENDANCE_TYPE_ID");
+			pstmt.setInt(1, companyId);
+			pstmt.setInt(2, leaveTypeId);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return mapRow(rs);
+			}
+
+			return null;
+
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+	}
+
 	public AttendanceType selectById(Connection conn, int attendanceTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
