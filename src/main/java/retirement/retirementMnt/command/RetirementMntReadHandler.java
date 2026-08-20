@@ -17,9 +17,7 @@ public class RetirementMntReadHandler implements CommandHandler {
         String retirementYear = req.getParameter("retirementYear");
         String employeeId = req.getParameter("employeeId");
         
-        // [수정된 부분] 
-        // 2026년 등 강제 세팅 로직을 완전히 삭제했습니다!
-        // "전체"를 누르면 retirementYear가 "" 상태 그대로 DAO에 전달되어 전체 목록이 조회됩니다.
+       
 
         // 콤보박스(사원 선택)용 전체 퇴직자 목록 조회
         List<RetirementMntModel> retiredEmpList = retirementService.getRetirementMntList(null, null);

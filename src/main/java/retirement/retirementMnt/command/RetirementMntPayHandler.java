@@ -42,7 +42,7 @@ public class RetirementMntPayHandler implements CommandHandler {
         out.print(resultString);
         out.flush();
 
-        // 4. AJAX 통신이므로 뷰 포워딩 생략
+        // 4. 뷰 포워딩 생략
         return null; 
     }
 

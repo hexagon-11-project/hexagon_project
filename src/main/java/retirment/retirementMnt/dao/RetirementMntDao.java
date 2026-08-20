@@ -21,15 +21,19 @@ public class RetirementMntDao {
 
         try {
             // JSP에서 판별할 수 있도록 NVL을 사용해 순수 'Y' 또는 'N' 값만 넘겨줌
-            String sql = "SELECT e.employee_id, "
-                       + "       e.employee_no, "
-                       + "       e.employee_name, "
-                       + "       TO_CHAR(e.hire_date, 'yyyy-mm-dd') AS hire_date, "
-                       + "       TO_CHAR(e.resign_date, 'yyyy-mm-dd') AS resign_date, "
-                       + "       NVL(rp.retirement_settlement_yn, 'N') AS retirement_settlement_yn "
-                       + "FROM employee e "
-                       + "LEFT JOIN retirement_pay rp ON e.employee_id = rp.employee_id "
-                       + "WHERE e.retirement_yn = 'Y' "; 
+        	String sql = "SELECT e.employee_id, "
+                    + "       e.employee_no, "
+                    + "       e.employee_name, "
+                    + "       TO_CHAR(e.hire_date, 'yyyy-mm-dd') AS hire_date, "
+                    + "       TO_CHAR(e.resign_date, 'yyyy-mm-dd') AS resign_date, "
+                    + "       NVL(rp.retirement_settlement_yn, 'N') AS retirement_settlement_yn "
+                    + "FROM employee e "
+                    + "LEFT JOIN ( "
+                    + "    SELECT employee_id, retirement_settlement_yn, "
+                    + "           ROW_NUMBER() OVER(PARTITION BY employee_id ORDER BY retirement_pay_id DESC) as rn "
+                    + "    FROM retirement_pay "
+                    + ") rp ON e.employee_id = rp.employee_id AND rp.rn = 1 "
+                    + "WHERE e.retirement_yn = 'Y' ";
 
             if (retirementYear != null && !retirementYear.trim().isEmpty()) {
                 sql += "AND TO_CHAR(e.resign_date, 'yyyy') = ? ";
@@ -60,7 +64,7 @@ public class RetirementMntDao {
                 model.setHireDate(rs.getString("hire_date"));
                 model.setResignDate(rs.getString("resign_date"));
                 
-                // 순수 'Y' 또는 'N' 매핑 (JSP에서 처리 예정)
+                
                 model.setRetirementSettlementYn(rs.getString("retirement_settlement_yn"));
                 
                 list.add(model);
@@ -112,6 +116,41 @@ public class RetirementMntDao {
             return list;
         } finally {
             JdbcUtil.close(rs);
+            JdbcUtil.close(pstmt);
+        }
+    }
+ // 3. 퇴직급여 계산 결과 저장 (필수 컬럼 전체 반영)
+    public int RetirementMntInsert(Connection conn, RetirementMntModel model) throws SQLException {
+        PreparedStatement pstmt = null;
+
+        try {
+            String sql = "INSERT INTO retirement_pay ("
+                       + "    retirement_pay_id, company_id, employee_id, "
+                       + "    calc_start_date, calc_end_date, service_days, "
+                       + "    total_wage_amount, average_daily_wage, retirement_pay_amount, "
+                       + "    net_pay_amount, reg_id, mod_id, created_at, updated_at, "
+                       + "    interim_settlement_yn, retirement_settlement_yn"
+                       + ") VALUES ("
+                       + "    retirement_pay_seq.NEXTVAL, 1, ?, "
+                       + "    TO_DATE(?, 'YYYY-MM-DD'), TO_DATE(?, 'YYYY-MM-DD'), ?, "
+                       + "    ?, ?, ?, "
+                       + "    ?, 'SYSTEM', 'SYSTEM', SYSDATE, SYSDATE, "
+                       + "    'N', 'Y'"
+                       + ")";
+
+            pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setString(1, model.getEmployeeId());
+            pstmt.setString(2, model.getHireDate());        // calc_start_date (입사일)
+            pstmt.setString(3, model.getResignDate());      // calc_end_date (퇴직일)
+            pstmt.setInt(4, model.getServiceDays());        // service_days
+            pstmt.setLong(5, model.getTotalWageAmount());   // total_wage_amount
+            pstmt.setDouble(6, model.getAverageDailyWage());// average_daily_wage
+            pstmt.setLong(7, model.getRetirementPayAmount());// retirement_pay_amount
+            pstmt.setLong(8, model.getRetirementPayAmount());// net_pay_amount (실지급액은 우선 퇴직금과 동일하게 처리)
+
+            return pstmt.executeUpdate();
+        } finally {
             JdbcUtil.close(pstmt);
         }
     }

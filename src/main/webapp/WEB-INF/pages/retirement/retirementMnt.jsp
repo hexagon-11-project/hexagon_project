@@ -86,7 +86,6 @@ request.setAttribute("pageJs", null);
 					</tbody>
 				</table>
 			</div>
-			<!-- 선택 삭제, 전체 삭제 버튼 영역 완전 제거 됨 -->
 		</div>
 	</section>
 
@@ -96,24 +95,23 @@ request.setAttribute("pageJs", null);
 			<h2 class="section-title">퇴직급여 계산</h2>
 		</div>
 		<div class="card-body">
-			<form action="/retirement/insert.do" method="post" id="calcForm">
+			<form action="${pageContext.request.contextPath}/Retire/retirementMntInsert.do" method="post" id="calcForm">
 
-				<input type="hidden" name="employeeId" id="selectedEmployeeId"
-					value=""> <input type="hidden" name="serviceDays"
-					id="serviceDays" value="0"> <input type="hidden"
-					name="totalWageAmount" id="totalWageAmount" value="0"> <input
-					type="hidden" name="averageDailyWage" id="averageDailyWage"
-					value="0"> <input type="hidden" name="retirementPayAmount"
-					id="retirementPayAmount" value="0">
+				<input type="hidden" name="employeeId" id="selectedEmployeeId" value=""> 
+				<input type="hidden" name="serviceDays" id="serviceDays" value="0"> 
+				<input type="hidden" name="totalWageAmount" id="totalWageAmount" value="0"> 
+				<input type="hidden" name="averageDailyWage" id="averageDailyWage" value="0"> 
+				<input type="hidden" name="retirementPayAmount" id="retirementPayAmount" value="0">
 
 				<div class="form-grid cols-2">
 					<div class="field ">
-						<label>입사일</label> <input type="date" class="input"
-							id="calcHireDate" readonly>
+						<label>입사일</label> 
+						<!-- [수정] name="hireDate" 추가 -->
+						<input type="date" class="input" id="calcHireDate" name="hireDate" readonly>
 					</div>
 					<div class="field ">
-						<label>퇴직일</label> <input type="date" class="input"
-							id="calcResignDate" name="resignDate" readonly>
+						<label>퇴직일</label> 
+						<input type="date" class="input" id="calcResignDate" name="resignDate" readonly>
 					</div>
 				</div>
 
@@ -191,13 +189,12 @@ request.setAttribute("pageJs", null);
 		}
 
 		var xhr = new XMLHttpRequest();
-		xhr
-				.open(
-						"POST",
-						"${pageContext.request.contextPath}/Retirement/retirementMntPay.do",
-						true);
-		xhr.setRequestHeader("Content-Type",
-				"application/x-www-form-urlencoded");
+		xhr.open(
+			"POST",
+			"${pageContext.request.contextPath}/Retire/retirementMntPay.do",
+			true
+		);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				var responseText = xhr.responseText.trim();
@@ -211,7 +208,7 @@ request.setAttribute("pageJs", null);
 				tbody.innerHTML = "";
 
 				var totalWage = 0;
-				var totalDays = 0; // 고정 90일 대신 실제 일수가 누적될 변수
+				var totalDays = 0; 
 
 				var months = responseText.split("|");
 
@@ -222,15 +219,13 @@ request.setAttribute("pageJs", null);
 
 					totalWage += payAmount;
 
-					// [추가] 해당 월의 실제 마지막 일자 계산 
 					var parts = wageMonth.split("-");
 					var year = parseInt(parts[0]);
 					var month = parseInt(parts[1]);
 					var daysInMonth = new Date(year, month, 0).getDate();
 
-					totalDays += daysInMonth; // 3개월간의 총 일수 합산
+					totalDays += daysInMonth; 
 
-					// 표에 행 추가 (실제 월별 일수 출력)
 					var tr = document.createElement('tr');
 					tr.innerHTML = "<td>" + wageMonth + "</td>" + "<td>"
 							+ payAmount.toLocaleString() + "</td>" + "<td>"
@@ -238,7 +233,6 @@ request.setAttribute("pageJs", null);
 					tbody.appendChild(tr);
 				}
 
-				// [3개월간의 실제 총 일수(totalDays)로 나누어 1일 평균임금 계산
 				var avgWage = Math.floor(totalWage / totalDays);
 
 				var hireDateVal = document.getElementById('calcHireDate').value;
@@ -247,7 +241,6 @@ request.setAttribute("pageJs", null);
 				var hireDateObj = new Date(hireDateVal);
 				var resignDateObj = new Date(resignDateVal);
 
-				// 밀리초(ms) 차이를 구한 뒤 일(day) 수로 환산 (+1은 퇴직일 당일 포함)
 				var diffTime = resignDateObj.getTime() - hireDateObj.getTime();
 				var serviceDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
@@ -255,22 +248,12 @@ request.setAttribute("pageJs", null);
 					serviceDays = 0;
 				}
 
-				// 법정 퇴직금 공식: 1일 평균임금 × 30일 × (근속일수 / 365)
-				var retirementPay = Math.floor(avgWage * 30
-						* (serviceDays / 365));
+				var retirementPay = Math.floor(avgWage * 30 * (serviceDays / 365));
 
-				// 화면 출력 갱신
-				document.getElementById('displayTotalWage').innerText = totalWage
-						.toLocaleString()
-						+ "원";
-				document.getElementById('displayAvgWage').innerText = avgWage
-						.toLocaleString()
-						+ "원";
-				document.getElementById('displayRetirementPay').innerText = retirementPay
-						.toLocaleString()
-						+ "원";
+				document.getElementById('displayTotalWage').innerText = totalWage.toLocaleString() + "원";
+				document.getElementById('displayAvgWage').innerText = avgWage.toLocaleString() + "원";
+				document.getElementById('displayRetirementPay').innerText = retirementPay.toLocaleString() + "원";
 
-				// Form Submit(저장) 용도 Hidden 값 세팅
 				document.getElementById('serviceDays').value = serviceDays;
 				document.getElementById('totalWageAmount').value = totalWage;
 				document.getElementById('averageDailyWage').value = avgWage;
