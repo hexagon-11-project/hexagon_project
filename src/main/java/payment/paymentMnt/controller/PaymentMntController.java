@@ -70,9 +70,11 @@ public class PaymentMntController implements CommandHandler {
 			// 2. 저장된 급여 데이터가 있으면, 목록의 지급총액/공제총액/실지급액을 우측 상세패널과 동일한 로직
 			//    (기본급/일용급여/공제 기본값 보정)으로 다시 계산해서 덮어쓴다.
 			//    (PAYROLL_EMPLOYEE에 저장된 값이 상세내역과 어긋나 있어도 좌측 목록과 우측 패널이 항상 일치하도록)
-			if (employeeList != null) {
+			if (employeeList != null && !employeeList.isEmpty()) {
+				// 사원마다 반복 조회하던 지급항목 기본값(마스터 전체 조회)을 루프 밖에서 한 번만 조회해 재사용
+				java.util.Map<Long, Long> bulkDefaults = dao.selectPayItemBulkDefaults(conn);
 				for (PaymentMntEmployeeDTO emp : employeeList) {
-					PaymentMntEffectiveDetail effective = dao.computeEffectiveDetail(conn, emp.getPayrollEmployeeId());
+					PaymentMntEffectiveDetail effective = dao.computeEffectiveDetail(conn, emp.getPayrollEmployeeId(), bulkDefaults);
 					emp.setTotalPayAmount(effective.getTotalPayAmount());
 					emp.setTotalDeductionAmount(effective.getTotalDeductionAmount());
 					emp.setNetPayAmount(effective.getNetPayAmount());
