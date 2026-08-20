@@ -221,6 +221,11 @@ public class PaymentInsuranceLedger {
 		this.employmentInsurance = employmentInsurance;
 	}
 
+	/** 국민연금+건강보험+장기요양보험+고용보험 합계. 값이 없으면 0원. */
+	public long getInsuranceTotal() {
+		return nationalPension + healthInsurance + longTermCare + employmentInsurance;
+	}
+
 	public List<PaymentInsuranceLedger> getEmployees() {
 		return employees;
 	}

@@ -2,6 +2,7 @@ package payment.fourinsureList.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
@@ -51,5 +52,17 @@ public class FourinsureListService {
 			return null;
 		}
 		return year + month;
+	}
+
+	/** 사원별 4대보험 합계를 모두 더한 전체 합계. */
+	public long sumInsuranceAmount(List<PaymentInsuranceLedger> employeeList) {
+		long sum = 0L;
+		if (employeeList == null) {
+			return sum;
+		}
+		for (PaymentInsuranceLedger row : employeeList) {
+			sum += row.getInsuranceTotal();
+		}
+		return sum;
 	}
 }
