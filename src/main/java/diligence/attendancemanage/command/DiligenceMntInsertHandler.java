@@ -48,6 +48,7 @@ public class DiligenceMntInsertHandler implements CommandHandler {
 		item.setStartDate(java.sql.Date.valueOf(startDateParam));
 		item.setEndDate(java.sql.Date.valueOf(endDateParam));
 		item.setDescription(req.getParameter("description"));
+		item.setAllowanceAmount(parseOrNull(req.getParameter("amount")));
 
 		BigDecimal count = parseOrNull(countParam);
 

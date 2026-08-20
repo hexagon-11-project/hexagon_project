@@ -30,6 +30,7 @@ public class EmployeeMntDao {
 				
 				// 2. Setter를 이용해 값을 하나씩 세팅
 				emp.setEmployeeId(rs.getInt("employee_id"));
+				emp.setEmployeeNo(rs.getString("employee_no"));
 				emp.setEmploymentType(rs.getString("employment_type"));
 				emp.setEmployeeName(rs.getString("employee_name"));
 				emp.setDepartment(rs.getString("department"));
@@ -63,6 +64,7 @@ public class EmployeeMntDao {
 				Employee emp = new Employee();
 				
 				emp.setEmployeeId(rs.getInt("employee_id"));
+				emp.setEmployeeNo(rs.getString("employee_no"));
 				emp.setEmploymentType(rs.getString("employment_type"));
 				emp.setEmployeeName(rs.getString("employee_name"));
 				emp.setDepartment(rs.getString("department"));
@@ -112,21 +114,29 @@ public class EmployeeMntDao {
 		return countMap;
 	}
 	// 지정한 범위만큼 사원 리스트를 잘라서 조회하는 페이징 쿼리 
-		public List<Employee> selectListByPaging(Connection conn, int firstRow, int endRow) throws SQLException {
+	public List<Employee> selectListByPaging(Connection conn, int firstRow, int endRow, String searchType, String keyword) throws SQLException {
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
-			
+			String where = searchCondition(searchType, keyword);
 			String sql = "SELECT * FROM (" +
 					"    SELECT ROWNUM rnum, emp.* FROM (" +
-					"        SELECT * FROM employee ORDER BY employee_id DESC" +
+					"        SELECT * FROM employee " + where + " ORDER BY employee_id DESC" +
 					"    ) emp WHERE ROWNUM <= ?" +
 					") WHERE rnum >= ?";
 			
 			try {
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setInt(1, endRow);
-				pstmt.setInt(2, firstRow);
-				rs = pstmt.executeQuery();
+	            int paramIndex = 1;
+	            
+	            // 검색어가 있을 경우 ? 위치에 값 바인딩
+	            if (!where.isEmpty()) {
+	                pstmt.setString(paramIndex++, "%" + keyword.trim() + "%");
+	            }
+	            
+	            pstmt.setInt(paramIndex++, endRow);
+	            pstmt.setInt(paramIndex++, firstRow);
+	            
+	            rs = pstmt.executeQuery();
 
 				List<Employee> empList = new java.util.ArrayList<>();
 				
@@ -134,6 +144,7 @@ public class EmployeeMntDao {
 					Employee emp = new Employee();
 					emp.setEmployeeId(rs.getInt("employee_id"));
 					emp.setEmploymentType(rs.getString("employment_type"));
+					emp.setEmployeeNo(rs.getString("employee_no"));
 					emp.setEmployeeName(rs.getString("employee_name"));
 					emp.setDepartment(rs.getString("department"));
 					emp.setPosition(rs.getString("position"));
@@ -161,4 +172,35 @@ public class EmployeeMntDao {
 				return pstmt.executeUpdate(); // 성공하면 1 반환, 실패하면 0 반환
 			}
 		}
+		// 공통 검색 조건 메소드
+		private String searchCondition(String searchType, String keyword) {
+	        if (keyword == null || keyword.trim().isEmpty()) {
+	            return "";
+	        }
+	        if ("name".equals(searchType)) {
+	            return " WHERE employee_name LIKE ? ";
+	        } else if ("empNo".equals(searchType)) {
+	            return " WHERE employee_no LIKE ? "; 
+	        } else if ("dept".equals(searchType)) {
+	            return " WHERE department LIKE ? ";
+	        }
+	        return "";
+	    }
+		// 검색된 데이터의 총 개수 카운트 메서드 
+		public int getSearchCount(Connection conn, String searchType, String keyword) throws SQLException {
+	        String where = searchCondition(searchType, keyword); 
+	        String sql = "SELECT COUNT(*) FROM employee" + where;
+	        
+	        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	            if (!where.isEmpty()) {
+	                pstmt.setString(1, "%" + keyword.trim() + "%");
+	            }
+	            try (ResultSet rs = pstmt.executeQuery()) {
+	                if (rs.next()) {
+	                    return rs.getInt(1);
+	                }
+	            }
+	        }
+	        return 0;
+	    }
 }

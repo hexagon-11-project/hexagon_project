@@ -80,7 +80,7 @@
 			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
 			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
 			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/item-ledger.jsp"><span
+			href="<%=ctx%>/Payment/paymentPayItemPart.do"><span
 			class="nav-icon">□</span><span>항목별 대장</span></a><a
 			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/payroll/insurance-deduction.jsp"><span
@@ -95,14 +95,14 @@
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
 			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
-			class="nav-item <%="annual-total".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/annual-total.jsp"><span
+			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
+			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
 			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
 			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/monthly-total.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatisticsAllMonth.do"><span
 			class="nav-icon">□</span><span>월별 전체급여 통계</span></a><a
 			class="nav-item <%="item-composition".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/item-composition.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatisticsPayItems.do"><span
 			class="nav-icon">□</span><span>급여항목 구성 통계</span></a>
 	</div>
 	<div class="nav-group">
