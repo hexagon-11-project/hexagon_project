@@ -10,7 +10,7 @@
 	<div class="nav-group">
 		<div class="nav-label">기본환경</div>
 		<a class="nav-item <%="user-info".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/user-info.jsp"><span
+			href="<%=ctx%>/Config/membersInfo.do"><span
 			class="nav-icon">□</span><span>사용자 정보</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>사원
@@ -26,15 +26,15 @@
 		<div class="nav-label">인사관리</div>
 		<a
 			class="nav-item <%="employee-list".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/hr/employee-list.jsp"><span class="nav-icon">□</span><span>사원현황/관리</span></a><a
+			href="<%=ctx%>/Person/employeeMnt.do"><span class="nav-icon">□</span><span>사원현황/관리</span></a><a
 			class="nav-item <%="personnel-card".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/hr/personnel-card.jsp"><span
+			href="<%=ctx%>/Person/employeeCard.do"><span
 			class="nav-icon">□</span><span>인사기록 카드</span></a><a
 			class="nav-item <%="certificate-issue".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/hr/certificate-issue.jsp"><span
+			href="<%=ctx%>/Person/certificatePrintWorking.do"><span
 			class="nav-icon">□</span><span>제 증명서 발급</span></a><a
 			class="nav-item <%="certificate-ledger".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/hr/certificate-ledger.jsp"><span
+			href="<%=ctx%>/Person/certificateRegister.do"><span
 			class="nav-icon">□</span><span>제 증명서 발급 대장</span></a>
 	</div>
 	<div class="nav-group">
@@ -108,13 +108,13 @@
 		<div class="nav-label">퇴직관리</div>
 		<a
 			class="nav-item <%="retirement-process".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/retirement/retirement-process.jsp"><span
+			href="<%=ctx%>/Retire/retireProcess.do"><span
 			class="nav-icon">□</span><span>사원 퇴직처리</span></a><a
 			class="nav-item <%="retirement-pay".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/retirement/retirement-pay.jsp"><span
+			href="<%=ctx%>/Retire/retirementMnt.do"><span
 			class="nav-icon">□</span><span>퇴직급여 입력/관리</span></a><a
 			class="nav-item <%="retirement-slip".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/retirement/retirement-slip.jsp"><span
+			href="<%=ctx%>/Retire/retirePayslip.do"><span
 			class="nav-icon">□</span><span>퇴직급여 명세서</span></a>
 	</div>
 </aside>
