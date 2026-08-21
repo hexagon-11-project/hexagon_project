@@ -13,10 +13,10 @@
 			href="<%=ctx%>/pages/environment/user-info.jsp"><span
 			class="nav-icon">□</span><span>사용자 정보</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/employee-register1.jsp"><span
+			href="<%=ctx%>/Config/employeeIns1.do"><span
 			class="nav-icon">□</span><span>사원 등록1</span></a><a
 			class="nav-item <%="leave-settings".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/leave-settings.jsp"><span
+			href="<%=ctx%>/Config/leavesettingslist.do"><span
 			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/payitemsetlist.do"><span
@@ -41,16 +41,16 @@
 		<div class="nav-label">근태관리</div>
 		<a
 			class="nav-item <%="attendance-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/attendance-manage.jsp"><span
+			href="<%=ctx%>/Diligence/diligenceMnt.do"><span
 			class="nav-icon">□</span><span>근태기록/관리</span></a><a
 			class="nav-item <%="attendance-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/attendance-search.jsp"><span
+			href="<%=ctx%>/Diligence/diligenceSearchMonth.do"><span
 			class="nav-icon">□</span><span>근태조회</span></a><a
 			class="nav-item <%="leave-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/leave-search.jsp"><span
+			href="<%=ctx%>/Diligence/holidaysSearchResult.do"><span
 			class="nav-icon">□</span><span>휴가조회</span></a><a
 			class="nav-item <%="daily-work-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/daily-work-manage.jsp"><span
+			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span
 			class="nav-icon">□</span><span>일용직 근무기록/관리</span></a><a
 			class="nav-item <%="daily-work-search".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/attendance/daily-work-search.jsp"><span
