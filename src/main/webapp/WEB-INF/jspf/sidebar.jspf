@@ -92,7 +92,7 @@
 			href="<%=ctx%>/Statistics/paymentStatistics.do"><span
 			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatisticsMonth.do"><span
 			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
 			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
