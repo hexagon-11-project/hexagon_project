@@ -63,7 +63,7 @@ netValuesJson.append(']');
 	<section class="filter-bar">
 		<div class="field">
 			<label>* 귀속년도를 선택해 주세요.</label>
-			<select class="select" name="year">
+			<select class="select" name="year" onchange="document.getElementById('pstFilterForm').submit()">
 <%
 for (int y = currentYear + 1; y >= 2005; y--) {
 %>

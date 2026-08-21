@@ -90,7 +90,7 @@
 		<div class="nav-label">급여통계</div>
 		<a
 			class="nav-item <%="annual-personal".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/annual-personal.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatistics.do"><span
 			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
