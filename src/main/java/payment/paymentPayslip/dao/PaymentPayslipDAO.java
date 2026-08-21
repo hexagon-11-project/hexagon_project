@@ -29,11 +29,17 @@ public class PaymentPayslipDAO {
     /** 급여차수에 속한 사원 목록 + 인적사항 + 지급/공제 합계 (지급/공제 상세는 별도 배치 조회 후 Service에서 합쳐준다) */
     public List<PaymentPayslipDetailDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
         List<PaymentPayslipDetailDTO> list = new ArrayList<>();
+        // 일용직/DAILY 사원은 이 급여차수에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 노출한다.
+        // (근무기록 없이 지급/공제 내역이 전부 0인 유령 PAYROLL_EMPLOYEE 행 - 예: 예전 "지난급여 불러오기"가
+        //  직군 구분 없이 복사하던 시절의 잔존 데이터 - 는 명세서 대상에서 제외)
         String sql = "SELECT pe.PAYROLL_EMPLOYEE_ID, e.EMPLOYMENT_TYPE, e.EMPLOYEE_NAME, e.RESIDENT_REG_NO, "
                    + "e.DEPARTMENT, e.POSITION, e.HIRE_DATE, "
                    + "pe.TOTAL_PAY_AMOUNT, pe.TOTAL_DEDUCTION_AMOUNT, pe.NET_PAY_AMOUNT "
                    + "FROM PAYROLL_EMPLOYEE pe JOIN EMPLOYEE e ON e.EMPLOYEE_ID = pe.EMPLOYEE_ID "
-                   + "WHERE pe.PAYROLL_ID = ? ORDER BY e.EMPLOYEE_NAME";
+                   + "WHERE pe.PAYROLL_ID = ? "
+                   + "  AND (e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY') "
+                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID)) "
+                   + "ORDER BY e.EMPLOYEE_NAME";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, payrollId);
             try (ResultSet rs = pstmt.executeQuery()) {
