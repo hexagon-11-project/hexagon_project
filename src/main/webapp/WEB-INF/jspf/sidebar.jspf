@@ -59,18 +59,18 @@
 		<div class="nav-label">급여관리</div>
 		<a
 			class="nav-item <%="payroll-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/payroll-manage.jsp"><span
+			href="<%=ctx%>/Payment/paymentMnt.do"><span
 			class="nav-icon">□</span><span>급여입력/관리</span></a><a
 			class="nav-item <%="daily-payroll".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/daily-payroll.jsp"><span
+			href="<%=ctx%>/Payment/paymentMntDayWorker.do"><span
 			class="nav-icon">□</span><span>급여입력/관리(일용직)</span></a><a
 			class="nav-item <%="payroll-ledger".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/payroll-ledger.jsp"><span
+			href="<%=ctx%>/Payment/paymentRegisterList.do"><span
 			class="nav-icon">□</span><span>급여대장</span></a><a
 			class="nav-item <%="pay-slip".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/pay-slip.jsp"><span class="nav-icon">□</span><span>급여명세</span></a><a
+			href="<%=ctx%>/Payment/paymentPayslip.do"><span class="nav-icon">□</span><span>급여명세</span></a><a
 			class="nav-item <%="employee-pay-history".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/employee-pay-history.jsp"><span
+			href="<%=ctx%>/Payment/paymentPayList.do"><span
 			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransfer.do"><span
@@ -89,7 +89,7 @@
 		<div class="nav-label">급여통계</div>
 		<a
 			class="nav-item <%="annual-personal".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/annual-personal.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatistics.do"><span
 			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
