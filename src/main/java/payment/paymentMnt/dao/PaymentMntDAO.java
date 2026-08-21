@@ -26,15 +26,13 @@ public class PaymentMntDAO {
 
     public List<PaymentMntEmployeeDTO> getPayrollEmployeeList(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
-        // 일용직/DAILY 사원은 이 급여차수에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 목록에 노출.
-        // (selectEmployeeList/selectPayrollSummary와 동일한 조건 - 0원짜리 빈 사원을 보여줄 필요가 없다는 요구사항)
+        // 일용직/DAILY 사원은 급여입력관리 화면 대상이 아니므로(별도 일용직 급여 화면에서 관리) 항상 제외한다.
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, e.employee_name, e.employment_type, e.department,"
                    + "p.total_pay_amount, p.total_deduction_amount, p.net_pay_amount "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
                    + "JOIN PAYROLL pr ON p.payroll_id = pr.payroll_id "
                    + "WHERE pr.pay_year_month = ? AND pr.pay_sequence = ? "
-                   + "  AND (e.employment_type NOT IN ('일용직','DAILY') "
-                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.payroll_employee_id = p.payroll_employee_id)) "
+                   + "  AND e.employment_type NOT IN ('일용직','DAILY') "
                    + "ORDER BY e.employee_name";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -63,15 +61,13 @@ public class PaymentMntDAO {
 
     public List<PaymentMntEmployeeDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
-        // 일용직/DAILY 사원은 이 급여차수(payrollId)에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 목록에 노출.
-        // (0원짜리 빈 사원을 보여줄 필요가 없다는 요구사항. 일용직이 아닌 사원은 근무기록과 무관하게 그대로 노출)
+        // 일용직/DAILY 사원은 급여입력관리 화면 대상이 아니므로(별도 일용직 급여 화면에서 관리) 항상 제외한다.
         String sql = "SELECT p.payroll_employee_id, p.payroll_id, p.employee_id, e.employee_name, e.employment_type, "
                    + "e.department, "
                    + "p.total_pay_amount, p.total_deduction_amount, p.net_pay_amount "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
                    + "WHERE p.payroll_id = ? "
-                   + "  AND (e.employment_type NOT IN ('일용직','DAILY') "
-                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.payroll_employee_id = p.payroll_employee_id)) "
+                   + "  AND e.employment_type NOT IN ('일용직','DAILY') "
                    + "ORDER BY e.employee_name";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -439,8 +435,10 @@ public class PaymentMntDAO {
 
     public List<PaymentMntEmployeeDTO> getModalEmployeeList(Connection conn, String keyword) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
-        String sql = "SELECT employee_id, employee_name, employment_type, DEPARTMENT, POSITION, BASE_WAGE_AMOUNT FROM EMPLOYEE ";
-        if (keyword != null && !keyword.trim().isEmpty()) { sql += "WHERE employee_name LIKE ? "; }
+        // 일용직/DAILY 사원은 급여입력관리 화면 대상이 아니므로(별도 일용직 급여 화면에서 관리) 항상 제외한다.
+        String sql = "SELECT employee_id, employee_name, employment_type, DEPARTMENT, POSITION, BASE_WAGE_AMOUNT FROM EMPLOYEE "
+                   + "WHERE employment_type NOT IN ('일용직','DAILY') ";
+        if (keyword != null && !keyword.trim().isEmpty()) { sql += "AND employee_name LIKE ? "; }
         sql += "ORDER BY employee_name";
         
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -462,20 +460,27 @@ public class PaymentMntDAO {
     }
 
     public List<PaymentMntEmployeeDTO> getModalEmployeeList(Connection conn, String keyword, int limit, int offset, String department, String position, String status) throws SQLException {
+        return getModalEmployeeList(conn, keyword, limit, offset, department, position, status, false);
+    }
+
+    /** excludeDayWorkers=true면 일용직/DAILY 사원은 목록에서 제외한다 (급여입력관리는 일용직을 별도 화면에서 관리하므로 사원추가 대상에서 뺀다). */
+    public List<PaymentMntEmployeeDTO> getModalEmployeeList(Connection conn, String keyword, int limit, int offset, String department, String position, String status, boolean excludeDayWorkers) throws SQLException {
         List<PaymentMntEmployeeDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
-        
+
         sql.append("SELECT * FROM ( ");
         sql.append("  SELECT ROWNUM AS RNUM, A.* FROM ( ");
         sql.append("    SELECT employee_id, employee_name, employment_type, DEPARTMENT, POSITION, BASE_WAGE_AMOUNT, RESIGN_DATE ");
         sql.append("    FROM EMPLOYEE WHERE 1=1 ");
-        
+
         if (keyword != null && !keyword.trim().isEmpty()) { sql.append(" AND employee_name LIKE ? "); }
         if (department != null && !department.trim().isEmpty()) { sql.append(" AND DEPARTMENT = ? "); }
         if (position != null && !position.trim().isEmpty()) { sql.append(" AND POSITION = ? "); }
-        
-        if ("재직".equals(status)) { sql.append(" AND RESIGN_DATE IS NULL "); } 
+
+        if ("재직".equals(status)) { sql.append(" AND RESIGN_DATE IS NULL "); }
         else if ("퇴직".equals(status)) { sql.append(" AND RESIGN_DATE IS NOT NULL "); }
+
+        if (excludeDayWorkers) { sql.append(" AND employment_type NOT IN ('일용직','DAILY') "); }
 
         sql.append("    ORDER BY employee_name ");
         sql.append("  ) A WHERE ROWNUM <= ? ");
@@ -511,15 +516,22 @@ public class PaymentMntDAO {
     }
 
     public int getModalEmployeeCount(Connection conn, String keyword, String department, String position, String status) throws SQLException {
+        return getModalEmployeeCount(conn, keyword, department, position, status, false);
+    }
+
+    /** excludeDayWorkers=true면 일용직/DAILY 사원은 카운트에서 제외한다 (getModalEmployeeList와 동일 조건). */
+    public int getModalEmployeeCount(Connection conn, String keyword, String department, String position, String status, boolean excludeDayWorkers) throws SQLException {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM EMPLOYEE WHERE 1=1 ");
-        
+
         if (keyword != null && !keyword.trim().isEmpty()) { sql.append(" AND employee_name LIKE ? "); }
         if (department != null && !department.trim().isEmpty()) { sql.append(" AND DEPARTMENT = ? "); }
         if (position != null && !position.trim().isEmpty()) { sql.append(" AND POSITION = ? "); }
-        
-        if ("재직".equals(status)) { sql.append(" AND RESIGN_DATE IS NULL "); } 
+
+        if ("재직".equals(status)) { sql.append(" AND RESIGN_DATE IS NULL "); }
         else if ("퇴직".equals(status)) { sql.append(" AND RESIGN_DATE IS NOT NULL "); }
-        
+
+        if (excludeDayWorkers) { sql.append(" AND employment_type NOT IN ('일용직','DAILY') "); }
+
         int count = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
             int paramIndex = 1;
@@ -809,6 +821,11 @@ public class PaymentMntDAO {
             String employmentType = (String) row[2];
             String incomeType = (String) row[3];
 
+            // 일용직/DAILY 사원은 급여입력관리 화면 대상이 아니므로(별도 일용직 급여 화면에서 관리) 복사하지 않는다.
+            if ("일용직".equals(employmentType) || "DAILY".equals(employmentType)) {
+                continue;
+            }
+
             // ★ 저장된 상세만 그대로 읽지 않고, 급여입력/관리 화면에 실제로 보이는 "최종" 금액(기본급/식대
             //   기본값 보정, 근무기록 합계 대체 포함)을 기준으로 복사한다. 이전 달 사원이 화면에는 금액이
             //   보였지만 상세행이 실제로 저장된 적은 없는 경우(예: 신규 사원목록 표시 - 저장 미클릭)까지
@@ -976,14 +993,13 @@ public class PaymentMntDAO {
         PaymentMntSummaryDTO summary = new PaymentMntSummaryDTO();
 
         // 1. 월 합계 - 이 급여차수에 실제로 화면 목록에 뜨는 사원 수
-        //    (일용직/DAILY는 근무기록(DAILY_WORK_RECORD)이 있는 사람만 화면에 노출하므로, selectEmployeeList와 동일한 조건으로 카운트)
+        //    (일용직/DAILY는 급여입력관리 화면 대상이 아니므로 항상 제외 - selectEmployeeList와 동일한 조건으로 카운트)
         String countSql = "SELECT COUNT(*) AS TOTAL_COUNT "
                    + "FROM PAYROLL_EMPLOYEE pe "
                    + "JOIN PAYROLL pr ON pe.PAYROLL_ID = pr.PAYROLL_ID "
                    + "JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
                    + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ? "
-                   + "  AND (e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY') "
-                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID))";
+                   + "  AND e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY')";
         try (PreparedStatement pstmt = conn.prepareStatement(countSql)) {
             pstmt.setString(1, payYearMonth);
             pstmt.setInt(2, paySequence);
@@ -1002,8 +1018,7 @@ public class PaymentMntDAO {
                    + "JOIN PAYROLL pr ON pe.PAYROLL_ID = pr.PAYROLL_ID "
                    + "JOIN EMPLOYEE e ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID "
                    + "WHERE pr.PAY_YEAR_MONTH = ? AND pr.PAY_SEQUENCE = ? "
-                   + "  AND (e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY') "
-                   + "       OR EXISTS (SELECT 1 FROM DAILY_WORK_RECORD d WHERE d.PAYROLL_EMPLOYEE_ID = pe.PAYROLL_EMPLOYEE_ID))";
+                   + "  AND e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY')";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, payYearMonth);

@@ -35,10 +35,11 @@ public class EmployeeAddModalHandler implements CommandHandler {
             PaymentMntDAO dao = new PaymentMntDAO();
             
             // 4. 필터(부서, 직위, 상태)가 적용된 페이징 사원 목록 조회
-            List<PaymentMntEmployeeDTO> employeeList = dao.getModalEmployeeList(conn, keyword, limit, offset, department, position, status);
-            
+            //    일용직/DAILY는 급여입력관리 대상이 아니므로(별도 일용직 급여 화면에서 관리) 사원선택 목록에서 제외
+            List<PaymentMntEmployeeDTO> employeeList = dao.getModalEmployeeList(conn, keyword, limit, offset, department, position, status, true);
+
             // 5. 필터가 적용된 전체 사원 수 계산
-            int totalCount = dao.getModalEmployeeCount(conn, keyword, department, position, status);
+            int totalCount = dao.getModalEmployeeCount(conn, keyword, department, position, status, true);
             int totalPage = (int) Math.ceil((double) totalCount / limit);
             if (totalPage == 0) totalPage = 1;
             
