@@ -157,7 +157,7 @@ request.setAttribute("pageJs", null);
 							<th>사원번호</th>
 							<td class="span-1"><input type="text" class="input" readonly
 								name="employeeNo" value="${defaultEmpNo}"></td>
-							<th>고용형태</th>
+							<th><span class="required-mark">*</span>고용형태</th>
 							<td class="span-1">
 								<select class="select" name="employmentType">
 									<option value="" <%=v_employmentType.isEmpty()?"selected":""%>>선택해주세요</option>
@@ -171,7 +171,7 @@ request.setAttribute("pageJs", null);
 							</td>
 						</tr>
 						<tr>
-							<th>성명(한글)</th>
+							<th><span class="required-mark">*</span>성명(한글)</th>
 							<td class="span-1"><input type="text" class="input"
 								name="employeeName" value="<%=v_employeeName%>"></td>
 							<th>성명(영문)</th>
@@ -179,7 +179,7 @@ request.setAttribute("pageJs", null);
 								name="employeeNameEn" value="<%=v_employeeNameEn%>"></td>
 						</tr>
 						<tr>
-							<th>입사일</th>
+							<th><span class="required-mark">*</span>입사일</th>
 							<td class="span-1"><input type="date" class="input"
 								name="hireDate" value="<%=v_hireDate%>"></td>
 							<th>퇴사일</th>
@@ -187,7 +187,7 @@ request.setAttribute("pageJs", null);
 								name="resignDate" value="<%=v_resignDate%>"></td>
 						</tr>
 						<tr>
-							<th>부서</th>
+							<th><span class="required-mark">*</span>부서</th>
 							<td class="span-1">
 								<div class="inline-control">
 									<select class="select" name="department">

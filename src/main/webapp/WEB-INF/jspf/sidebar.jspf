@@ -13,14 +13,14 @@
 			href="<%=ctx%>/Config/membersInfo.do"><span
 			class="nav-icon">□</span><span>사용자 정보</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/employee-register1.jsp"><span
-			class="nav-icon">□</span><span>사원 등록1</span></a><a
+			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>사원
+				등록1</span></a><a
 			class="nav-item <%="leave-settings".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/environment/leave-settings.jsp"><span
+			href="<%=ctx%>/Config/leavesettingslist.do"><span
 			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/payitemsetlist.do"><span
-			class="nav-icon">□</span><span>급여항목 설정</span></a>
+			class="nav-icon">□</span><span>給与項目設定</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">인사관리</div>
@@ -41,69 +41,68 @@
 		<div class="nav-label">근태관리</div>
 		<a
 			class="nav-item <%="attendance-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/attendance-manage.jsp"><span
-			class="nav-icon">□</span><span>근태기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/diligenceMnt.do"><span class="nav-icon">□</span><span>근태기록/관리</span></a><a
 			class="nav-item <%="attendance-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/attendance-search.jsp"><span
+			href="<%=ctx%>/Diligence/diligenceSearchMonth.do"><span
 			class="nav-icon">□</span><span>근태조회</span></a><a
 			class="nav-item <%="leave-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/leave-search.jsp"><span
+			href="<%=ctx%>/Diligence/holidaysSearchResult.do"><span
 			class="nav-icon">□</span><span>휴가조회</span></a><a
 			class="nav-item <%="daily-work-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/daily-work-manage.jsp"><span
-			class="nav-icon">□</span><span>일용직 근무기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span class="nav-icon">□</span><span>일용직
+				근무기록/관리</span></a><a
 			class="nav-item <%="daily-work-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/daily-work-search.jsp"><span
+			href="<%=ctx%>/Diligence/dayWorkerSearchMonth.do"><span
 			class="nav-icon">□</span><span>일용직 근무 조회</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">급여관리</div>
 		<a
 			class="nav-item <%="payroll-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/payroll-manage.jsp"><span
+			href="<%=ctx%>/Payment/paymentMnt.do"><span
 			class="nav-icon">□</span><span>급여입력/관리</span></a><a
 			class="nav-item <%="daily-payroll".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/daily-payroll.jsp"><span
+			href="<%=ctx%>/Payment/paymentMntDayWorker.do"><span
 			class="nav-icon">□</span><span>급여입력/관리(일용직)</span></a><a
 			class="nav-item <%="payroll-ledger".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/payroll-ledger.jsp"><span
+			href="<%=ctx%>/Payment/paymentRegisterList.do"><span
 			class="nav-icon">□</span><span>급여대장</span></a><a
 			class="nav-item <%="pay-slip".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/pay-slip.jsp"><span class="nav-icon">□</span><span>급여명세</span></a><a
+			href="<%=ctx%>/Payment/paymentPayslip.do"><span class="nav-icon">□</span><span>급여명세</span></a><a
 			class="nav-item <%="employee-pay-history".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/payroll/employee-pay-history.jsp"><span
+			href="<%=ctx%>/Payment/paymentPayList.do"><span
 			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransfer.do"><span
-			class="nav-icon">□</span><span>급여이체 신청</span></a><a
+			class="nav-icon">□</span><span>給与振込申請</span></a><a
 			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
-			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
+			class="nav-icon">□</span><span>給与振込結果照会</span></a><a
 			class="nav-item <%="item-ledger".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentPayItemPart.do"><span
-			class="nav-icon">□</span><span>항목별 대장</span></a><a
+			class="nav-icon">□</span><span>項目別台帳</span></a><a
 			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/fourinsureList.do"><span
-			class="nav-icon">□</span><span>4대보험 공제내역</span></a>
+			class="nav-icon">□</span><span>4大保険控除内訳</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">급여통계</div>
 		<a
 			class="nav-item <%="annual-personal".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/statistics/annual-personal.jsp"><span
+			href="<%=ctx%>/Statistics/paymentStatistics.do"><span
 			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/pages/statistics/monthly-personal.jsp"><span
 			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
 			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
-			class="nav-icon">□</span><span>연도별 전체급여 통계</span></a><a
+			class="nav-icon">□</span><span>年度別給与総額統計</span></a><a
 			class="nav-item <%="monthly-total".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAllMonth.do"><span
-			class="nav-icon">□</span><span>월별 전체급여 통계</span></a><a
+			class="nav-icon">□</span><span>月別給与総額統計</span></a><a
 			class="nav-item <%="item-composition".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsPayItems.do"><span
-			class="nav-icon">□</span><span>급여항목 구성 통계</span></a>
+			class="nav-icon">□</span><span>給与項目構成統計</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">퇴직관리</div>
