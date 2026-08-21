@@ -256,10 +256,7 @@ request.setAttribute("pageJs", null);
 	checkboxes.forEach(function(cb) {
 		cb.addEventListener('change', function() {
 			if (this.checked) {
-				checkboxes.forEach(function(other) {
-					if (other !== cb) other.checked = false;
-				});
-				employeeIdInput.value = this.value;
+				employeeIdInput.value = this.value; // 입력폼 대상은 마지막으로 체크한 사원 기준
 			} else if (employeeIdInput.value === this.value) {
 				employeeIdInput.value = '';
 			}

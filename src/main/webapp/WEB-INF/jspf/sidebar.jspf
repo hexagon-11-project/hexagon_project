@@ -13,14 +13,14 @@
 			href="<%=ctx%>/pages/environment/user-info.jsp"><span
 			class="nav-icon">□</span><span>사용자 정보</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Config/employeeIns1.do"><span
-			class="nav-icon">□</span><span>사원 등록1</span></a><a
+			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>사원
+				등록1</span></a><a
 			class="nav-item <%="leave-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/leavesettingslist.do"><span
 			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Config/payitemsetlist.do"><span
-			class="nav-icon">□</span><span>급여항목 설정</span></a>
+			href="<%=ctx%>/Config/payitemsetlist.do"><span class="nav-icon">□</span><span>급여항목
+				설정</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">인사관리</div>
@@ -41,8 +41,7 @@
 		<div class="nav-label">근태관리</div>
 		<a
 			class="nav-item <%="attendance-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Diligence/diligenceMnt.do"><span
-			class="nav-icon">□</span><span>근태기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/diligenceMnt.do"><span class="nav-icon">□</span><span>근태기록/관리</span></a><a
 			class="nav-item <%="attendance-search".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Diligence/diligenceSearchMonth.do"><span
 			class="nav-icon">□</span><span>근태조회</span></a><a
@@ -50,10 +49,10 @@
 			href="<%=ctx%>/Diligence/holidaysSearchResult.do"><span
 			class="nav-icon">□</span><span>휴가조회</span></a><a
 			class="nav-item <%="daily-work-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span
-			class="nav-icon">□</span><span>일용직 근무기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span class="nav-icon">□</span><span>일용직
+				근무기록/관리</span></a><a
 			class="nav-item <%="daily-work-search".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/pages/attendance/daily-work-search.jsp"><span
+			href="<%=ctx%>/Diligence/dayWorkerSearchMonth.do"><span
 			class="nav-icon">□</span><span>일용직 근무 조회</span></a>
 	</div>
 	<div class="nav-group">
@@ -74,8 +73,8 @@
 			href="<%=ctx%>/pages/payroll/employee-pay-history.jsp"><span
 			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Payment/paymenttransfer.do"><span
-			class="nav-icon">□</span><span>급여이체 신청</span></a><a
+			href="<%=ctx%>/Payment/paymenttransfer.do"><span class="nav-icon">□</span><span>급여이체
+				신청</span></a><a
 			class="nav-item <%="transfer-result".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransferlist.do"><span
 			class="nav-icon">□</span><span>급여이체 결과조회</span></a><a
@@ -83,8 +82,8 @@
 			href="<%=ctx%>/Payment/paymentPayItemPart.do"><span
 			class="nav-icon">□</span><span>항목별 대장</span></a><a
 			class="nav-item <%="insurance-deduction".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Payment/fourinsureList.do"><span
-			class="nav-icon">□</span><span>4대보험 공제내역</span></a>
+			href="<%=ctx%>/Payment/fourinsureList.do"><span class="nav-icon">□</span><span>4대보험
+				공제내역</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">급여통계</div>
