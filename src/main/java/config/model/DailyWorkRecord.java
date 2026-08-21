@@ -13,12 +13,12 @@ public class DailyWorkRecord {
 	private Integer employeeId;
 	private String workSiteName;
 	private Date workDate;
-	private BigDecimal dailyWage; // 일당
-	private BigDecimal payRate; // 지급율
-	private BigDecimal payAmount; // 지급액 (일당 * 지급율)
-	private BigDecimal incomeTaxAmount; // 소득세
+	private BigDecimal dailyWage;         // 일당
+	private BigDecimal payRate;           // 지급율
+	private BigDecimal payAmount;         // 지급액 (일당 * 지급율)
+	private BigDecimal incomeTaxAmount;   // 소득세
 	private BigDecimal localIncomeTaxAmount; // 지방소득세
-	private BigDecimal netPayAmount; // 실지급액
+	private BigDecimal netPayAmount;      // 실지급액
 
 	// 화면 표시용 (join 결과)
 	private String employeeName;
@@ -140,6 +140,13 @@ public class DailyWorkRecord {
 
 	public String getNetPayAmountValue() {
 		return formatWon(netPayAmount);
+	}
+
+	// 일용직 근무조회 화면 "세금" 컬럼 - 소득세 + 지방소득세 합계
+	public String getTotalTaxValue() {
+		BigDecimal income = incomeTaxAmount == null ? BigDecimal.ZERO : incomeTaxAmount;
+		BigDecimal local = localIncomeTaxAmount == null ? BigDecimal.ZERO : localIncomeTaxAmount;
+		return formatWon(income.add(local));
 	}
 
 	private String formatWon(BigDecimal value) {
