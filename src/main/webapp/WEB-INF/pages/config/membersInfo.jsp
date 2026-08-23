@@ -10,12 +10,11 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<!-- 1. action 경로를 데이터를 '조회'하는 read가 아니라 '수정'을 처리할 핸들러 주소로 변경합니다. (예: updateMembersInfo.do) -->
+
 <form
 	action="${pageContext.request.contextPath}/Config/updateMembersInfo.do"
 	method="post">
 
-	<!-- 어떤 회사의 데이터인지 식별하기 위해 companyId를 숨김 필드로 전달 -->
 	<input type="hidden" name="companyId" value="${companyInfo.companyId}">
 
 	<div class="user-info-layout">
@@ -42,20 +41,12 @@ request.setAttribute("pageJs", null);
 						</tr>
 						<tr>
 							<th>설립일</th>
-							<!-- 참고: timestamp 데이터가 yyyy-MM-dd 형태로 나와야 input type="date"에 정상 표시됩니다. -->
 							<td class="span-1"><input type="date" class="input"
 								name="estDate" value="${companyInfo.estDate}"></td>
 							<th>홈페이지</th>
 							<td class="span-1"><input type="text" class="input"
 								name="webSite" value="${companyInfo.webSite}"></td>
-						</tr>
-						<%-- <tr>
-							<th>사업장 주소</th>
-							<td class="span-3"><div class="address-control">
-									<input class="input" type="text" name="address" value="${companyInfo.address}">
-									<button type="button" class="btn btn-sm">우편번호</button>
-								</div></td>
-						</tr> --%>
+						
 						<tr>
 							<th>전화번호</th>
 							<td class="span-1"><input type="text" class="input"
@@ -213,7 +204,16 @@ request.setAttribute("pageJs", null);
 				<div class="brand-assets">
 					<div class="brand-asset">
 						<div class="brand-title">회사로고</div>
-						<div class="brand-preview">${companyInfo.logoPath != null ? companyInfo.logoPath : '회사 로고'}</div>
+						<div class="brand-preview">
+							<c:choose>
+								<c:when test="${not empty companyInfo.logoPath}">
+									<img src="${pageContext.request.contextPath}${companyInfo.logoPath}" alt="회사로고" style="max-height: 80px; max-width: 100%;">
+								</c:when>
+								<c:otherwise>
+									회사 로고
+								</c:otherwise>
+							</c:choose>
+						</div>
 						<div class="mini-actions">
 							<button type="button" class="btn btn-sm">등록</button>
 							<button type="button" class="btn btn-sm">삭제</button>
@@ -221,7 +221,16 @@ request.setAttribute("pageJs", null);
 					</div>
 					<div class="brand-asset">
 						<div class="brand-title">회사도장</div>
-						<div class="brand-preview seal-preview">${companyInfo.sealPath != null ? companyInfo.sealPath : '직인'}</div>
+						<div class="brand-preview seal-preview">
+							<c:choose>
+								<c:when test="${not empty companyInfo.sealPath}">
+									<img src="${pageContext.request.contextPath}${companyInfo.sealPath}" alt="직인" style="max-height: 80px; max-width: 100%;">
+								</c:when>
+								<c:otherwise>
+									직인
+								</c:otherwise>
+							</c:choose>
+						</div>
 						<div class="mini-actions">
 							<button type="button" class="btn btn-sm">등록</button>
 							<button type="button" class="btn btn-sm">삭제</button>
@@ -268,7 +277,6 @@ request.setAttribute("pageJs", null);
 										<option>주임</option>
 										<option>사원</option>
 										<option>실장</option></select>
-									<!-- 	<button type="button" class="btn btn-sm">관리</button> -->
 								</div></td>
 						</tr>
 						<tr>

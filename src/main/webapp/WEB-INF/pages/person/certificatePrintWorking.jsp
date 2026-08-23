@@ -22,57 +22,60 @@ request.setAttribute("pageJs", null);
 <div class="certificate-source-layout">
 	<section class="source-list-panel">
 		<div class="source-list-search">
-	<!-- 검색 폼 추가: GET 방식으로 검색어(searchName) 전송 -->
-	<form action="${pageContext.request.contextPath}/Person/certificatePrintWorking.do" method="GET" style="display: flex; gap: 5px; width: 100%;">
-		<!-- 선택된 사원 정보와 증명서 타입 유지를 위한 hidden 필드 -->
-		<input type="hidden" name="employeeNo" value="${selectedEmpNo}">
-		<input type="hidden" name="certType" value="${selectedCertType}">
-		
-		<input class="input" type="text" name="searchName" placeholder="이름 입력" value="${param.searchName}">
-		<button class="btn btn-primary" type="submit">검색</button>
-		<button class="btn btn-primary" type="button" onclick="location.href='${pageContext.request.contextPath}/Person/certificatePrintWorking.do'" style="background-color: #6c757d; border-color: #6c757d;">전체보기</button>
-	</form>
-</div>
+			<!-- 검색 폼 추가: GET 방식으로 검색어(searchName) 전송 -->
+			<form
+				action="${pageContext.request.contextPath}/Person/certificatePrintWorking.do"
+				method="GET" style="display: flex; gap: 5px; width: 100%;">
+				<!-- 선택된 사원 정보와 증명서 타입 유지를 위한 hidden 필드 -->
+				<input type="hidden" name="employeeNo" value="${selectedEmpNo}">
+				<input type="hidden" name="certType" value="${selectedCertType}">
+
+				<input class="input" type="text" name="searchName"
+					placeholder="이름 입력" value="${param.searchName}">
+				<button class="btn btn-primary" type="submit">검색</button>
+				<button class="btn btn-primary" type="button"
+					onclick="location.href='${pageContext.request.contextPath}/Person/certificatePrintWorking.do'"
+					style="background-color: #6c757d; border-color: #6c757d;">전체보기</button>
+			</form>
+		</div>
 		<div class="table-wrap">
-	<table class="data-table source-data-table compact-list">
-		<thead>
-			<tr>
-				<th>구분</th>
-				<th>사원번호</th>
-				<th>성명</th>
-				<th>부서</th>
-				<th>직위</th>
-				<th>상태</th>
-			</tr>
-		</thead>
-		<tbody>
-			<c:forEach var="emp" items="${empList}">
-				<tr <c:if test="${emp.employeeNo == selectedEmpNo}">style="background-color: #f0f8ff;"</c:if>>
-					<td>${emp.employmentType}</td>
-					<td>${emp.employeeNo}</td> <!-- 끝에 있던 's' 오타 삭제됨 -->
-					<td>
-						<a href="${pageContext.request.contextPath}/Person/certificatePrintWorking.do?employeeNo=${emp.employeeNo}&certType=${selectedCertType}&searchName=${param.searchName}"
-							style="color: #0056b3; text-decoration: underline; font-weight: bold;">
-							${emp.employeeName}
-						</a>
-					</td>
-					<td>${emp.department}</td>
-					<td>${emp.position}</td>
-					<td>
-						<c:choose>
-							<c:when test="${emp.retirementYn == 'Y'}">
-								<span style="color: gray;">퇴직</span>
-							</c:when>
-							<c:otherwise>
-								<span style="color: blue;">재직</span>
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:forEach>
-		</tbody>
-	</table>
-</div>
+			<table class="data-table source-data-table compact-list">
+				<thead>
+					<tr>
+						<th>구분</th>
+						<th>사원번호</th>
+						<th>성명</th>
+						<th>부서</th>
+						<th>직위</th>
+						<th>상태</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="emp" items="${empList}">
+						<tr
+							<c:if test="${emp.employeeNo == selectedEmpNo}">style="background-color: #f0f8ff;"</c:if>>
+							<td>${emp.employmentType}</td>
+							<td>${emp.employeeNo}</td>
+							<!-- 끝에 있던 's' 오타 삭제됨 -->
+							<td><a
+								href="${pageContext.request.contextPath}/Person/certificatePrintWorking.do?employeeNo=${emp.employeeNo}&certType=${selectedCertType}&searchName=${param.searchName}"
+								style="color: #0056b3; text-decoration: underline; font-weight: bold;">
+									${emp.employeeName} </a></td>
+							<td>${emp.department}</td>
+							<td>${emp.position}</td>
+							<td><c:choose>
+									<c:when test="${emp.retirementYn == 'Y'}">
+										<span style="color: gray;">퇴직</span>
+									</c:when>
+									<c:otherwise>
+										<span style="color: blue;">재직</span>
+									</c:otherwise>
+								</c:choose></td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
 	</section>
 
 	<section class="certificate-workspace">
@@ -92,7 +95,9 @@ request.setAttribute("pageJs", null);
 
 		<!--  여기서부터 <form> 태그 시작! (Handler와 연결되는 주소 입력) -->
 		<!-- action 주소는 Handler가 매핑된 URL로 맞춰주세요. -->
-		<form action="${pageContext.request.contextPath}/Person/certificatePrintWorkingInsert.do" method="POST">
+		<form
+			action="${pageContext.request.contextPath}/Person/certificatePrintWorkingInsert.do"
+			method="POST">
 
 			<!--  서버로 몰래 넘겨야 하는 필수 데이터 (hidden) -->
 			<!-- Handler에서 req.getParameter("employeeNo") 로 받기 위한 이름표(name) -->
@@ -184,19 +189,24 @@ request.setAttribute("pageJs", null);
 						</tr>
 					</tbody>
 				</table>
-				<div class="signature-area">
-					<p>
+				<div class="signature-area"
+					style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+					<p style="margin: 0;">
 						<strong>(주)헥사곤아이티 대표이사</strong>
 					</p>
-					<div class="seal-box">직인</div>
+					<div class="seal-box">
+						<!-- 아까 assets 폴더에 저장한 직인 이미지를 불러옵니다 -->
+						<img
+							src="${pageContext.request.contextPath}/assets/images/Seal.png"
+							alt="직인" style="width: 60px; height: 60px;">
+					</div>
 				</div>
-			</div>
 
-			<div class="source-bottom-actions">
-				<!--  버튼 타입 변경: 단순 인쇄(button)에서 폼 데이터 전송(submit)으로 바꿈 -->
-				<button type="submit" class="btn btn-primary">저장하기</button>
-				<!-- 인쇄는 저장 후 완료 화면에서 진행하거나 JS로 따로 빼는 것이 좋습니다 -->
-			</div>
+				<div class="source-bottom-actions">
+					<!--  버튼 타입 변경: 단순 인쇄(button)에서 폼 데이터 전송(submit)으로 바꿈 -->
+					<button type="submit" class="btn btn-primary">저장하기</button>
+					<!-- 인쇄는 저장 후 완료 화면에서 진행하거나 JS로 따로 빼는 것이 좋습니다 -->
+				</div>
 		</form>
 		<!--  form 태그 닫기 -->
 	</section>
