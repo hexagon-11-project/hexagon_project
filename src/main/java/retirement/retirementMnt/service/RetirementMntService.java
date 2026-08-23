@@ -7,7 +7,7 @@ import java.util.List;
 import connection.ConnectionProvider;
 import retirement.model.RetirementMntModel;
 import retirement.model.RetirementMntModel.MonthlyWage;
-import retirment.retirementMnt.dao.RetirementMntDao;
+import retirement.retirementMnt.dao.RetirementMntDao;
 
 public class RetirementMntService {
 	private RetirementMntDao retirementDao = new RetirementMntDao();

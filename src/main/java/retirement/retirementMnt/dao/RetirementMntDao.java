@@ -1,4 +1,4 @@
-package retirment.retirementMnt.dao;
+package retirement.retirementMnt.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -124,18 +124,22 @@ public class RetirementMntDao {
         PreparedStatement pstmt = null;
 
         try {
+            // VALUES 구문 대신 SELECT ... FROM DUAL WHERE NOT EXISTS 구문으로 변경
             String sql = "INSERT INTO retirement_pay ("
                        + "    retirement_pay_id, company_id, employee_id, "
                        + "    calc_start_date, calc_end_date, service_days, "
                        + "    total_wage_amount, average_daily_wage, retirement_pay_amount, "
                        + "    net_pay_amount, reg_id, mod_id, created_at, updated_at, "
                        + "    interim_settlement_yn, retirement_settlement_yn"
-                       + ") VALUES ("
-                       + "    retirement_pay_seq.NEXTVAL, 1, ?, "
-                       + "    TO_DATE(?, 'YYYY-MM-DD'), TO_DATE(?, 'YYYY-MM-DD'), ?, "
-                       + "    ?, ?, ?, "
-                       + "    ?, 'SYSTEM', 'SYSTEM', SYSDATE, SYSDATE, "
-                       + "    'N', 'Y'"
+                       + ") "
+                       + "SELECT retirement_pay_seq.NEXTVAL, 1, ?, "
+                       + "       TO_DATE(?, 'YYYY-MM-DD'), TO_DATE(?, 'YYYY-MM-DD'), ?, "
+                       + "       ?, ?, ?, "
+                       + "       ?, 'SYSTEM', 'SYSTEM', SYSDATE, SYSDATE, "
+                       + "       'N', 'Y' "
+                       + "FROM DUAL "
+                       + "WHERE NOT EXISTS ( "
+                       + "    SELECT 1 FROM retirement_pay WHERE employee_id = ? "
                        + ")";
 
             pstmt = conn.prepareStatement(sql);
@@ -148,12 +152,14 @@ public class RetirementMntDao {
             pstmt.setDouble(6, model.getAverageDailyWage());// average_daily_wage
             pstmt.setLong(7, model.getRetirementPayAmount());// retirement_pay_amount
             pstmt.setLong(8, model.getRetirementPayAmount());// net_pay_amount (실지급액은 우선 퇴직금과 동일하게 처리)
+            
+            // ★ 추가된 부분: WHERE NOT EXISTS 조건을 위한 9번째 파라미터 (employee_id 검사)
+            pstmt.setString(9, model.getEmployeeId());
 
             return pstmt.executeUpdate();
         } finally {
             JdbcUtil.close(pstmt);
         }
     }
-
     
 }

@@ -32,7 +32,11 @@ public class RetirementMntInsertHandler implements CommandHandler {
       
         	res.sendRedirect(req.getContextPath() + "/Retire/retirementMnt.do");
             return null; // 직접 응답을 보냈으므로 프레임워크의 뷰 처리를 생략하기 위해 null 반환
-        } else {
+        }else if(result == 0) {
+        	// [중복] 이미 해당 사원의 데이터가 존재하는 경우 (DB에서 INSERT를 수행하지 않음)
+            res.sendRedirect(req.getContextPath() + "/Retire/retirementMnt.do?error=dup");
+            return null;
+        }else {
             // 실패 시 처리
             req.setAttribute("errorMsg", "저장에 실패했습니다.");
             return "/WEB-INF/pages/common/error.jsp";

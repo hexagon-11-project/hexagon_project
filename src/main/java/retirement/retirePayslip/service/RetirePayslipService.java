@@ -17,7 +17,7 @@ public class RetirePayslipService {
     // 1. 명세서 데이터 채우기
     public void getRetirementStatement(String employeeId, 
                                        RetirementMntModel statement, CompanyInfo company) {
-        // 괄호() 제대로 닫고 메서드 호출은 중괄호{} 안으로 이동
+     
         try (Connection conn = ConnectionProvider.getConnection()) { 
             retirePayslipDao.selectRetirementStatement(conn,  employeeId, statement, company);
         } catch (SQLException e) {

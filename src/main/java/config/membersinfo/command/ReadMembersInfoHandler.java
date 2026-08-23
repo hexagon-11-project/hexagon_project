@@ -10,7 +10,7 @@ import config.model.CompanyInfo;
 
 public class ReadMembersInfoHandler implements CommandHandler {
 
-    // 회사 정보를 조회하는 비즈니스 로직을 처리할 서비스 객체 생성
+
     private ReadmembersInfoService readService = new ReadmembersInfoService();
 
     @Override
@@ -29,7 +29,7 @@ public class ReadMembersInfoHandler implements CommandHandler {
             
             // 3. JSP에서 ${companyInfo.companyName} 등으로 꺼내 쓸 수 있게 request에 저장
             req.setAttribute("companyInfo", companyInfo);
-            System.out.println(companyInfo);
+           
             // 4. 화면을 그려줄 JSP 뷰 경로 리턴
             return "/WEB-INF/pages/config/membersInfo.jsp";
             

@@ -275,4 +275,17 @@ request.setAttribute("pageJs", null);
 		}
 		return confirm("해당 퇴직급여 내역을 저장하시겠습니까?");
 	}
+	window.onload = function() {
+	    // 1. 현재 URL의 파라미터를 읽어옵니다.
+	    var urlParams = new URLSearchParams(window.location.search);
+	    
+	    // 2. 파라미터 중 error 값이 'dup'인지 확인합니다.
+	    if (urlParams.get('error') === 'dup') {
+	        alert("이미 저장된 내역입니다.");
+	        
+	        // 3. 경고창을 띄운 후, 새로고침 시 계속 경고창이 뜨는 것을 막기 위해 주소창에서 파라미터를 지웁니다.
+	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+	    }
+	};
 </script>

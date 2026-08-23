@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import connection.ConnectionProvider;
 import retirement.model.RetirementMntModel;
-import retirment.retirementMnt.dao.RetirementMntDao; // DAO 임포트 필수
+import retirement.retirementMnt.dao.RetirementMntDao;
 
 public class RetirementMntInsertService {
     
