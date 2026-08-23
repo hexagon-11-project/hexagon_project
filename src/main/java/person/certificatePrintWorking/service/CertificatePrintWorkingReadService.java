@@ -13,7 +13,7 @@ import person.certificatePrintWorking.dao.CertificatePrintWorkingDao;
 public class CertificatePrintWorkingReadService {
 	private CertificatePrintWorkingDao certDao = new CertificatePrintWorkingDao();
 
-    // 1. 사원 목록 조회
+    // 사원 목록 조회
 	public List<Employee> getEmployeeList(String searchName) {
 	    try (Connection conn = ConnectionProvider.getConnection()) {
 	        return certDao.selectEmployeeList(conn, searchName); // 검색어 전달
@@ -23,7 +23,7 @@ public class CertificatePrintWorkingReadService {
 	    }
 	}
 
-    // 2. 사원 상세 조회 및 개인정보(주민등록번호) 마스킹 처리
+    // 사원 상세 조회 및 개인정보(주민등록번호) 마스킹 처리
     public Employee getEmployeeDetail(String employeeNo) {
         try (Connection conn = ConnectionProvider.getConnection()) {
             Employee emp = certDao.selectEmployeeDetail(conn, employeeNo);

@@ -99,23 +99,23 @@ public class CertificatePrintWorkingDao {
                        + "    submission_target, reg_id, mod_id, created_at, updated_at  "
                        + ") "
                        + "SELECT "
-                       + "    certificate_issue_seq.NEXTVAL, " // 1. 발급 고유아이디
-                       + "    e.company_id, "                  // 2. 회사 아이디
-                       + "    e.employee_id, "                 // 3. 사원 고유아이디
-                       + "    ?, "                             // 4. [Model] 증명서종류코드 (pstmt 1번)
-                       + "    TO_CHAR(SYSDATE, 'YYYY'), "      // 5. 발급연도
+                       + "    certificate_issue_seq.NEXTVAL, " 
+                       + "    e.company_id, "                 
+                       + "    e.employee_id, "               
+                       + "    ?, "                            
+                       + "    TO_CHAR(SYSDATE, 'YYYY'), "     
                        + "    (SELECT NVL(MAX(issue_sequence), 0) + 1 FROM certificate_issue WHERE issue_year = TO_CHAR(SYSDATE, 'YYYY')), " // 6. 순번
                        // 7. 발급번호: 4자리 연도(YYYY) || '-' || 6자리 순번(000001) 자동 생성
                        + "    TO_CHAR(SYSDATE, 'YYYY') || '-' || LPAD((SELECT NVL(MAX(issue_sequence), 0) + 1 FROM certificate_issue WHERE issue_year = TO_CHAR(SYSDATE, 'YYYY')), 6, '0'), "
-                       + "    SYSDATE, "                       // 8. 발급일
-                       + "    ?, "                             // 9. [Model] 용도 (pstmt 2번)
-                       + "    ?, "                             // 10.[Model] 제출처 (pstmt 3번)
-                       + "    ?, "                             // 11. 등록자 (pstmt 4번)
-                       + "    ?, "                             // 12. 수정자 (pstmt 5번)
-                       + "    SYSDATE, "                       // 13. 생성일시
-                       + "    SYSDATE "                        // 14. 수정일시
+                       + "    SYSDATE, "                       
+                       + "    ?, "                             
+                       + "    ?, "                             
+                       + "    ?, "                             
+                       + "    ?, "                            
+                       + "    SYSDATE, "                      
+                       + "    SYSDATE "                        
                        + "FROM employee e "
-                       + "WHERE e.employee_no = ?";            // 사원번호 조건 (pstmt 6번)
+                       + "WHERE e.employee_no = ?";            
 
             pstmt = conn.prepareStatement(sql);
             
@@ -123,9 +123,9 @@ public class CertificatePrintWorkingDao {
             pstmt.setString(1, model.getCertificateTypeCode()); 
             pstmt.setString(2, model.getPurpose());             
             pstmt.setString(3, model.getSubmissionTarget());    
-            pstmt.setString(4, model.getRegId());               // 등록자
-            pstmt.setString(5, model.getRegId());               // 수정자
-            pstmt.setString(6, model.getEmployeeNo());          // 사원번호
+            pstmt.setString(4, model.getRegId());               
+            pstmt.setString(5, model.getRegId());               
+            pstmt.setString(6, model.getEmployeeNo());          
             result = pstmt.executeUpdate();
             
         } finally {
