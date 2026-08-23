@@ -11,7 +11,6 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<!-- 검색 조건을 서버로 보내기 위해 폼(form)으로 감싸기 -->
 <form action="${pageContext.request.contextPath}/Person/certificateRegister.do" method="GET">
 	<section class="filter-bar">
 		<div class="field ">
@@ -24,7 +23,6 @@ request.setAttribute("pageJs", null);
 		</div>
 		<div class="field ">
 			<label>증명서</label>
-			<!--  name="certType" 부여 및 선택된 값 유지 로직 -->
 			<select class="select" name="certType">
 				<option value="전체" ${certType == '전체' ? 'selected' : ''}>전체</option>
 				<option value="재직증명서" ${certType == '재직증명서' ? 'selected' : ''}>재직증명서</option>
@@ -33,12 +31,10 @@ request.setAttribute("pageJs", null);
 			</select>
 		</div>
 		<div class="field ">
-			<!-- name="empName" 부여 및 검색어 유지 -->
 			<label>사원명</label>
 			<input type="text" name="empName" class="input" value="${empName}">
 		</div>
 		<div class="actions">
-			<!--  검색 버튼이 작동하도록 type="submit"으로 변경 -->
 			<button type="submit" class="btn btn-primary">조회</button>
 			<button type="button" class="btn ">인쇄</button>
 		</div>
@@ -51,14 +47,12 @@ request.setAttribute("pageJs", null);
 	</div>
 	<div class="card-body">
 		
-		<!-- 선택 삭제 기능을 위해 테이블 전체를 감싸는 폼 태그 -->
 		
 		<form action="${pageContext.request.contextPath}/Person/certificateRegisterUpdate.do" method="POST" onsubmit="return confirm('선택한 증명서를 정말 취소 처리하시겠습니까?');">
 			<div class="table-toolbar">
 				
 				<span class="table-count">총 ${certList.size()}건</span>
 				<div class="actions">
-					<!-- 자바스크립트 없이 폼 데이터를 넘기기 위해 type을 submit으로 변경 -->
 					<button type="submit" class="btn btn-danger">선택 삭제</button>
 					<button type="button" class="btn btn-danger">전체 삭제</button>
 				</div>
@@ -81,7 +75,6 @@ request.setAttribute("pageJs", null);
 					<tbody>
 						<c:forEach var="cert" items="${certList}">
 							<tr>
-								<!--  서버로 발급번호를 넘기기 위한 name, value 속성 추가 -->
 								<td><input type="checkbox" name="issueNo" value="${cert.issueNo}"></td>
 								<td>${cert.issueNo}</td>
 								<td>${cert.issueDate}</td>
@@ -90,7 +83,6 @@ request.setAttribute("pageJs", null);
 								<td>${cert.purpose}</td>
 								<td>${cert.regId}</td>
 								
-								<!-- 상태값(Y/N)에 따라 텍스트와 색상 다르게 출력 -->
 								<td>
 									<c:choose>
 										<c:when test="${cert.certificateYn == 'Y'}">

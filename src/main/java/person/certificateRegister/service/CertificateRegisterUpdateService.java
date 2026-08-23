@@ -20,9 +20,9 @@ public class CertificateRegisterUpdateService {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
-            conn.setAutoCommit(false); // 트랜잭션 시작
+            conn.setAutoCommit(false); 
             
-            // DAO 호출
+          
             int count = updateDao.updateCertificateStatusToN(conn, issueNos);
             
             // 업데이트된 건수가 있으면 커밋
@@ -35,7 +35,7 @@ public class CertificateRegisterUpdateService {
             }
             
         } catch (SQLException e) {
-            JdbcUtil.rollback(conn); // 예외 발생 시 롤백
+            JdbcUtil.rollback(conn); 
             throw new RuntimeException("삭제중 DB 에러 발생", e);
         } finally {
             JdbcUtil.close(conn);
