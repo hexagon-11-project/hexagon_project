@@ -35,7 +35,6 @@ request.setAttribute("pageJs", null);
 	</button>
 </div>
 
-<!-- 오타(ass="...") 수정 완료 -->
 <div class="employee-list-tools"> 
 
 	<form action="${pageContext.request.contextPath}/Person/employeeMnt.do" method="GET" style="display:inline;">
@@ -61,7 +60,6 @@ request.setAttribute("pageJs", null);
 	</div>
 </div>
 
-<!--  삭제할 데이터를 서버로 보내기 위해 Table 전체를 form으로 감쌉니다 -->
 <form id="deleteForm" action="${pageContext.request.contextPath}/Person/employeeMntDelete.do" method="POST">
 	<div class="table-wrap">
 		<table class="data-table source-data-table employee-master-table">
@@ -83,7 +81,6 @@ request.setAttribute("pageJs", null);
 			<tbody>
 				<c:forEach var="emp" items="${employeePage.content}">
 					<tr>
-						<!-- 체크박스에 name과 value(사번) 부여 -->
 						<td><input type="checkbox" name="empId" value="${emp.employeeId}"></td>
 
 						<td>${emp.employmentType}</td>
@@ -109,7 +106,6 @@ request.setAttribute("pageJs", null);
 </form> 
 
 <div class="source-pagination">
-	<!--  페이지 이동 시에도 검색된 상태가 풀리지 않도록 파라미터(&searchType=...&keyword=...) 유지 -->
 	
 	<!-- 이전 구간으로 이동 (‹ 이전페이지) -->
 	<c:if test="${employeePage.startPage > 5}">
@@ -137,7 +133,6 @@ request.setAttribute("pageJs", null);
 <div class="source-bottom-actions">
 	<button type="button" class="btn btn-primary"
 		onclick="location.href='${pageContext.request.contextPath}/Config/employeeIns1.do'">신규사원등록</button>
-	<!--  버튼 클릭 시 자바스크립트 함수 호출 -->
 	<!-- <button type="submit" class="btn">선택 삭제</button> -->
 	<button type="submit" form="deleteForm" class="btn">선택 삭제</button>
 </div>

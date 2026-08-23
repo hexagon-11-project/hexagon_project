@@ -8,7 +8,6 @@ import person.employeeMnt.dao.EmployeeMntDao;
 
 public class EmployeeMntDeleteService {
 
-    // 기존 DAO는 그대로 사용
     private EmployeeMntDao employeeDao = new EmployeeMntDao();
 
     public void deleteEmployees(String[] empIds) {

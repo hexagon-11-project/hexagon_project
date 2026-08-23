@@ -28,7 +28,6 @@ public class EmployeeMntDao {
 			if (rs.next()) {
 				emp = new Employee();
 				
-				// 2. Setter를 이용해 값을 하나씩 세팅
 				emp.setEmployeeId(rs.getInt("employee_id"));
 				emp.setEmployeeNo(rs.getString("employee_no"));
 				emp.setEmploymentType(rs.getString("employment_type"));
@@ -169,7 +168,7 @@ public class EmployeeMntDao {
 			
 			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setInt(1, employeeId);
-				return pstmt.executeUpdate(); // 성공하면 1 반환, 실패하면 0 반환
+				return pstmt.executeUpdate(); 
 			}
 		}
 		// 공통 검색 조건 메소드
