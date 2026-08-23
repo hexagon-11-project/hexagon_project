@@ -18,13 +18,10 @@ public class EmployeeCardService {
 	public EmployeeCard getEmployeeCard(int employeeId) {
 		Connection conn = null;
 		try {
-			// DB 커넥션 획득
 			conn = ConnectionProvider.getConnection();
 			
-			// DAO를 통해 데이터 조회
 			EmployeeCard card = employeeCardDao.selectById(conn, employeeId);
 			
-			// 데이터가 없을 경우 예외 처리
 			if (card == null) {
 				throw new RuntimeException("해당 사원의 인사기록을 찾을 수 없습니다. 사원번호: " + employeeId);
 			}
@@ -34,7 +31,6 @@ public class EmployeeCardService {
 		} catch (SQLException e) {
 			throw new RuntimeException("인사기록카드 조회 중 DB 오류 발생", e);
 		} finally {
-			// 커넥션 자원 반납
 			JdbcUtil.close(conn);
 		}
 	}
@@ -45,13 +41,11 @@ public class EmployeeCardService {
 	public List<EmployeeCard> getAllEmployeeList() {
 		Connection conn = null;
 		try {
-			// 커넥션을 맺고 DAO 호출
 			conn = ConnectionProvider.getConnection();
 			return employeeCardDao.selectAllEmployees(conn); 
 		} catch (SQLException e) {
 			throw new RuntimeException("전체 사원 목록 조회 중 DB 오류 발생", e);
 		} finally {
-			// 커넥션 자원 반납
 			JdbcUtil.close(conn);
 		}
 	}
