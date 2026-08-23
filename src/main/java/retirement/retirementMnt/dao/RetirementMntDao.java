@@ -13,14 +13,13 @@ import retirement.model.RetirementMntModel.MonthlyWage;
 
 public class RetirementMntDao {
 
-    // 1. 퇴직급여 대상 목록 조회 (순수 데이터만 반환)
+    //  퇴직급여 대상 목록 조회 
     public List<RetirementMntModel> getRetirementMntList(Connection conn, String retirementYear, String employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         List<RetirementMntModel> list = new ArrayList<>();
 
         try {
-            // JSP에서 판별할 수 있도록 NVL을 사용해 순수 'Y' 또는 'N' 값만 넘겨줌
         	String sql = "SELECT e.employee_id, "
                     + "       e.employee_no, "
                     + "       e.employee_name, "
@@ -76,7 +75,7 @@ public class RetirementMntDao {
         }
     }
 
-    // 2. 기준일 바탕으로 최근 3개월 급여 내역 조회
+    // 기준일 바탕으로 최근 3개월 급여 내역 조회
     public List<MonthlyWage> getRecent3MonthsPayroll(Connection conn, String employeeId, String baseDate) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -119,12 +118,11 @@ public class RetirementMntDao {
             JdbcUtil.close(pstmt);
         }
     }
- // 3. 퇴직급여 계산 결과 저장 (필수 컬럼 전체 반영)
+ // 퇴직급여 계산 결과 저장 (필수 컬럼 전체 반영)
     public int RetirementMntInsert(Connection conn, RetirementMntModel model) throws SQLException {
         PreparedStatement pstmt = null;
 
         try {
-            // VALUES 구문 대신 SELECT ... FROM DUAL WHERE NOT EXISTS 구문으로 변경
             String sql = "INSERT INTO retirement_pay ("
                        + "    retirement_pay_id, company_id, employee_id, "
                        + "    calc_start_date, calc_end_date, service_days, "
@@ -145,15 +143,14 @@ public class RetirementMntDao {
             pstmt = conn.prepareStatement(sql);
             
             pstmt.setString(1, model.getEmployeeId());
-            pstmt.setString(2, model.getHireDate());        // calc_start_date (입사일)
-            pstmt.setString(3, model.getResignDate());      // calc_end_date (퇴직일)
-            pstmt.setInt(4, model.getServiceDays());        // service_days
-            pstmt.setLong(5, model.getTotalWageAmount());   // total_wage_amount
-            pstmt.setDouble(6, model.getAverageDailyWage());// average_daily_wage
-            pstmt.setLong(7, model.getRetirementPayAmount());// retirement_pay_amount
-            pstmt.setLong(8, model.getRetirementPayAmount());// net_pay_amount (실지급액은 우선 퇴직금과 동일하게 처리)
+            pstmt.setString(2, model.getHireDate());       
+            pstmt.setString(3, model.getResignDate());     
+            pstmt.setInt(4, model.getServiceDays());        
+            pstmt.setLong(5, model.getTotalWageAmount());   
+            pstmt.setDouble(6, model.getAverageDailyWage());
+            pstmt.setLong(7, model.getRetirementPayAmount());
+            pstmt.setLong(8, model.getRetirementPayAmount());
             
-            // ★ 추가된 부분: WHERE NOT EXISTS 조건을 위한 9번째 파라미터 (employee_id 검사)
             pstmt.setString(9, model.getEmployeeId());
 
             return pstmt.executeUpdate();

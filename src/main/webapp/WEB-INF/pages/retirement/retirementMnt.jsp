@@ -11,7 +11,7 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
-<!-- 1. 상단 검색 영역 (Filter Bar) -->
+<!-- 상단 검색 영역 (Filter Bar) -->
 <section class="filter-bar">
 	<form action="" method="get" id="searchForm" style="display: contents;">
 		<div class="field ">
@@ -45,7 +45,7 @@ request.setAttribute("pageJs", null);
 </section>
 
 <div class="page-grid two">
-	<!-- 2. 좌측: 퇴직급여 대상 목록 -->
+	<!--  퇴직급여 대상 목록 -->
 	<section class="card ">
 		<div class="card-header">
 			<h2 class="section-title">퇴직급여 대상 목록</h2>
@@ -89,7 +89,7 @@ request.setAttribute("pageJs", null);
 		</div>
 	</section>
 
-	<!-- 3. 우측: 퇴직급여 계산 -->
+	<!-- 퇴직급여 계산 -->
 	<section class="card ">
 		<div class="card-header">
 			<h2 class="section-title">퇴직급여 계산</h2>
@@ -276,14 +276,13 @@ request.setAttribute("pageJs", null);
 		return confirm("해당 퇴직급여 내역을 저장하시겠습니까?");
 	}
 	window.onload = function() {
-	    // 1. 현재 URL의 파라미터를 읽어옵니다.
 	    var urlParams = new URLSearchParams(window.location.search);
 	    
-	    // 2. 파라미터 중 error 값이 'dup'인지 확인합니다.
+	    //  error 값이 'dup'인지 확인
 	    if (urlParams.get('error') === 'dup') {
 	        alert("이미 저장된 내역입니다.");
 	        
-	        // 3. 경고창을 띄운 후, 새로고침 시 계속 경고창이 뜨는 것을 막기 위해 주소창에서 파라미터를 지웁니다.
+	        // 경고창을 띄운 후, 새로고침 시 계속 경고창이 뜨는 것을 막기 위해 주소창에서 파라미터를 지움
 	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
 	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
 	    }
