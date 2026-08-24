@@ -339,11 +339,14 @@ public class PaymentMntDAO {
                     }
                 }
             }
-        } else if (!hasPayItem(payDetails, 2801L)) {
-            Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
-            if (baseWageAmount != null && baseWageAmount > 0) {
-                upsertPayDetailInList(payDetails, 2801L, baseWageAmount);
-                touchedPayItemIds.add(2801L);
+        } else {
+            Long baseWagePayItemId = selectBaseWagePayItemId(conn);
+            if (baseWagePayItemId != null && !hasPayItem(payDetails, baseWagePayItemId)) {
+                Long baseWageAmount = selectEmployeeBaseWageAmount(conn, payrollEmployeeId);
+                if (baseWageAmount != null && baseWageAmount > 0) {
+                    upsertPayDetailInList(payDetails, baseWagePayItemId, baseWageAmount);
+                    touchedPayItemIds.add(baseWagePayItemId);
+                }
             }
         }
 
@@ -574,11 +577,12 @@ public class PaymentMntDAO {
 
      // 2. PAYROLL_PAY_DETAIL 테이블에 지급항목 등록 (고용형태에 따라 분기)
      //    - DAILY(일용직) : '일용급여' 항목에 등록
-     //    - 그 외(REGULAR/CONTRACT 등) : '기본급'(2801) 항목에 등록
-        // '일용급여' 항목 ID는 미리 한 번만 조회해서 바인드 파라미터로 넘긴다.
+     //    - 그 외(REGULAR/CONTRACT 등) : '기본급' 항목에 등록
+        // '일용급여'/'기본급' 항목 ID는 미리 한 번만 조회해서 바인드 파라미터로 넘긴다.
         // (CASE 안에 스칼라 서브쿼리를 직접 넣으면, JOIN + correlated NOT EXISTS와 결합될 때
         //  Oracle이 타입을 잘못 추론해 ORA-00932(inconsistent datatypes)가 발생한다)
         Long dailyPayItemId = selectDailyPayItemId(conn);
+        Long baseWagePayItemId = selectBaseWagePayItemId(conn);
 
         String insertPayDetailSql = "INSERT INTO PAYROLL_PAY_DETAIL ("
                    + "    payroll_pay_detail_id, payroll_employee_id, pay_item_id, amount, reg_id, mod_id"
@@ -586,7 +590,7 @@ public class PaymentMntDAO {
                    + "SELECT "
                    + "    (SELECT NVL(MAX(payroll_pay_detail_id), 0) FROM PAYROLL_PAY_DETAIL) + 1, "
                    + "    p.payroll_employee_id, "
-                   + "    CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE 2801 END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급(2801) - 실데이터의 EMPLOYMENT_TYPE이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함
+                   + "    CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE ? END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급 항목 - 실데이터의 EMPLOYMENT_TYPE이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함
                    + "    e.base_wage_amount, "
                    + "    'admin', 'admin' "
                    + "FROM PAYROLL_EMPLOYEE p JOIN EMPLOYEE e ON p.employee_id = e.employee_id "
@@ -594,7 +598,7 @@ public class PaymentMntDAO {
                    + "  AND NOT EXISTS ("
                    + "      SELECT 1 FROM PAYROLL_PAY_DETAIL d "
                    + "      WHERE d.payroll_employee_id = p.payroll_employee_id "
-                   + "        AND d.pay_item_id = CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE 2801 END"
+                   + "        AND d.pay_item_id = CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE ? END"
                    + "  )";
 
         try (PreparedStatement pstmtEmp = conn.prepareStatement(insertEmpSql);
@@ -609,9 +613,11 @@ public class PaymentMntDAO {
                 pstmtEmp.executeUpdate();
 
                 setDailyPayItemIdParam(pstmtDetail, 1, dailyPayItemId);
-                pstmtDetail.setLong(2, payrollId);
-                pstmtDetail.setString(3, empId.trim());
-                setDailyPayItemIdParam(pstmtDetail, 4, dailyPayItemId);
+                setDailyPayItemIdParam(pstmtDetail, 2, baseWagePayItemId);
+                pstmtDetail.setLong(3, payrollId);
+                pstmtDetail.setString(4, empId.trim());
+                setDailyPayItemIdParam(pstmtDetail, 5, dailyPayItemId);
+                setDailyPayItemIdParam(pstmtDetail, 6, baseWagePayItemId);
                 pstmtDetail.executeUpdate();
             }
         }
@@ -620,6 +626,20 @@ public class PaymentMntDAO {
     /** '일용급여' 지급항목의 PAY_ITEM_ID (없으면 null) */
     public Long selectDailyPayItemId(Connection conn) throws SQLException {
         String sql = "SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '일용급여'";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                long id = rs.getLong(1);
+                return rs.wasNull() ? null : id;
+            }
+        }
+        return null;
+    }
+
+    /** '기본급' 지급항목의 PAY_ITEM_ID (없으면 null). PAY_ITEM 마스터에서 이름으로 조회하며,
+     *  ID를 하드코딩하지 않는 이유는 환경마다 실제 채번된 ID가 다를 수 있기 때문이다. */
+    public Long selectBaseWagePayItemId(Connection conn) throws SQLException {
+        String sql = "SELECT PAY_ITEM_ID FROM PAY_ITEM WHERE PAY_ITEM_NAME = '기본급'";
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
