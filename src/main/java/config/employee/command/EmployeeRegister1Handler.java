@@ -96,6 +96,7 @@ public class EmployeeRegister1Handler implements CommandHandler {
         emp.setNationalPensionBaseAmount(RowFormUtil.parseIntOrDefault(request.getParameter("nationalPensionBaseAmount"), 0));
         emp.setHealthInsuranceBaseAmount(RowFormUtil.parseIntOrDefault(request.getParameter("healthInsuranceBaseAmount"), 0));
         emp.setEmploymentInsuranceAmount(RowFormUtil.parseIntOrDefault(request.getParameter("employmentInsuranceAmount"), 0));
+        emp.setPhotoPath(request.getParameter("photoPath"));
 
         // 2. 날짜 데이터 변환 (빈 문자열이 넘어오면 에러가 나므로 예외 방지 처리)
         String hireDateStr = request.getParameter("hireDate");

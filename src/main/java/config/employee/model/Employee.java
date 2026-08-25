@@ -32,6 +32,7 @@ public class Employee {
 	
 	private String retirementYn; // 재직상태 구분 추가(이승준/ 260809)
 	private String birthDate; // 사원현황관리 생년월일 추가(이승준/ 260809)
+	private String photoPath; // 사원 사진 경로
 
 	// ==========================================
 	// Getters and Setters
@@ -254,8 +255,13 @@ public class Employee {
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
-	
-	
-	
-	
+
+	public String getPhotoPath() {
+		return photoPath;
+	}
+
+	public void setPhotoPath(String photoPath) {
+		this.photoPath = photoPath;
+	}
+
 }
