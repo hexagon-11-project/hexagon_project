@@ -24,8 +24,19 @@ request.setAttribute("pageJs", null);
 <div class="employee-register-shell">
 	<aside class="employee-register-side">
 		<div class="employee-profile-box">
-			<div class="employee-photo-placeholder">
-				<span>사원사진</span><small>등록하세요</small>
+			<div class="employee-photo-placeholder" id="photoBox" onclick="document.getElementById('photoSelectDialog').classList.add('open');" style="cursor:pointer;">
+				<%
+				String currentPhoto = nz(request.getParameter("photoPath"));
+				if (!currentPhoto.isEmpty()) {
+				%>
+				<img src="<%=request.getContextPath()%><%=currentPhoto%>" style="width:100%;height:100%;object-fit:cover;">
+				<%
+				} else {
+				%>
+				<span>사원사진</span><small>클릭하여 선택</small>
+				<%
+				}
+				%>
 			</div>
 			<dl class="employee-mini-info">
 				<dt>사원번호</dt>
@@ -40,8 +51,8 @@ request.setAttribute("pageJs", null);
 				<dd><%=nz(request.getParameter("hireDate"))%></dd>
 			</dl>
 			<div class="mini-actions">
-				<button type="button" class="btn btn-sm">등록</button>
-				<button type="button" class="btn btn-sm">삭제</button>
+				<button type="button" class="btn btn-sm" onclick="document.getElementById('photoSelectDialog').classList.add('open');">등록</button>
+				<button type="button" class="btn btn-sm" onclick="clearPhoto();">삭제</button>
 			</div>
 		</div>
 		<div class="employee-page-menu">
@@ -94,6 +105,7 @@ request.setAttribute("pageJs", null);
 			<input type="hidden" name="familyRowCount" value="<%=familyRowCount%>">
 			<input type="hidden" name="educationRowCount" value="<%=educationRowCount%>">
 			<input type="hidden" name="careerRowCount" value="<%=careerRowCount%>">
+			<input type="hidden" name="photoPath" id="photoPathInput" value="<%=nz(request.getParameter("photoPath"))%>">
 
 
 			<section class="source-section">
@@ -330,7 +342,7 @@ request.setAttribute("pageJs", null);
 								</div></td>
 						</tr>
 						<tr>
-							<th>기본급/월급</th>
+							<th><span class="required-mark">*</span>기본급/월급</th>
 							<td class="span-1"><div class="money-control">
 									<input type="text" class="input number" name="baseWageAmount"
 										value="<%=v_baseWageAmount%>"><span>원</span>
@@ -753,3 +765,66 @@ request.setAttribute("pageJs", null);
 	</div>
 </div>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
+
+<div class="dialog-backdrop" id="photoSelectDialog">
+	<div class="dialog" style="width: min(520px, 100%);">
+		<div class="dialog-header">
+			<strong>사원사진 선택</strong>
+			<button type="button" class="btn btn-icon" onclick="document.getElementById('photoSelectDialog').classList.remove('open');">×</button>
+		</div>
+		<div class="dialog-body">
+			<div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; padding:8px 0;">
+				<%
+				for (int pi = 1; pi <= 5; pi++) {
+					String pPath = "/assets/img/profile/" + pi + ".jpg";
+					String currentSelected = nz(request.getParameter("photoPath"));
+				%>
+				<label style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+					<input type="radio" name="photoRadio" value="<%=pPath%>"
+						<%=currentSelected.equals(pPath) ? "checked" : ""%>
+						onchange="previewPhoto('<%=pPath%>')"
+						style="width:18px;height:18px;accent-color:var(--accent);">
+					<img src="<%=request.getContextPath()%><%=pPath%>"
+						style="width:100px;height:130px;object-fit:cover;border-radius:6px;border:2px solid var(--line);">
+				</label>
+				<%
+				}
+				%>
+			</div>
+		</div>
+		<div class="dialog-footer">
+			<button type="button" class="btn btn-primary" onclick="confirmPhoto();">선택</button>
+			<button type="button" class="btn" onclick="document.getElementById('photoSelectDialog').classList.remove('open');">닫기</button>
+		</div>
+	</div>
+</div>
+
+<script>
+function previewPhoto(path) {
+	// 라디오 선택만 하고 아직 확정은 안 함 - [선택] 버튼 누를 때 확정
+}
+
+function confirmPhoto() {
+	var selected = document.querySelector('input[name="photoRadio"]:checked');
+	if (!selected) {
+		alert('사진을 선택해주세요.');
+		return;
+	}
+	var path = selected.value;
+	document.getElementById('photoPathInput').value = path;
+	var box = document.getElementById('photoBox');
+	box.innerHTML = '<img src="<%=request.getContextPath()%>' + path + '" style="width:100%;height:100%;object-fit:cover;">';
+	document.getElementById('photoSelectDialog').classList.remove('open');
+}
+
+function clearPhoto() {
+	document.getElementById('photoPathInput').value = '';
+	document.getElementById('photoBox').innerHTML = '<span>사원사진</span><small>클릭하여 선택</small>';
+	var radios = document.querySelectorAll('input[name="photoRadio"]');
+	radios.forEach(function(r) { r.checked = false; });
+}
+
+document.getElementById('photoSelectDialog').addEventListener('click', function(e) {
+	if (e.target === this) this.classList.remove('open');
+});
+</script>

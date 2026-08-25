@@ -48,14 +48,14 @@ public class EmployeeDao {
                        + "  DOM_FOR_YN, RESIDENT_REG_NO, PHONE, MOBILE, EMAIL, "
                        + "  SNS, BANK_NAME, BANK_ACCOUNT, EMP_INCOME_TYPE, BASE_WAGE_AMOUNT, "
                        + "  NATIONAL_PENSION_BASE_AMOUNT, HEALTH_INSURANCE_BASE_AMOUNT, EMPLOYMENT_INSURANCE_AMOUNT, "
-                       + "  REG_ID, MOD_ID"
+                       + "  PHOTO_PATH, REG_ID, MOD_ID"
                        + ") VALUES ("
                        + "  EMPLOYEE_SEQ.NEXTVAL, 1001, ?, ?, ?, "
                        + "  ?, ?, ?, ?, ?, "
                        + "  ?, ?, ?, ?, ?, "
                        + "  ?, ?, ?, ?, ?, "
                        + "  ?, ?, ?, "
-                       + "  'SYSTEM', 'SYSTEM'"
+                       + "  ?, 'SYSTEM', 'SYSTEM'"
                        + ")";
             
             pstmt = conn.prepareStatement(sql);
@@ -80,6 +80,7 @@ public class EmployeeDao {
             pstmt.setInt(19, emp.getNationalPensionBaseAmount()); // 국민연금 기준소득월액
             pstmt.setInt(20, emp.getHealthInsuranceBaseAmount()); // 건강보험 보수월액
             pstmt.setInt(21, emp.getEmploymentInsuranceAmount()); // 고용보험 보수월액
+            pstmt.setString(22, emp.getPhotoPath());             // 사진 경로
             pstmt.executeUpdate();
 
             // 방금 INSERT에 쓴 시퀀스 값을 같은 커넥션(같은 세션)에서 다시 읽어온다.
@@ -132,6 +133,7 @@ public class EmployeeDao {
                 emp.setNationalPensionBaseAmount(rs.getInt("NATIONAL_PENSION_BASE_AMOUNT"));
                 emp.setHealthInsuranceBaseAmount(rs.getInt("HEALTH_INSURANCE_BASE_AMOUNT"));
                 emp.setEmploymentInsuranceAmount(rs.getInt("EMPLOYMENT_INSURANCE_AMOUNT"));
+                emp.setPhotoPath(rs.getString("PHOTO_PATH"));
             }
             return emp;
         } finally {
@@ -140,7 +142,19 @@ public class EmployeeDao {
         }
     }
 
-    // 4. 2페이지 추가 정보 저장용 메서드
+    // 4. 사원등록 취소 - 사원번호로 해당 사원 레코드 삭제
+    public void deleteByEmployeeNo(Connection conn, String employeeNo) throws SQLException {
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement("DELETE FROM EMPLOYEE WHERE EMPLOYEE_NO = ?");
+            pstmt.setString(1, employeeNo);
+            pstmt.executeUpdate();
+        } finally {
+            JdbcUtil.close(pstmt);
+        }
+    }
+
+    // 5. 2페이지 추가 정보 저장용 메서드
     public int insertAdditionalInfo(Connection conn, String employeeNo) throws SQLException {
         PreparedStatement pstmt = null;
         try {

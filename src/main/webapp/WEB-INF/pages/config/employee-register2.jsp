@@ -33,8 +33,22 @@ request.setAttribute("pageJs", null);
 <div class="employee-register-shell">
 	<aside class="employee-register-side">
 		<div class="employee-profile-box">
+			<%
+			config.employee.model.Employee photoEmpInfo = (config.employee.model.Employee) request.getAttribute("empInfo");
+			String empPhotoPath = (photoEmpInfo != null && photoEmpInfo.getPhotoPath() != null) ? photoEmpInfo.getPhotoPath() : "";
+			%>
 			<div class="employee-photo-placeholder">
+				<%
+				if (!empPhotoPath.isEmpty()) {
+				%>
+				<img src="<%=request.getContextPath()%><%=empPhotoPath%>" style="width:100%;height:100%;object-fit:cover;">
+				<%
+				} else {
+				%>
 				<span>사원사진</span><small>등록하세요</small>
+				<%
+				}
+				%>
 			</div>
 			<!-- [수정 완료] 왼쪽 프로필 요약창에 데이터 꽂기 -->
 			<dl class="employee-mini-info">
@@ -608,12 +622,17 @@ request.setAttribute("pageJs", null);
 
 			<div class="source-bottom-actions">
 				<button type="submit" class="btn btn-primary">저장하기</button>
-				<button type="reset" class="btn">취소하기</button>
+				<button type="button" class="btn"
+					onclick="if(confirm('취소하면 입력한 사원 정보가 모두 삭제됩니다. 계속하시겠습니까?')) { document.getElementById('cancelForm').submit(); }">취소하기</button>
 				<button type="button" class="btn"
 					onclick="location.href='employeeList.do'">리스트</button>
 				<button type="submit" class="btn btn-blue">신규사원등록</button>
 			</div>
 
+		</form>
+
+		<form id="cancelForm" method="post" action="<%=request.getContextPath()%>/Config/employeeRegisterCancel.do">
+			<input type="hidden" name="employeeNo" value="${empInfo.employeeNo}">
 		</form>
 		<%
 		if (request.getAttribute("justSaved") != null) {
