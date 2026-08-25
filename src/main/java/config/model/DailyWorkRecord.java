@@ -5,8 +5,8 @@ import java.math.RoundingMode;
 import java.sql.Date;
 
 // DAILY_WORK_RECORD 테이블 모델. 이 테이블은 payment.paymentMntDayWorker(일용직 급여입력) 기능과
-// 공유한다 - 그쪽은 PAYROLL_EMPLOYEE_ID로 특정 급여차수에 귀속시켜 쓰고, 이 화면(diligence.dailyworkrecord)은
-// 급여차수 없이 순수 근무기록만 남긴다(PAYROLL_EMPLOYEE_ID는 NULL로 저장).
+// 공유한다 - 근무일자가 속한 귀속연월 + 급여-01차의 PAYROLL_EMPLOYEE_ID로 자동 귀속시켜 저장하므로,
+// 이 화면(diligence.dailyworkrecord)에서 근무기록을 등록하면 급여입력관리 화면에도 바로 반영된다.
 public class DailyWorkRecord {
 
 	private Integer dailyWorkRecordId;
