@@ -12,6 +12,11 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
+<%-- 급여이체 신청 화면 --%>
+<%-- 給与振込申請画面。 --%>
+
+<%-- 검색폼 --%>
+<%-- 検索フォーム。 --%>
 <form action="<%=ctx%>/Payment/paymenttransfer.do" method="get">
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
@@ -64,12 +69,8 @@ request.setAttribute("pageJs", null);
 	<div class="info-note" style="color: #c0392b;">${errorMessage}</div>
 </c:if>
 
-<%--
-  [급여이체 신청 폼]
-  - 체크된 체크박스(name=payrollEmployeeId)만 POST로 서버에 전달된다.
-  - "급여이체 신청" 버튼 → action=apply → Handler → Service → PAYROLL_TRANSFER_REQUEST 저장
-  - 체크 안 한 행은 파라미터로 안 넘어가므로 신청 대상에서 제외된다.
---%>
+<%-- 급여이체 신청 폼 --%>
+<%-- 給与振込申請フォーム。 --%>
 <form action="<%=ctx%>/Payment/paymenttransfer.do" method="post">
 	<input type="hidden" name="action" value="apply"> <input
 		type="hidden" name="payYear" value="${payYear}"> <input
@@ -81,6 +82,8 @@ request.setAttribute("pageJs", null);
 			<h2 class="section-title">振替申請対象</h2>
 		</div>
 		<div class="card-body">
+			<%-- 이체 대상 테이블 --%>
+			<%-- 振込対象テーブル。 --%>
 			<div class="table-wrap">
 				<table class="data-table">
 					<thead>
@@ -96,11 +99,15 @@ request.setAttribute("pageJs", null);
 					</thead>
 					<tbody>
 						<c:choose>
+							<%-- 아직 조회하지 않은 빈 상태 --%>
+							<%-- まだ照会していない空の状態。 --%>
 							<c:when test="${not searched}">
 								<tr>
 									<td colspan="7" style="text-align: center;">帰属年・月・次数を選択してから照会してください。</td>
 								</tr>
 							</c:when>
+							<%-- 조회했으나 해당 차수 지급 사원이 없는 빈 상태 --%>
+							<%-- 照会したが当該次数の支給社員がない空の状態。 --%>
 							<c:when test="${empty transferList}">
 								<tr>
 									<td colspan="7" style="text-align: center;">照会された振込対象がありません。</td>
@@ -110,7 +117,9 @@ request.setAttribute("pageJs", null);
 								<c:forEach var="row" items="${transferList}">
 									<tr>
 										<td>
-											<%-- 체크된 행만 서버로 전달. value=PAYROLL_EMPLOYEE_ID --%> <input
+											<%-- 체크된 행만 서버로 전달 --%>
+											<%-- チェックされた行だけをサーバーへ渡す。 --%>
+											<input
 											type="checkbox" name="payrollEmployeeId"
 											value="${row.payrollEmployeeId}" checked>
 										</td>
@@ -136,6 +145,8 @@ request.setAttribute("pageJs", null);
 		</div>
 	</section>
 
+	<%-- 신청정보 --%>
+	<%-- 申請情報。 --%>
 	<section class="card">
 		<div class="card-header">
 			<h2 class="section-title">申請情報</h2>
@@ -153,7 +164,8 @@ request.setAttribute("pageJs", null);
 			</dl>
 			<div class="info-note">実際の銀行振込は行われず、申請ボタンを押すと「申請完了」状態で保存されます。</div>
 			<div class="button-row">
-				<%-- 클릭 시 체크된 행 ID만 전송 → PAYROLL_TRANSFER_REQUEST INSERT/UPDATE --%>
+				<%-- 급여이체 신청 버튼 --%>
+				<%-- 給与振込申請ボタン。 --%>
 				<button type="submit" class="btn btn-primary"
 					${empty transferList ? 'disabled' : ''}>給与振込の申し込み</button>
 			</div>

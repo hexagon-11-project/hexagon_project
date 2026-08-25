@@ -1,8 +1,12 @@
+<%-- 항목별 대장 화면 --%>
+<%-- 項目別台帳画面。 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.text.DecimalFormat"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.List"%>
 <%@ page import="payment.model.PaymentItemLedger"%>
+<%-- 빈 문자열을 "-"로 바꾼다 --%>
+<%-- 空文字列を"-"に変える。 --%>
 <%!private String dash(String value) {
 		if (value == null || value.trim().length() == 0) {
 			return "-";
@@ -10,6 +14,8 @@
 		return value;
 	}
 
+	// 사원의 해당 연월 금액을 더한다
+	// 社員の当該年月金額を加算する。
 	private long amountOfMonth(PaymentItemLedger emp, String monthLabel) {
 		long sum = 0L;
 		if (emp == null || monthLabel == null || monthLabel.length() < 7) {
@@ -63,13 +69,19 @@ String selectedItemName = (String) request.getAttribute("selectedItemName");
 if (selectedItemName == null) {
 	selectedItemName = "";
 }
+// 빈 안내 행의 colspan: 사원 4칸 + 월 칸 + 합계 1칸
+// 空案内行のcolspan: 社員4欄 + 月欄 + 合計1欄。
 int tableColCount = 5 + monthColumns.size();
 DecimalFormat amountFormat = new DecimalFormat("#,###");
+// 월별 전 사원 합과 전체 합
+// 月別の全社員合計と全体合計。
 long[] monthTotals = new long[monthColumns.size()];
 long grandTotal = 0L;
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
+<%-- 조회기간과 지급/공제 항목 선택 --%>
+<%-- 照会期間と支給/控除項目の選択。 --%>
 <form action="<%=ctx%>/Payment/paymentPayItemPart.do" method="get"
 	autocomplete="off" onsubmit="return checkLedgerPeriod(this);">
 	<input type="hidden" name="search" value="Y">
@@ -83,6 +95,8 @@ long grandTotal = 0L;
 					value="${endYearMonth}">
 			</div>
 		</div>
+		<%-- 지급/공제 통합 항목 셀렉트 --%>
+		<%-- 支給/控除統合項目のセレクト。 --%>
 		<div class="field">
 			<label>項目</label> <select class="select" name="payItemKey"
 				autocomplete="off">
@@ -110,6 +124,8 @@ long grandTotal = 0L;
 	</section>
 </form>
 <section class="card">
+	<%-- 선택한 항목명을 제목에 붙인다 --%>
+	<%-- 選択した項目名をタイトルに付ける。 --%>
 	<div class="card-header">
 		<h2 class="section-title">
 			<%
@@ -127,6 +143,8 @@ long grandTotal = 0L;
 		</h2>
 	</div>
 	<div class="card-body">
+		<%-- 사원별 월 컬럼 + 행 합계 테이블 --%>
+		<%-- 社員別の月カラム + 行合計テーブル。 --%>
 		<div class="table-wrap">
 			<table class="data-table item-ledger-table">
 				<thead>
@@ -150,12 +168,16 @@ long grandTotal = 0L;
 					<%
 					if (!searched) {
 					%>
+					<%-- 첫 진입이거나 12개월 초과로 조회를 접은 빈 상태 --%>
+					<%-- 初回入場、または12ヶ月超過で照会を閉じた空の状態。 --%>
 					<tr>
 						<td colspan="<%=tableColCount%>" style="text-align: center;">照会期間と項目を選択してから照会してください。</td>
 					</tr>
 					<%
 					} else if (employeeRows.isEmpty()) {
 					%>
+					<%-- 조회했으나 해당 기간·항목 금액이 없는 빈 상태 --%>
+					<%-- 照会したが当該期間・項目の金額がない空の状態。 --%>
 					<tr>
 						<td colspan="<%=tableColCount%>" style="text-align: center;">照会された履歴はありません。</td>
 					</tr>
@@ -191,6 +213,8 @@ long grandTotal = 0L;
 					}
 					%>
 				</tbody>
+				<%-- 월별 전 사원 합과 전체 합 --%>
+				<%-- 月別の全社員合計と全体合計。 --%>
 				<tfoot>
 					<tr>
 						<td colspan="4">合計</td>
@@ -208,7 +232,11 @@ long grandTotal = 0L;
 		</div>
 	</div>
 </section>
+<%-- 조회기간 12개월 초과 검사 --%>
+<%-- 照会期間が12ヶ月を超えるかの検査。 --%>
 <script>
+// 조회기간이 12개월을 넘는지 검사
+// 照会期間が12ヶ月を超えるかを検査する。
 function checkLedgerPeriod(form) {
 	var startValue = form.startYearMonth.value;
 	var endValue = form.endYearMonth.value;
@@ -229,6 +257,8 @@ function checkLedgerPeriod(form) {
 	return true;
 }
 </script>
+<%-- 서버가 12개월 초과를 막았을 때 alert --%>
+<%-- サーバーが12ヶ月超過を防いだときのalert。 --%>
 <%
 String errorMessage = (String) request.getAttribute("errorMessage");
 if (errorMessage != null) {

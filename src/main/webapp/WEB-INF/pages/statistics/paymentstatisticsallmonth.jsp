@@ -12,12 +12,16 @@ request.setAttribute("activeKey", "monthly-total");
 request.setAttribute("pageCss", "statistics.css?v=3");
 request.setAttribute("pageJs", "charts.js?v=combo4");
 
+// 차트용 JSON
+// チャート用JSON。
 @SuppressWarnings("unchecked")
 List<MonthlyTotalStatistics> monthlyTotalList = (List<MonthlyTotalStatistics>) request.getAttribute("monthlyTotalList");
 if (monthlyTotalList == null) {
 	monthlyTotalList = new ArrayList<>();
 }
 
+// 콤보 차트 데이터
+// コンボチャートデータ。
 StringBuilder labelsJson = new StringBuilder("[");
 StringBuilder barValuesJson = new StringBuilder("[");
 StringBuilder lineValuesJson = new StringBuilder("[");
@@ -28,7 +32,11 @@ for (int i = 0; i < monthlyTotalList.size(); i++) {
 		barValuesJson.append(',');
 		lineValuesJson.append(',');
 	}
+	// 가로축 라벨
+	// 横軸ラベル。
 	labelsJson.append('"').append(row.getMonth()).append("月\"");
+	// 천원 단위
+	// 千円単位。
 	barValuesJson.append(row.getTotalSalaryAmount() / 1000L);
 	lineValuesJson.append(row.getEmployeeCount());
 }
@@ -36,6 +44,8 @@ labelsJson.append(']');
 barValuesJson.append(']');
 lineValuesJson.append(']');
 
+// 표 합계열
+// 表の合計列。
 long monthlySalaryTotal = 0L;
 long monthlyEmployeeSum = 0L;
 for (MonthlyTotalStatistics row : monthlyTotalList) {
@@ -54,12 +64,18 @@ int currentYear = java.time.LocalDate.now().getYear();
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
+<%-- 월별 전체 급여 통계 화면 --%>
+<%-- 月別給与総額統計画面。 --%>
+<%-- 검색폼 --%>
+<%-- 検索フォーム。 --%>
 <form action="<%=ctx%>/Statistics/paymentStatisticsAllMonth.do"
 	method="get">
 	<section class="filter-bar">
 		<div class="field">
 			<label>基準年</label> <select class="select" name="year">
 				<%
+				// 선택 연도 1~12월
+				// 選択年1〜12月。
 				for (int y = currentYear + 1; y >= 2000; y--) {
 				%>
 				<option value="<%=y%>" <%=y == selectedYear ? "selected" : ""%>><%=y%>年
@@ -79,6 +95,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 		<h2 class="section-title">毎月の全給与の推移</h2>
 	</div>
 	<div class="card-body">
+		<%-- 차트 --%>
+		<%-- チャート。 --%>
 		<script>
 			window.paymentStatisticsAllMonthChartData = {
 				labels: <%=labelsJson.toString()%>,
@@ -100,6 +118,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 
 			function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
 
+			// 차트 툴팁
+			// チャートツールチップ。
 			function ensureTooltip() {
 				var tip = document.getElementById('paymentStatisticsAllMonthTooltip');
 				var canvas = document.getElementById('paymentStatisticsAllMonthCanvas');
@@ -336,6 +356,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 		<h2 class="section-title">毎月の全給与履歴</h2>
 	</div>
 	<div class="card-body">
+		<%-- 테이블 --%>
+		<%-- テーブル。 --%>
 		<div class="table-wrap">
 			<table class="data-table stats-matrix">
 				<thead>

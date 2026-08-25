@@ -2,20 +2,25 @@ package statistics.model;
 
 /**
  * 사원별 급여 통계의 지급/공제 항목 1건.
- * 도넛 차트와 표의 항목별 금액·구성비율을 담는다.
+ * 社員別給与統計の支給/控除項目1件。
+ *
  */
 public class SalaryItemStatistics {
 
-	/** 지급항목 또는 공제항목 아이디 */
+	// 지급항목 또는 공제항목 아이디
+	// 支給項目または控除項目ID。
 	private Long itemId;
 
-	/** 항목명 (기본급, 국민연금 등) */
+	/** 항목명 (기본급, 국민연금 등)
+	 * 項目名（基本給、国民年金など）。 */
 	private String itemName;
 
-	/** 항목 금액 */
+	/** 항목 금액
+	 * 項目金額。 */
 	private long amount;
 
-	/** 구성비율 (%) — 지급이면 지급합계 대비, 공제면 공제합계 대비. 합계가 0이면 null */
+	// 구성비율 (%)
+	// 構成比 (%)。
 	private Double compositionRatio;
 
 	public SalaryItemStatistics() {

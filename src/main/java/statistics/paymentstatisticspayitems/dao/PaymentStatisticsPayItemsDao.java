@@ -16,17 +16,15 @@ import statistics.model.SalaryItemStatistics;
 
 /**
  * 사원별 급여 항목 통계 Dao.
- * 연도, 월, 사원이름으로 해당 월 지급내역·공제항목을 집계한다.
+ * 社員別給与項目統計Dao。
  *
- * PAY_YEAR_MONTH 컬럼이 CHAR(6) 이므로 연월은 'YYYYMM' 문자열로 조회한다.
- * 같은 월에 급여차수가 여러 건이면 항목별 금액을 합산한다.
  */
 public class PaymentStatisticsPayItemsDao {
 
 	/**
 	 * 사원 선택 팝업용 목록을 조회한다.
-	 * 사원 구분, 사원번호, 이름, 부서, 직위, 재직상태를 반환한다.
-	 * employeeName / department / status가 있으면 해당 조건으로 필터한다.
+	 * 社員選択ポップアップ用一覧を照会する。
+	 *
 	 */
 	public List<Employee> selectEmployeeList(Connection conn, int companyId, String employeeName,
 			String department, String status) throws SQLException {
@@ -34,6 +32,8 @@ public class PaymentStatisticsPayItemsDao {
 		ResultSet rs = null;
 
 		try {
+			// 동적 WHERE
+			// 動的WHERE。
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT EMPLOYEE_ID, EMPLOYEE_NO, EMPLOYMENT_TYPE, EMPLOYEE_NAME, ");
 			sql.append("DEPARTMENT, POSITION, RETIREMENT_YN ");
@@ -83,12 +83,17 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 사원등록 화면과 동일한 기본 부서. 사원이 없는 부서도 필터에 보이게 한다. */
+	// 사원등록 화면과 동일한 기본 부서
+	// 社員登録画面と同じ既定部署。
 	private static final String[] DEFAULT_DEPARTMENTS = {
 			"사장실", "개발팀", "업무지원팀", "디자인팀", "관리팀", "기획전략팀", "콘텐츠팀"
 	};
 
-	/** 사원 선택 팝업의 부서 필터 목록. 기본 부서 + EMPLOYEE에 있는 부서. */
+	/**
+	 * 사원 선택 팝업의 부서 필터 목록. 기본 부서 + EMPLOYEE에 있는 부서.
+	 * 社員選択ポップアップの部署フィルタ一覧。既定部署 + EMPLOYEEにある部署。
+	 *
+	 */
 	public List<String> selectDepartmentList(Connection conn) throws SQLException {
 		Set<String> result = new LinkedHashSet<String>();
 		for (String dept : DEFAULT_DEPARTMENTS) {
@@ -116,7 +121,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 사원 선택 팝업의 상태 필터 목록. EMPLOYEE 재직여부를 재직/퇴직으로 가져온다. */
+	/**
+	 * 사원 선택 팝업의 상태 필터 목록. EMPLOYEE 재직여부를 재직/퇴직으로 가져온다.
+	 * 社員選択ポップアップの状態フィルタ一覧。EMPLOYEE在職可否を在職/退職で取得する。
+	 *
+	 */
 	public List<String> selectStatusList(Connection conn) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -139,13 +148,19 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
+	/**
+	 * 문자열이 비어 있지 않은지 확인한다.
+	 * 文字列が空でないか確認する。
+	 *
+	 */
 	private boolean hasText(String value) {
 		return value != null && !value.trim().isEmpty();
 	}
 
 	/**
 	 * 연도, 월, 사원이름으로 해당 사원의 월 급여 항목 통계를 조회한다.
-	 * 해당 월 급여 데이터가 없으면 null을 반환한다.
+	 * 年、月、社員名で該当社員の月給与項目統計を照会する。
+	 *
 	 */
 	public EmployeeSalaryStatistics selectByYearMonthAndName(Connection conn, int companyId, int year, int month,
 			String employeeName) throws SQLException {
@@ -153,6 +168,8 @@ public class PaymentStatisticsPayItemsDao {
 			return null;
 		}
 
+		// CHAR(6) 연월
+		// CHAR(6)年月。
 		String payYearMonth = toPayYearMonth(year, month);
 		String name = employeeName.trim();
 
@@ -169,7 +186,11 @@ public class PaymentStatisticsPayItemsDao {
 		return result;
 	}
 
-	/** 사용 중인 지급항목 마스터를 표시 순서대로 조회한다. */
+	/**
+	 * 사용 중인 지급항목 마스터를 표시 순서대로 조회한다.
+	 * 使用中の支給項目マスタを表示順に照会する。
+	 *
+	 */
 	public List<SalaryItemStatistics> selectPayItemColumns(Connection conn, int companyId) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -189,6 +210,8 @@ public class PaymentStatisticsPayItemsDao {
 				SalaryItemStatistics item = new SalaryItemStatistics();
 				item.setItemId(rs.getLong("ITEM_ID"));
 				item.setItemName(rs.getString("ITEM_NAME"));
+				// 마스터 열 0 채우기
+				// マスタ列を0で埋める。
 				item.setAmount(0L);
 				item.setCompositionRatio(0D);
 				result.add(item);
@@ -200,7 +223,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 사용 중인 공제항목 마스터를 표시 순서대로 조회한다. */
+	/**
+	 * 사용 중인 공제항목 마스터를 표시 순서대로 조회한다.
+	 * 使用中の控除項目マスタを表示順に照会する。
+	 *
+	 */
 	public List<SalaryItemStatistics> selectDeductionItemColumns(Connection conn, int companyId) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -220,6 +247,8 @@ public class PaymentStatisticsPayItemsDao {
 				SalaryItemStatistics item = new SalaryItemStatistics();
 				item.setItemId(rs.getLong("ITEM_ID"));
 				item.setItemName(rs.getString("ITEM_NAME"));
+				// 마스터 열 0 채우기
+				// マスタ列を0で埋める。
 				item.setAmount(0L);
 				item.setCompositionRatio(0D);
 				result.add(item);
@@ -231,7 +260,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 사원 식별 정보와 지급/공제/실지급 합계를 조회한다. 동명이인이면 EMPLOYEE_ID 오름차순 1명만 사용한다. */
+	/**
+	 * 사원 식별 정보와 지급/공제/실지급 합계를 조회한다.
+	 * 社員識別情報と支給/控除/実支給合計を照会する。
+	 *
+	 */
 	private EmployeeSalaryStatistics selectHeader(Connection conn, int companyId, String payYearMonth,
 			String employeeName) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -276,7 +309,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 해당 월 지급항목을 항목별로 합산한다. */
+	/**
+	 * 해당 월 지급항목을 항목별로 합산한다.
+	 * 該当月の支給項目を項目別に合算する。
+	 *
+	 */
 	private List<SalaryItemStatistics> selectPayItems(Connection conn, int companyId, String payYearMonth,
 			String employeeId) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -312,7 +349,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 해당 월 공제항목을 항목별로 합산한다. */
+	/**
+	 * 해당 월 공제항목을 항목별로 합산한다.
+	 * 該当月の控除項目を項目別に合算する。
+	 *
+	 */
 	private List<SalaryItemStatistics> selectDeductionItems(Connection conn, int companyId, String payYearMonth,
 			String employeeId) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -348,6 +389,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
+	/**
+	 * 항목 ResultSet 한 행을 모델로 변환한다.
+	 * 項目ResultSetの1行をモデルに変換する。
+	 *
+	 */
 	private SalaryItemStatistics mapItem(ResultSet rs) throws SQLException {
 		SalaryItemStatistics item = new SalaryItemStatistics();
 		item.setItemId(rs.getLong("ITEM_ID"));
@@ -356,7 +402,11 @@ public class PaymentStatisticsPayItemsDao {
 		return item;
 	}
 
-	/** 지급/공제 합계 비율과 항목별 구성비율을 채운다. */
+	/**
+	 * 지급/공제 합계 비율과 항목별 구성비율을 채운다.
+	 * 支給/控除合計比率と項目別構成比を入れる。
+	 *
+	 */
 	private void fillRatios(EmployeeSalaryStatistics result) {
 		long totalPay = result.getTotalPayAmount();
 		long totalDeduction = result.getTotalDeductionAmount();
@@ -373,7 +423,11 @@ public class PaymentStatisticsPayItemsDao {
 		}
 	}
 
-	/** 구성비율(%). 분모가 0이면 null. */
+	/**
+	 * 구성비율(%). 분모가 0이면 null.
+	 * 構成比(%)。分母が0ならnull。
+	 *
+	 */
 	private Double calcRatio(long part, long total) {
 		if (total == 0L) {
 			return null;
@@ -381,6 +435,11 @@ public class PaymentStatisticsPayItemsDao {
 		return (part * 100D) / total;
 	}
 
+	/**
+	 * 연/월을 PAY_YEAR_MONTH(YYYYMM)로 맞춘다.
+	 * 年/月をPAY_YEAR_MONTH(YYYYMM)に合わせる。
+	 *
+	 */
 	private String toPayYearMonth(int year, int month) {
 		return String.format("%04d%02d", year, month);
 	}

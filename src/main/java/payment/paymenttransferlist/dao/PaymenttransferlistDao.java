@@ -13,20 +13,23 @@ import payment.model.PaymentTransferRequest;
 
 /**
  * 급여이체 신청 조회 Dao.
- * PAYROLL_TRANSFER_REQUEST에 저장된 신청 건을 기준으로
- * 사원 이체정보 + 회사 출금계좌(COMPANY_INFO)를 조회한다.
+ * 給与振込申請照会Dao。
+ *
  */
 public class PaymenttransferlistDao {
 
 	/**
 	 * 신청기간(REQUEST_DATE) 안의 이체신청 결과 조회.
-	 * 출금은행/출금계좌(회사), 입금은행/입금계좌/예금주(사원), 이체금액
+	 * 申請期間(REQUEST_DATE)内の振込申請結果を照会する。
+	 *
 	 */
 	public List<PaymentTransferRequest> selectListByRequestPeriod(Connection conn, Date startDate, Date endDate)
 			throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
+			// UNIQUE 신청 1건 → PAYROLL → PAYROLL_EMPLOYEE → EMPLOYEE 로 사원 행을 펼친다
+			// UNIQUE申請1件 → PAYROLL → PAYROLL_EMPLOYEE → EMPLOYEE で社員行を展開する。
 			String sql = "SELECT e.BANK_NAME, e.BANK_ACCOUNT, e.EMPLOYEE_NAME, pe.NET_PAY_AMOUNT, "
 					+ "c.BANK_NAME AS COMPANY_BANK_NAME, c.ACCOUNT_HOLDER AS COMPANY_ACCOUNT_HOLDER, "
 					+ "c.BANK_ACCOUNT AS COMPANY_BANK_ACCOUNT "
@@ -50,6 +53,11 @@ public class PaymenttransferlistDao {
 		}
 	}
 
+	/**
+	 * ResultSet을 신청 결과 행 목록으로 변환한다.
+	 * ResultSetを申請結果行の一覧に変換する。
+	 *
+	 */
 	private List<PaymentTransferRequest> mapList(ResultSet rs) throws SQLException {
 		List<PaymentTransferRequest> list = new ArrayList<>();
 		while (rs.next()) {

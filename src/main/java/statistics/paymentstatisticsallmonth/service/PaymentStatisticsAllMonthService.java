@@ -11,7 +11,8 @@ import statistics.paymentstatisticsallmonth.dao.PaymentStatisticsAllMonthDao;
 
 /**
  * 월별 전체급여 통계 Service.
- * 선택 연도의 1월~12월 집계를 조회한다.
+ * 月別給与総額統計Service。
+ *
  */
 public class PaymentStatisticsAllMonthService {
 
@@ -19,6 +20,8 @@ public class PaymentStatisticsAllMonthService {
 
 	/**
 	 * 선택 연도의 1월~12월 통계 목록 조회.
+	 * 選択年の1月〜12月統計一覧照会。
+	 *
 	 */
 	public List<MonthlyTotalStatistics> getMonthlyTotalList(int companyId, int year) {
 		Connection conn = null;

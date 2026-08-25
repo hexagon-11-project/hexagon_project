@@ -2,22 +2,37 @@ package payment.model;
 
 /**
  * 급여이체 신청 조회 리스트 한 행.
+ * 給与振込申請照会リストの1行。
  *
- * - 사원(이체 대상): 은행이름, 계좌번호, 이름, 이체금액
- * - 회사(COMPANY_INFO 출금계좌): 은행명, 예금주, 계좌번호
  */
 public class PaymentTransferRequest {
 
 	// ===== 사원 이체 정보 (EMPLOYEE + PAYROLL_EMPLOYEE) =====
-	private String bankName;       // 은행이름
-	private String bankAccount;    // 계좌번호
-	private String employeeName;   // 이름
-	private long transferAmount;   // 이체금액 (실지급액)
+	// ===== 社員振込情報 (EMPLOYEE + PAYROLL_EMPLOYEE) =====
+	// 은행이름
+	// 銀行名。
+	private String bankName;
+	// 계좌번호
+	// 口座番号。
+	private String bankAccount;
+	// 이름
+	// 氏名。
+	private String employeeName;
+	// 이체금액 (실지급액)
+	// 振込金額 (実支給額)。
+	private long transferAmount;
 
 	// ===== 회사 출금계좌 (COMPANY_INFO) =====
-	private String companyBankName;        // 은행명
-	private String companyAccountHolder;   // 예금주
-	private String companyBankAccount;     // 계좌번호
+	// ===== 会社出金口座 (COMPANY_INFO) =====
+	// 은행명
+	// 銀行名。
+	private String companyBankName;
+	// 예금주
+	// 口座名義人。
+	private String companyAccountHolder;
+	// 계좌번호
+	// 口座番号。
+	private String companyBankAccount;
 
 	public PaymentTransferRequest() {
 	}

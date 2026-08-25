@@ -11,14 +11,19 @@ request.setAttribute("pageDescription", "過去10年間の会社全体の給与�
 request.setAttribute("activeKey", "paymentstatisticsall");
 request.setAttribute("pageCss", "statistics.css?v=3");
 /* 구버전 charts.js(캐시)는 combo를 못 그림 → 버전 쿼리로 강제 갱신 */
+/* 旧版charts.js(キャッシュ)はcomboを描けないので、バージョンクエリで強制更新する。 */
 request.setAttribute("pageJs", "charts.js?v=combo4");
 
+// 차트용 JSON
+// チャート用JSON。
 @SuppressWarnings("unchecked")
 List<AnnualTotalStatistics> annualTotalList = (List<AnnualTotalStatistics>) request.getAttribute("annualTotalList");
 if (annualTotalList == null) {
 	annualTotalList = new ArrayList<>();
 }
 
+// 콤보 차트 데이터 속성용 배열
+// コンボチャートデータ属性用配列。
 StringBuilder labelsJson = new StringBuilder("[");
 StringBuilder barValuesJson = new StringBuilder("[");
 StringBuilder lineValuesJson = new StringBuilder("[");
@@ -29,7 +34,11 @@ for (int i = 0; i < annualTotalList.size(); i++) {
 		barValuesJson.append(',');
 		lineValuesJson.append(',');
 	}
+	// 가로축 라벨
+	// 横軸ラベル。
 	labelsJson.append('"').append(row.getYear()).append("年\"");
+	// 천원 단위
+	// 千円単位。
 	barValuesJson.append(row.getTotalSalaryAmount() / 1000L);
 	lineValuesJson.append(row.getAvgEmployeeCount());
 }
@@ -45,11 +54,18 @@ int currentYear = java.time.LocalDate.now().getYear();
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
+<%-- 연도별 전체 급여 통계 화면 --%>
+<%-- 年度別給与総額統計画面。 --%>
+
+<%-- 검색폼 --%>
+<%-- 検索フォーム。 --%>
 <form action="<%=ctx%>/Statistics/paymentStatisticsAll.do" method="get">
 	<section class="filter-bar">
 		<div class="field">
 			<label>基準年</label> <select class="select" name="endYear">
 				<%
+				// 10년 구간의 끝 연도
+				// 10年区間の終了年。
 				for (int y = currentYear + 1; y >= 2000; y--) {
 				%>
 				<option value="<%=y%>" <%=y == selectedEndYear ? "selected" : ""%>><%=y%>年
@@ -70,6 +86,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 		<h2 class="section-title">最近10年の全給与推移</h2>
 	</div>
 	<div class="card-body">
+		<%-- 차트 --%>
+		<%-- チャート。 --%>
 		<script>
 			window.paymentStatisticsAllChartData = {
 				labels: <%=labelsJson.toString()%>,
@@ -90,6 +108,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 
 			function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
 
+			// 차트 툴팁
+			// チャートツールチップ。
 			function ensureTooltip() {
 				var tip = document.getElementById('paymentStatisticsAllTooltip');
 				var canvas = document.getElementById('paymentStatisticsAllCanvas');
@@ -241,6 +261,7 @@ int currentYear = java.time.LocalDate.now().getYear();
 					var barX = cx - barW / 2;
 					var barY = p.t + plotH - bh;
 					/* 값이 0이어도 해당 연도 세로 구간 호버 가능 */
+					/* 値が0でも該当年の縦区間をホバーできる。 */
 					hitAreas.push({
 						x: p.l + slot * b,
 						y: p.t,
@@ -328,6 +349,8 @@ int currentYear = java.time.LocalDate.now().getYear();
 		<h2 class="section-title">年度別給与総額の内訳</h2>
 	</div>
 	<div class="card-body">
+		<%-- 테이블 --%>
+		<%-- テーブル。 --%>
 		<div class="table-wrap">
 			<table class="data-table stats-matrix">
 				<thead>

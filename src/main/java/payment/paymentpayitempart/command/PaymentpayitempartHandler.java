@@ -15,22 +15,32 @@ import payment.model.PaymentItemLedger;
 import payment.paymentpayitempart.service.PaymentpayitempartService;
 
 /**
- * 항목별 대장 화면 핸들러.
- *
- * [조회] GET + search=Y
- *   - 조회기간(startYearMonth ~ endYearMonth)과 지급/공제 항목으로 사원별 내역·합계 조회
+ * 항목별 대장 화면 요청을 처리한다.
+ * 項目別台帳画面のリクエストを処理する。
  */
 public class PaymentpayitempartHandler implements CommandHandler {
 
+	// 항목별 대장 JSP 경로
+	// 項目別台帳のJSPパス。
 	private static final String FORM_VIEW = "/WEB-INF/pages/payment/paymentitemledger.jsp";
+	// 조회 회사아이디
+	// 照会する会社ID。
 	private static final int DEFAULT_COMPANY_ID = 1001;
+	// 조회기간 최대 개월 수
+	// 照会期間の最大月数。
 	private static final int MAX_MONTHS = 12;
 
 	private PaymentpayitempartService paymentpayitempartService = new PaymentpayitempartService();
 
+	/**
+	 * 항목별 대장 화면을 열고 조건으로 조회한다.
+	 * 項目別台帳画面を開き、条件で照会する。
+	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		int companyId = DEFAULT_COMPANY_ID;
+		// hidden search=Y가 있을 때만 조회한다
+		// hidden search=Yがあるときだけ照会する。
 		boolean searched = "Y".equals(req.getParameter("search"));
 
 		YearMonth current = YearMonth.now();
@@ -45,6 +55,8 @@ public class PaymentpayitempartHandler implements CommandHandler {
 
 		List<PaymentItemLedger> employeeList = Collections.emptyList();
 		if (searched && isPeriodOver12Months(startYearMonth, endYearMonth)) {
+			// 양끝 포함 13개월부터 막는다 (1월~다음 1월 = 13)
+			// 両端を含め13ヶ月から防ぐ (1月〜翌年1月 = 13)。
 			errorMessage = "조회기간은 12개월을 초과할 수 없습니다.";
 			searched = false;
 		} else if (searched) {
@@ -70,8 +82,8 @@ public class PaymentpayitempartHandler implements CommandHandler {
 	}
 
 	/**
-	 * type=month 값(YYYY-MM) 파싱.
-	 * 값이 없거나 잘못되면 기본 연월을 사용한다.
+	 * type=month 값(YYYY-MM)을 YearMonth로 바꾼다.
+	 * type=month値(YYYY-MM)をYearMonthに変換する。
 	 */
 	private YearMonth parseYearMonth(String yearMonthParam, YearMonth defaultValue) {
 		if (yearMonthParam == null || yearMonthParam.trim().isEmpty()) {
@@ -89,18 +101,26 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		}
 	}
 
-	/** 시작~종료 연월이 12개월을 넘으면 true. 같은 달부터 12개월(예: 1월~12월)은 허용한다. */
+	/**
+	 * 시작~종료 연월이 12개월을 넘는지 본다.
+	 * 開始〜終了の年月が12ヶ月を超えるかを見る。
+	 */
 	private boolean isPeriodOver12Months(YearMonth startYearMonth, YearMonth endYearMonth) {
 		return monthCount(startYearMonth, endYearMonth) > MAX_MONTHS;
 	}
 
-	/** 조회기간 시작~종료의 연월 목록. 경고 기준과 같이 최대 12개월만 표시한다. */
+	/**
+	 * 조회기간 시작~종료의 연월 목록을 만든다.
+	 * 照会期間の開始〜終了の年月一覧を作る。
+	 */
 	private List<String> toMonthColumns(YearMonth startYearMonth, YearMonth endYearMonth) {
 		List<String> months = new ArrayList<>();
 		if (startYearMonth == null || endYearMonth == null || startYearMonth.isAfter(endYearMonth)) {
 			return months;
 		}
 		YearMonth cursor = startYearMonth;
+		// 시작월 포함 최대 12칸: plusMonths(11)이 마지막 칸이다
+		// 開始月を含め最大12欄: plusMonths(11)が最後の欄である。
 		YearMonth cappedEnd = startYearMonth.plusMonths(MAX_MONTHS - 1);
 		if (endYearMonth.isBefore(cappedEnd)) {
 			cappedEnd = endYearMonth;
@@ -112,12 +132,19 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		return months;
 	}
 
+	/**
+	 * 시작~종료의 포함 개월 수를 센다.
+	 * 開始〜終了の含まれる月数を数える。
+	 */
 	private int monthCount(YearMonth startYearMonth, YearMonth endYearMonth) {
 		return (endYearMonth.getYear() - startYearMonth.getYear()) * 12
 				+ (endYearMonth.getMonthValue() - startYearMonth.getMonthValue()) + 1;
 	}
 
-	/** 항목을 고르지 않았으면 기본값(급여항목 선택)을 유지한다. */
+	/**
+	 * 항목 셀렉트 값을 정리한다.
+	 * 項目セレクト値を整理する。
+	 */
 	private String parseItemSelectValue(String itemSelectValue) {
 		if (itemSelectValue == null || itemSelectValue.trim().isEmpty()) {
 			return "";
@@ -125,6 +152,10 @@ public class PaymentpayitempartHandler implements CommandHandler {
 		return itemSelectValue.trim();
 	}
 
+	/**
+	 * 셀렉트 value에 맞는 항목명을 찾는다.
+	 * セレクトvalueに合う項目名を探す。
+	 */
 	private String findItemName(List<PaymentItemLedger> itemList, String itemSelectValue) {
 		if (itemList == null || itemSelectValue == null) {
 			return "";

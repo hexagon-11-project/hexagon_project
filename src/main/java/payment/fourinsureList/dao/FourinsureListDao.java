@@ -11,16 +11,14 @@ import jdbc.JdbcUtil;
 import payment.model.PaymentInsuranceLedger;
 
 /**
- * 4대보험 대장 Dao.
- * 귀속연월·급여차수로 급여 헤더(정산기간, 급여지급일)와
- * 해당 지급 내역이 있는 사원의 4대보험 공제액을 조회한다.
- * 공제 행이 없으면 0원으로 둔다.
+ * 4대보험 대장 DB 조회 Dao.
+ * 社会保険(4大保険)台帳のDB照会Dao。
  */
 public class FourinsureListDao {
 
 	/**
 	 * 귀속연월(YYYYMM)·급여차수로 4대보험 대장을 조회한다.
-	 * 해당 급여차수가 없으면 null을 반환한다.
+	 * 帰属年月(YYYYMM)・給与次数で社会保険(4大保険)台帳を照会する。
 	 */
 	public PaymentInsuranceLedger selectByYearMonthSeq(Connection conn, String payYearMonth, int paySequence)
 			throws SQLException {
@@ -32,6 +30,10 @@ public class FourinsureListDao {
 		return ledger;
 	}
 
+	/**
+	 * 급여 헤더(정산기간, 급여지급일)를 조회한다.
+	 * 給与ヘッダー(精算期間、給与支給日)を照会する。
+	 */
 	private PaymentInsuranceLedger selectPayrollHeader(Connection conn, String payYearMonth, int paySequence)
 			throws SQLException {
 		PreparedStatement pstmt = null;
@@ -66,11 +68,17 @@ public class FourinsureListDao {
 		}
 	}
 
+	/**
+	 * 해당 차수 지급 사원의 4대보험 공제액을 조회한다.
+	 * 当該次数の支給社員の社会保険(4大保険)控除額を照会する。
+	 */
 	private List<PaymentInsuranceLedger> selectEmployees(Connection conn, String payYearMonth, int paySequence)
 			throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
+			// 세로 공제상세를 가로 4칸으로 피벗한다
+			// 縦の控除明細を横4欄にピボットする。
 			String sql = "SELECT pe.PAYROLL_EMPLOYEE_ID, e.EMPLOYEE_ID, e.EMPLOYMENT_TYPE, e.EMPLOYEE_NAME, "
 					+ "e.HIRE_DATE, e.DEPARTMENT, e.POSITION, "
 					+ "NVL(SUM(CASE WHEN di.DEDUCTION_ITEM_NAME = ? THEN dd.AMOUNT END), 0) AS NATIONAL_PENSION, "
@@ -88,6 +96,8 @@ public class FourinsureListDao {
 					+ "ORDER BY e.EMPLOYEE_NAME, e.EMPLOYEE_ID";
 
 			pstmt = conn.prepareStatement(sql);
+			// 1~4번은 피벗 항목명, 5~6번은 조회 키(연월·차수)이다
+			// 1〜4番はピボット項目名、5〜6番は照会キー(年月・次数)である。
 			pstmt.setString(1, PaymentInsuranceLedger.DEDUCTION_NATIONAL_PENSION);
 			pstmt.setString(2, PaymentInsuranceLedger.DEDUCTION_HEALTH_INSURANCE);
 			pstmt.setString(3, PaymentInsuranceLedger.DEDUCTION_LONG_TERM_CARE);
@@ -109,6 +119,8 @@ public class FourinsureListDao {
 				row.setNationalPension(rs.getLong("NATIONAL_PENSION"));
 				row.setHealthInsurance(rs.getLong("HEALTH_INSURANCE"));
 				row.setLongTermCare(rs.getLong("LONG_TERM_CARE"));
+				// 사장은 고용보험을 0원으로 덮는다
+				// 社長は雇用保険を0円で上書きする。
 				long employmentInsurance = rs.getLong("EMPLOYMENT_INSURANCE");
 				row.setEmploymentInsurance(row.isPresident() ? 0L : employmentInsurance);
 				employees.add(row);

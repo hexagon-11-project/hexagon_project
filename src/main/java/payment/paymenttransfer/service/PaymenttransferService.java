@@ -10,11 +10,20 @@ import jdbc.JdbcUtil;
 import payment.model.PaymentTransfer;
 import payment.paymenttransfer.dao.PaymenttransferDao;
 
+/**
+ * 급여이체 신청 Service.
+ * 給与振込申請Service。
+ *
+ */
 public class PaymenttransferService {
 
 	private PaymenttransferDao transferDao = new PaymenttransferDao();
 
-	/** 귀속연/월/차수로 이체 대상(사원) 목록 조회 */
+	/**
+	 * 귀속연/월/차수로 이체 대상(사원) 목록 조회
+	 * 帰属年/月/次数で振込対象(社員)一覧を照会する。
+	 *
+	 */
 	public List<PaymentTransfer> getTransferList(String payYear, String payMonth, int paySequence) {
 		String payYearMonth = toPayYearMonth(payYear, payMonth);
 		if (payYearMonth == null) {
@@ -34,24 +43,12 @@ public class PaymenttransferService {
 
 	/**
 	 * [급여이체 신청] 체크된 행 기준으로 DB 저장
+	 * [給与振込申請] チェックされた行を基準にDBへ保存する。
 	 *
-	 * 흐름:
-	 * 1) selectedIds = 화면에서 체크된 payrollEmployeeId 목록 (체크 안 된 행은 여기 없음)
-	 * 2) 귀속연/월/차수로 PAYROLL_ID 조회
-	 * 3) 체크된 ID가 그 PAYROLL에 실제 속하는지 COUNT로 검증
-	 * 4) PAYROLL_TRANSFER_REQUEST에 저장
-	 *    - 없으면 INSERT (급여작업당 1건)
-	 *    - 있으면 UPDATE (REQUEST_YN='Y', 신청일 갱신)
-	 *
-	 * 주의:
-	 * PAYROLL_TRANSFER_REQUEST는 PAYROLL_ID UNIQUE라서
-	 * "체크된 사원 수만큼 INSERT"가 아니라 "체크가 1명 이상이면 해당 급여작업 1건 저장"이다.
-	 *
-	 * @param selectedIds 체크박스에서 넘어온 payrollEmployeeId 배열
-	 * @return 검증 통과한 선택 사원 수 (0이면 저장 안 함)
 	 */
 	public int applyTransferRequest(String payYear, String payMonth, int paySequence, String[] selectedIds) {
 		// 체크된 행이 하나도 없으면 저장하지 않음
+		// チェックされた行が1件もなければ保存しない。
 		if (selectedIds == null || selectedIds.length == 0) {
 			return 0;
 		}
@@ -72,12 +69,14 @@ public class PaymenttransferService {
 			conn.setAutoCommit(false);
 
 			// 조회 조건에 해당하는 급여작업 PK
+			// 照会条件に該当する給与作業PK。
 			Integer payrollId = transferDao.selectPayrollId(conn, payYearMonth, paySequence);
 			if (payrollId == null) {
 				throw new IllegalArgumentException("해당 귀속연월/차수의 급여작업이 없습니다.");
 			}
 
 			// 체크된 행이 이 급여작업 소속인지 확인 (조작된 ID 방지)
+			// チェックされた行がこの給与作業に属するかを確認する (操作されたIDの防止)。
 			int validCount = transferDao.countSelectedInPayroll(conn, payrollId, payrollEmployeeIds);
 			if (validCount == 0) {
 				conn.rollback();
@@ -85,10 +84,11 @@ public class PaymenttransferService {
 			}
 
 			// 체크가 유효하면 이체신청 저장 (급여작업 단위 1건)
+			// チェックが有効なら振込申請を保存する (給与作業単位で1件)。
 			if (transferDao.existsTransferRequest(conn, payrollId)) {
-				transferDao.updateTransferRequest(conn, payrollId); // 재신청 → UPDATE
+				transferDao.updateTransferRequest(conn, payrollId); // 재신청 → UPDATE / 再申請 → UPDATE。
 			} else {
-				transferDao.insertTransferRequest(conn, payrollId); // 최초 신청 → INSERT
+				transferDao.insertTransferRequest(conn, payrollId); // 최초 신청 → INSERT / 初回申請 → INSERT。
 			}
 
 			conn.commit();
@@ -107,6 +107,11 @@ public class PaymenttransferService {
 		}
 	}
 
+	/**
+	 * 목록의 실지급액 합계를 구한다.
+	 * 一覧の実支給額合計を求める。
+	 *
+	 */
 	public long sumNetPayAmount(List<PaymentTransfer> list) {
 		long sum = 0L;
 		if (list == null) {
@@ -118,7 +123,11 @@ public class PaymenttransferService {
 		return sum;
 	}
 
-	/** 귀속연 + 귀속월 → PAY_YEAR_MONTH(YYYYMM) */
+	/**
+	 * 귀속연 + 귀속월 → PAY_YEAR_MONTH(YYYYMM)
+	 * 帰属年 + 帰属月 → PAY_YEAR_MONTH(YYYYMM)。
+	 *
+	 */
 	public String toPayYearMonth(String payYear, String payMonth) {
 		if (payYear == null || payYear.trim().isEmpty() || payMonth == null || payMonth.trim().isEmpty()) {
 			return null;
@@ -134,7 +143,11 @@ public class PaymenttransferService {
 		return year + month;
 	}
 
-	/** 체크박스 value 문자열 배열 → int 배열 */
+	/**
+	 * 체크박스 value 문자열 배열 → int 배열
+	 * チェックボックスvalueの文字列配列 → int配列。
+	 *
+	 */
 	private int[] parseIds(String[] selectedIds) {
 		int[] ids = new int[selectedIds.length];
 		int count = 0;

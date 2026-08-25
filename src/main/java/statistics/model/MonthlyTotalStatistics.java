@@ -2,26 +2,33 @@ package statistics.model;
 
 /**
  * 월별 전체급여 통계 1건.
- * 선택 연도의 1월부터 12월까지를 표시할 때 월 단위로 사용한다.
+ * 月別給与総額統計1件。
+ *
  */
 public class MonthlyTotalStatistics {
 
-	/** 연도 */
+	/** 연도
+	 * 年度。 */
 	private int year;
 
-	/** 월 (1~12) */
+	/** 월 (1~12)
+	 * 月 (1〜12)。 */
 	private int month;
 
-	/** 해당 월 전체 급여액 */
+	/** 해당 월 전체 급여액
+	 * 該当月の給与総額。 */
 	private long totalSalaryAmount;
 
-	/** 전월 대비 급여 증가율 (%) — 전월 데이터가 없으면 null */
+	// 전월 대비 급여 증가율 (%)
+	// 前月比給与増加率 (%)。
 	private Double salaryGrowthRate;
 
-	/** 해당 월 사원수 */
+	/** 해당 월 사원수
+	 * 該当月の社員数。 */
 	private int employeeCount;
 
-	/** 전월 대비 사원수 증가율 (%) — 전월 데이터가 없으면 null */
+	// 전월 대비 사원수 증가율 (%)
+	// 前月比社員数増加率 (%)。
 	private Double employeeGrowthRate;
 
 	public MonthlyTotalStatistics() {

@@ -10,8 +10,18 @@ import java.util.List;
 import jdbc.JdbcUtil;
 import payment.model.PaymentTransfer;
 
+/**
+ * 급여이체 신청 Dao.
+ * 給与振込申請Dao。
+ *
+ */
 public class PaymenttransferDao {
 
+	/**
+	 * 귀속연월/차수로 이체 대상 사원 목록을 조회한다.
+	 * 帰属年月/次数で振込対象の社員一覧を照会する。
+	 *
+	 */
 	public List<PaymentTransfer> selectByYearMonthSeq(Connection conn, String payYearMonth, int paySequence)
 			throws SQLException {
 		PreparedStatement pstmt = null;
@@ -52,6 +62,11 @@ public class PaymenttransferDao {
 		}
 	}
 
+	/**
+	 * 귀속연월/차수로 급여작업 PK를 조회한다.
+	 * 帰属年月/次数で給与作業PKを照会する。
+	 *
+	 */
 	public Integer selectPayrollId(Connection conn, String payYearMonth, int paySequence) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -74,12 +89,16 @@ public class PaymenttransferDao {
 	/**
 	 * 화면에서 체크된 payrollEmployeeId들이
 	 * 해당 급여작업(PAYROLL_ID)에 실제로 속하는지 검증하고 건수를 반환한다.
-	 * (체크된 행만 신청 대상으로 인정)
+	 * 画面でチェックされたpayrollEmployeeIdが
+	 * 当該給与作業(PAYROLL_ID)に実際に属するかを検証し、件数を返す。
+	 *
 	 */
 	public int countSelectedInPayroll(Connection conn, int payrollId, int[] payrollEmployeeIds) throws SQLException {
 		if (payrollEmployeeIds == null || payrollEmployeeIds.length == 0) {
 			return 0;
 		}
+		// IN (?, ?, ...) 를 선택 건수만큼 동적으로 붙인다
+		// IN (?, ?, ...) を選択件数だけ動的に付ける。
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(*) FROM PAYROLL_EMPLOYEE ");
 		sql.append("WHERE PAYROLL_ID = ? AND PAYROLL_EMPLOYEE_ID IN (");
@@ -95,6 +114,8 @@ public class PaymenttransferDao {
 		ResultSet rs = null;
 		try {
 			pstmt = conn.prepareStatement(sql.toString());
+			// 1번은 급여작업 PK, 2번부터가 체크된 PAYROLL_EMPLOYEE_ID 이다
+			// 1番は給与作業PK、2番からがチェックされたPAYROLL_EMPLOYEE_IDである。
 			pstmt.setInt(1, payrollId);
 			for (int i = 0; i < payrollEmployeeIds.length; i++) {
 				pstmt.setInt(i + 2, payrollEmployeeIds[i]);
@@ -110,7 +131,11 @@ public class PaymenttransferDao {
 		}
 	}
 
-	/** 이미 같은 PAYROLL_ID로 이체신청이 있는지 확인 (UK_PTR_1) */
+	/**
+	 * 이미 같은 PAYROLL_ID로 이체신청이 있는지 확인 (UK_PTR_1)
+	 * 既に同じPAYROLL_IDで振込申請があるかを確認する (UK_PTR_1)。
+	 *
+	 */
 	public boolean existsTransferRequest(Connection conn, int payrollId) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -128,8 +153,8 @@ public class PaymenttransferDao {
 
 	/**
 	 * [INSERT] 체크된 행이 1건 이상일 때 호출.
-	 * PAYROLL_TRANSFER_REQUEST에 급여작업(PAYROLL_ID) 단위로 1건 저장.
-	 * ※ 사원(체크 행)마다 INSERT하지 않음.
+	 * [INSERT] チェックされた行が1件以上あるときに呼び出す。
+	 *
 	 */
 	public int insertTransferRequest(Connection conn, int payrollId) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -150,7 +175,8 @@ public class PaymenttransferDao {
 
 	/**
 	 * [UPDATE] 같은 PAYROLL_ID 신청이 이미 있으면 재신청 처리.
-	 * REQUEST_YN='Y', REQUEST_DATE=SYSDATE 로 갱신.
+	 * [UPDATE] 同じPAYROLL_IDの申請が既にあれば再申請処理をする。
+	 *
 	 */
 	public int updateTransferRequest(Connection conn, int payrollId) throws SQLException {
 		PreparedStatement pstmt = null;

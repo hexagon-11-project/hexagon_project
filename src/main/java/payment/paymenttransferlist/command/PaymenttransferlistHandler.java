@@ -13,21 +13,28 @@ import payment.paymenttransferlist.service.PaymenttransferlistService;
 
 /**
  * 급여이체 신청 조회 화면 컨트롤러.
+ * 給与振込申請照会画面のコントローラー。
  *
- * [조회] GET + search=Y
- *   - 신청기간(startDate ~ endDate) 안의 REQUEST_DATE 이체신청 결과 조회
- *   - 리스트: 출금은행, 출금계좌, 입금은행, 입금계좌, 예금주, 이체금액
  */
 public class PaymenttransferlistHandler implements CommandHandler {
 
+	// 결과 조회 화면 JSP 경로
+	// 結果照会画面のJSPパス。
 	private static final String FORM_VIEW = "/WEB-INF/pages/payroll/paymenttransferlist.jsp";
 
 	private PaymenttransferlistService transferListService = new PaymenttransferlistService();
 
+	/**
+	 * 신청기간으로 이체 신청 결과를 조회한다.
+	 * 申請期間で振込申請結果を照会する。
+	 *
+	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		String startDate = req.getParameter("startDate");
 		String endDate = req.getParameter("endDate");
+		// hidden search=Y가 있을 때만 DB를 친다
+		// hidden search=YがあるときだけDBを照会する。
 		boolean searched = "Y".equals(req.getParameter("search"));
 
 		LocalDate today = LocalDate.now();

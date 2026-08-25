@@ -4,57 +4,76 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 항목별 대장 모델.
- * 지급/공제 통합 셀렉트 항목, 사원별 조회 결과, 월(차수) 내역을 한 파일에서 담는다.
+ * 항목별 대장 한 건을 담는 모델.
+ * 項目別台帳の1件を格納するモデル。
  */
 public class PaymentItemLedger {
 
+	// 지급 항목 구분값
+	// 支給項目の区分値。
 	public static final String TYPE_PAY = "PAY";
+	// 공제 항목 구분값
+	// 控除項目の区分値。
 	public static final String TYPE_DEDUCTION = "DEDUCTION";
 
-	/** 항목 구분 — PAY(지급) 또는 DEDUCTION(공제) */
+	// 항목 구분
+	// 項目区分。
 	private String itemType;
 
-	/** 지급항목아이디 또는 공제항목아이디 */
+	// 지급항목아이디 또는 공제항목아이디
+	// 支給項目IDまたは控除項目ID。
 	private Long itemId;
 
-	/** 항목명 (기본급, 국민연금 등) */
+	// 항목명
+	// 項目名。
 	private String itemName;
 
-	/** 사원아이디 */
+	// 사원아이디
+	// 社員ID。
 	private int employeeId;
 
-	/** 구분 (고용형태) */
+	// 구분(고용형태)
+	// 区分(雇用形態)。
 	private String employmentType;
 
-	/** 성명 */
+	// 성명
+	// 氏名。
 	private String employeeName;
 
-	/** 부서 */
+	// 부서
+	// 部署。
 	private String department;
 
-	/** 직위 */
+	// 직위
+	// 職位。
 	private String position;
 
-	/** 귀속연월 YYYYMM */
+	// 귀속연월
+	// 帰属年月。
 	private String payYearMonth;
 
-	/** 연도 */
+	// 연도
+	// 年度。
 	private int year;
 
-	/** 월 (1~12) */
+	// 월(1~12)
+	// 月(1〜12)。
 	private int month;
 
-	/** 급여차수. 같은 월에 차수가 여러 건이면 건별로 담는다 */
+	// 급여차수
+	// 給与次数。
 	private Integer paySequence;
 
-	/** 해당 항목 금액 */
+	// 해당 항목 금액
+	// 当該項目の金額。
 	private long amount;
 
-	/** 기간 안 월(차수)별 항목 내역 */
+	// 기간 안 월(차수)별 항목 내역
+	// 期間内の月(次数)別項目明細。
 	private List<PaymentItemLedger> details = new ArrayList<>();
 
-	/** 사원별 기간 내 총 합계 */
+	// 사원별 기간 내 총 합계
+	// 社員別の期間内総計。
 	private long totalAmount;
 
 	public PaymentItemLedger() {
@@ -74,15 +93,26 @@ public class PaymentItemLedger {
 		this.amount = amount;
 	}
 
-	/** 셀렉트 박스 value. 예: PAY:1001, DEDUCTION:2001 */
+	/**
+	 * 셀렉트 박스 value를 만든다.
+	 * セレクトボックスのvalueを作る。
+	 */
 	public String getSelectValue() {
 		return itemType + ":" + itemId;
 	}
 
+	/**
+	 * 지급 항목인지 판별한다.
+	 * 支給項目かを判定する。
+	 */
 	public boolean isPayItem() {
 		return TYPE_PAY.equals(itemType);
 	}
 
+	/**
+	 * 공제 항목인지 판별한다.
+	 * 控除項目かを判定する。
+	 */
 	public boolean isDeductionItem() {
 		return TYPE_DEDUCTION.equals(itemType);
 	}
@@ -207,7 +237,10 @@ public class PaymentItemLedger {
 		this.totalAmount = totalAmount;
 	}
 
-	/** 해당 연월 금액. yearMonthLabel 형식은 YYYY.MM (예: 2026.01). */
+	/**
+	 * 연월 라벨에 해당하는 금액을 구한다.
+	 * 年月ラベルに該当する金額を求める。
+	 */
 	public long getAmountOf(String yearMonthLabel) {
 		if (yearMonthLabel == null || yearMonthLabel.length() < 7) {
 			return 0L;
@@ -221,7 +254,10 @@ public class PaymentItemLedger {
 		}
 	}
 
-	/** 해당 연월 금액. 같은 달에 차수가 여러 건이면 합산한다. */
+	/**
+	 * 해당 연월 금액을 구한다.
+	 * 当該年月の金額を求める。
+	 */
 	public long getAmountByYearMonth(int year, int month) {
 		long sum = 0L;
 		if (details == null) {

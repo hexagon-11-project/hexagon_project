@@ -4,13 +4,23 @@
 <%@ page import="java.text.DecimalFormat"%>
 <%@ page import="statistics.model.EmployeeSalaryStatistics"%>
 <%@ page import="statistics.model.SalaryItemStatistics"%>
-<%!private static final String[] DONUT_PALETTE = {"#3f8fc4", "#e76c64", "#6f7b87", "#50a57a", "#d19a43", "#8d75b8",
+<%!// 도넛 범례/조각 색
+	// ドーナツ凡例・切片の色。
+	private static final String[] DONUT_PALETTE = {"#3f8fc4", "#e76c64", "#6f7b87", "#50a57a", "#d19a43", "#8d75b8",
 			"#58aeb2"};
 
+	/**
+	 * null이면 빈 문자열로 바꾼다.
+	 * nullなら空文字列に変える。
+	 */
 	private String nvl(String value) {
 		return value == null ? "" : value;
 	}
 
+	/**
+	 * HTML 특수문자를 이스케이프한다.
+	 * HTML特殊文字をエスケープする。
+	 */
 	private String esc(String value) {
 		if (value == null || value.isEmpty()) {
 			return "";
@@ -18,6 +28,10 @@
 		return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
 	}
 
+	/**
+	 * 구성비율을 소수 1자리 % 문자열로 만든다.
+	 * 構成比を小数1桁の%文字列にする。
+	 */
 	private String formatRatio(Double ratio) {
 		if (ratio == null) {
 			return "0.0%";
@@ -25,6 +39,10 @@
 		return String.format("%.1f%%", ratio);
 	}
 
+	/**
+	 * long 값들을 JSON 배열 문자열로 만든다.
+	 * long値をJSON配列文字列にする。
+	 */
 	private String toValuesJson(long... values) {
 		StringBuilder sb = new StringBuilder("[");
 		for (int i = 0; i < values.length; i++) {
@@ -37,6 +55,10 @@
 		return sb.toString();
 	}
 
+	/**
+	 * 항목 금액 목록을 JSON 배열로 만든다.
+	 * 項目金額一覧をJSON配列にする。
+	 */
 	private String toItemValuesJson(List<SalaryItemStatistics> items) {
 		StringBuilder sb = new StringBuilder("[");
 		if (items != null) {
@@ -51,6 +73,10 @@
 		return sb.toString();
 	}
 
+	/**
+	 * JSON 문자열 특수문자를 이스케이프한다.
+	 * JSON文字列の特殊文字をエスケープする。
+	 */
 	private String escJson(String value) {
 		if (value == null) {
 			return "";
@@ -58,6 +84,10 @@
 		return value.replace("\\", "\\\\").replace("\"", "\\\"");
 	}
 
+	/**
+	 * 문자열 라벨들을 JSON 배열로 만든다.
+	 * 文字列ラベルをJSON配列にする。
+	 */
 	private String toLabelsJson(String... labels) {
 		StringBuilder sb = new StringBuilder("[");
 		for (int i = 0; i < labels.length; i++) {
@@ -70,6 +100,10 @@
 		return sb.toString();
 	}
 
+	/**
+	 * 항목명 목록을 JSON 배열로 만든다.
+	 * 項目名一覧をJSON配列にする。
+	 */
 	private String toItemLabelsJson(List<SalaryItemStatistics> items) {
 		StringBuilder sb = new StringBuilder("[");
 		if (items != null) {
@@ -84,6 +118,10 @@
 		return sb.toString();
 	}
 
+	/**
+	 * 도넛 범례 색을 순환한다.
+	 * ドーナツ凡例色を循環する。
+	 */
 	private String paletteColor(int index) {
 		return DONUT_PALETTE[index % DONUT_PALETTE.length];
 	}%>
@@ -97,6 +135,8 @@ request.setAttribute("pageJs", "charts.js?v=donutTip1");
 
 Integer selectedYear = (Integer) request.getAttribute("year");
 Integer selectedMonth = (Integer) request.getAttribute("month");
+// 귀속연월 기본값
+// 帰属年月の既定値。
 java.time.YearMonth selectedYearMonth = (selectedYear != null && selectedMonth != null)
 		? java.time.YearMonth.of(selectedYear, selectedMonth)
 		: java.time.YearMonth.now();
@@ -106,6 +146,8 @@ String employeeNameValue = request.getAttribute("employeeName") == null
 		: String.valueOf(request.getAttribute("employeeName"));
 employeeNameValue = esc(employeeNameValue);
 String errorMessage = (String) request.getAttribute("errorMessage");
+// alert용 메시지 이스케이프
+// alert用メッセージのエスケープ。
 String errorMessageJs = errorMessage == null
 		? ""
 		: errorMessage.replace("\\", "\\\\").replace("'", "\\'").replace("\r", "").replace("\n", "\\n");
@@ -122,6 +164,8 @@ if (deductionItems == null) {
 	deductionItems = new ArrayList<SalaryItemStatistics>();
 }
 DecimalFormat moneyFormat = new DecimalFormat("#,###");
+// 지급/공제 열 개수
+// 支給/控除列数。
 int itemColCount = Math.max(payItems.size(), deductionItems.size());
 boolean hasResult = stats != null;
 long totalPayAmount = hasResult ? stats.getTotalPayAmount() : 0L;
@@ -130,6 +174,10 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
+<%-- 급여항목 구성 통계 화면 --%>
+<%-- 給与項目構成統計画面。 --%>
+<%-- 검색폼 --%>
+<%-- 検索フォーム。 --%>
 <form action="<%=ctx%>/Statistics/paymentStatisticsPayItems.do"
 	method="get">
 	<section class="filter-bar">
@@ -155,6 +203,8 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 		<h2 class="section-title">給与項目の構成</h2>
 	</div>
 	<div class="card-body">
+		<%-- 차트 --%>
+		<%-- チャート。 --%>
 		<%
 		if (errorMessage != null) {
 		%>
@@ -245,6 +295,8 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 		<h2 class="section-title">支給・控除内訳</h2>
 	</div>
 	<div class="card-body">
+		<%-- 테이블 --%>
+		<%-- テーブル。 --%>
 		<div class="table-wrap">
 			<table class="data-table stats-matrix item-composition-matrix">
 				<colgroup>
@@ -364,6 +416,8 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 	</div>
 </section>
 <script>
+	// 팝업
+	// ポップアップ。
 	var employeePopup = null;
 
 	function openEmployeePopup() {
@@ -399,6 +453,8 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 		}
 	};
 </script>
+<%-- 급여 없음 안내 --%>
+<%-- 給与なし案内。 --%>
 <%
 if (errorMessage != null) {
 %>

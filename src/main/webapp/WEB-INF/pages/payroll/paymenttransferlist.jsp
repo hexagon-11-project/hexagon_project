@@ -12,6 +12,11 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
+<%-- 급여이체 신청 결과 조회 화면 --%>
+<%-- 給与振込申請結果照会画面。 --%>
+
+<%-- 검색폼 --%>
+<%-- 検索フォーム。 --%>
 <form action="<%=ctx%>/Payment/paymenttransferlist.do" method="get">
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
@@ -34,6 +39,8 @@ request.setAttribute("pageJs", null);
 		<h2 class="section-title">給与振込の申請結果</h2>
 	</div>
 	<div class="card-body">
+		<%-- 이체 신청 결과 테이블 --%>
+		<%-- 振込申請結果テーブル。 --%>
 		<div class="table-wrap">
 			<table class="data-table">
 				<thead>
@@ -48,11 +55,15 @@ request.setAttribute("pageJs", null);
 				</thead>
 				<tbody>
 					<c:choose>
+						<%-- 아직 조회하지 않은 빈 상태 --%>
+						<%-- まだ照会していない空の状態。 --%>
 						<c:when test="${not searched}">
 							<tr>
 								<td colspan="6" style="text-align: center;">申請期間を選択してから照会してください。</td>
 							</tr>
 						</c:when>
+						<%-- 조회했으나 REQUEST_YN='Y' 결과가 없는 빈 상태 --%>
+						<%-- 照会したがREQUEST_YN='Y'の結果がない空の状態。 --%>
 						<c:when test="${empty transferRequestList}">
 							<tr>
 								<td colspan="6" style="text-align: center;">照会された振替申請結果はありません。</td>
