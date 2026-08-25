@@ -300,7 +300,7 @@ public class PaymentMntDayWorkerDAO {
         String sql = "INSERT INTO DAILY_WORK_RECORD "
                 + "(DAILY_WORK_RECORD_ID, EMPLOYEE_ID, PAYROLL_EMPLOYEE_ID, WORK_SITE_NAME, WORK_DATE, "
                 + " DAILY_WAGE, PAY_RATE, PAY_AMOUNT, INCOME_TAX_AMOUNT, LOCAL_INCOME_TAX_AMOUNT, NET_PAY_AMOUNT, REG_ID, MOD_ID) "
-                + "VALUES ((SELECT NVL(MAX(DAILY_WORK_RECORD_ID), 0) + 1 FROM DAILY_WORK_RECORD), "
+                + "VALUES (DAILY_WORK_RECORD_SEQ.NEXTVAL, "
                 + "?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?, ?, ?, 'admin', 'admin')";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (PaymentMntDayWorkerDailyVO d : dailyList) {
