@@ -63,9 +63,9 @@ public class CompanyInfoDao {
 				+ "bank_name=?, account_holder=?, bank_account=?, logo_path=?, seal_path=?, updated_at=sysdate "
 				+ "WHERE company_id=?";
 
-		String sql2 = "UPDATE employee SET emp_name=?, tel_no=?, mobile_no=?, email=? "
-				+ "WHERE emp_id = (SELECT manager_id FROM company_info WHERE company_id = ?)";
-
+		String sql2 = "UPDATE employee SET employee_name=?, phone=?, mobile=?, email=? "
+	            + "WHERE company_id = ? AND mng_yn = 'Y'";
+		
 		try (PreparedStatement pstmt1 = conn.prepareStatement(sql1);
 				PreparedStatement pstmt2 = conn.prepareStatement(sql2)) {
 
@@ -90,10 +90,18 @@ public class CompanyInfoDao {
 			pstmt1.setInt(19, info.getCompanyId()); 
 			int result1 = pstmt1.executeUpdate();
 
-			return result1;
+			// 모델의 필드명에 맞춘 getter를 사용하여 담당자 정보 업데이트
+			pstmt2.setString(1, info.getManagerName()); 
+			pstmt2.setString(2, info.getManagerTel()); 
+			pstmt2.setString(3, info.getManagerMobile()); 
+			pstmt2.setString(4, info.getManagerEmail()); 
+			pstmt2.setInt(5, info.getCompanyId());
+			int result2 = pstmt2.executeUpdate();
 
+			return result1 + result2;
 		}
 	}
+	
 //날짜 문자열을 데이터베이스 저장용 날짜 객체로 변환
 	private Date toDate(String date) {
 		if (date == null || date.trim().isEmpty()) {
@@ -102,10 +110,8 @@ public class CompanyInfoDao {
 		String trimmed = date.trim();
 		try {
 			if (trimmed.contains("-")) {
-				// 브라우저 달력 위젯이 보내는 형식: yyyy-MM-dd
 				return Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ISO_LOCAL_DATE));
 			} else {
-				// 순수 텍스트로 8자리 입력받는 형식: yyyyMMdd
 				return Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyyMMdd")));
 			}
 		} catch (Exception e) {

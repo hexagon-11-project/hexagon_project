@@ -19,7 +19,6 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		if (request.getMethod().equalsIgnoreCase("GET")) {
 			return processForm(request, response);
 		} else if (request.getMethod().equalsIgnoreCase("POST")) {
-
 			return processSubmit(request, response);
 		} else {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -61,6 +60,12 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		String bankAccount = request.getParameter("bankAccount");
 		String logoPath = request.getParameter("logoPath");
 		String sealPath = request.getParameter("sealPath");
+		
+	
+		String managerName = request.getParameter("managerName");
+		String managerTel = request.getParameter("managerTel");
+		String managerMobile = request.getParameter("managerMobile");
+		String managerEmail = request.getParameter("managerEmail");
 
 		CompanyInfo info = new CompanyInfo();
 		info.setCompanyId(companyId);
@@ -83,30 +88,34 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		info.setBankAccount(bankAccount);
 		info.setLogoPath(logoPath);
 		info.setSealPath(sealPath);
+		
+		// 담당자 정보
+		info.setManagerName(managerName);
+		info.setManagerTel(managerTel);
+		info.setManagerMobile(managerMobile);
+		info.setManagerEmail(managerEmail);
 
 		updateService.update(info);
 
-		// 수정 완료 후 리다이렉트 (하드코딩 1001 대신 companyId 변수 사용)
-		response.sendRedirect(request.getContextPath() + "/Config/membersInfo.do?id=" + 1001);
+		// 수정 완료 후 알림창을 띄우기 위해 파라미터 추가
+		response.sendRedirect(request.getContextPath() + "/Config/membersInfo.do?id=" + companyId + "&save=success");
 		return null;
 	}
 
-	// 화면에서 넘어온 날짜 문자열(yyyy-MM-dd 또는 yyyyMMdd)을 java.sql.Date로 변환
+	// 화면에서 넘어온 날짜 문자열(yyyy-MM-dd 또는 yyyyMMdd)
 	private java.sql.Date parseDate(String value) {
 		if (value == null || value.trim().isEmpty()) {
-			return null; // 값이 없으면 null 반환
+			return null; 
 		}
 		String trimmed = value.trim();
 		try {
 			if (trimmed.contains("-")) {
-				// yyyy-MM-dd 형태일 때 변환
 				return java.sql.Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ISO_LOCAL_DATE));
 			} else {
-				// yyyyMMdd 형태일 때 변환
 				return java.sql.Date.valueOf(LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyyMMdd")));
 			}
 		} catch (Exception e) {
-			return null; // 형식이 안 맞아도 에러를 내지 않고 null 반환
+			return null; 
 		}
 	}
 }
