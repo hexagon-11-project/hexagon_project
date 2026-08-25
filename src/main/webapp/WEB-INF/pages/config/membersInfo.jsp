@@ -292,3 +292,19 @@ request.setAttribute("pageJs", null);
 
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // URL 파라미터를 읽어옵니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // save 파라미터 값이 'success'이면 알림창을 띄웁니다.
+        if (urlParams.get('save') === 'success') {
+            alert('저장되었습니다.');
+            
+            // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL에서 파라미터를 정리합니다.
+            const companyId = urlParams.get('id') || '1001';
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?id=" + companyId;
+            window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+        }
+    });
+</script>
