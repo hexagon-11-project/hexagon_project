@@ -32,3 +32,17 @@
 		grid-template-columns: 1fr
 	}
 }
+
+.required-mark {
+	color: #e03131 !important;
+	margin-right: 2px;
+}
+.required-mark {
+    color: #e03131 !important;
+    margin-right: 2px;
+}
+
+th .required-mark,
+.source-form-table th .required-mark {
+    color: #e03131 !important;
+}

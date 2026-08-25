@@ -2,9 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-request.setAttribute("pageTitle", "급여이체 신청");
-request.setAttribute("pageSection", "급여관리");
-request.setAttribute("pageDescription", "급여작업의 사원별 계좌와 실지급액을 확인한 후 이체신청 완료내역을 저장합니다.");
+request.setAttribute("pageTitle", "給与振込の申し込み");
+request.setAttribute("pageSection", "給与管理");
+request.setAttribute("pageDescription", "給与処理における社員ごとの口座と実支給額を確認した後、振込申請の完了履歴を保存します。");
 request.setAttribute("activeKey", "transfer-request");
 request.setAttribute("pageCss", "payroll.css");
 request.setAttribute("pageJs", null);
@@ -16,27 +16,43 @@ request.setAttribute("pageJs", null);
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
 		<div class="field">
-			<label>귀속연</label>
-			<input type="number" class="input" name="payYear" value="${payYear}" min="2000" max="2100" required>
+			<label>帰属年</label> <input type="number" class="input" name="payYear"
+				value="${payYear}" min="2000" max="2100" required>
 		</div>
 		<div class="field">
-			<label>귀속월</label>
-			<select class="select" name="payMonth">
+			<label>帰属月</label> <select class="select" name="payMonth">
 				<c:forEach var="m" begin="1" end="12">
-					<fmt:formatNumber var="mm" value="${m}" pattern="00"/>
+					<fmt:formatNumber var="mm" value="${m}" pattern="00" />
 					<option value="${mm}" ${payMonth == mm ? 'selected' : ''}>${mm}</option>
 				</c:forEach>
 			</select>
 		</div>
 		<div class="field">
-			<label>급여차수</label>
-			<select class="select" name="paySequence">
-				<option value="1" ${paySequence == 1 ? 'selected' : ''}>1차</option>
-				<option value="2" ${paySequence == 2 ? 'selected' : ''}>2차</option>
+			<label>給与回</label> <select class="select" name="paySequence">
+				<option value="1" ${paySequence == 1 ? 'selected' : ''}>給与
+					01回</option>
+				<option value="2" ${paySequence == 2 ? 'selected' : ''}>給与
+					02回</option>
+				<option value="3" ${paySequence == 3 ? 'selected' : ''}>給与
+					03回</option>
+				<option value="4" ${paySequence == 4 ? 'selected' : ''}>給与
+					04回</option>
+				<option value="5" ${paySequence == 5 ? 'selected' : ''}>給与
+					05回</option>
+				<option value="6" ${paySequence == 6 ? 'selected' : ''}>給与
+					06回</option>
+				<option value="7" ${paySequence == 7 ? 'selected' : ''}>給与
+					07回</option>
+				<option value="8" ${paySequence == 8 ? 'selected' : ''}>給与
+					08回</option>
+				<option value="9" ${paySequence == 9 ? 'selected' : ''}>給与
+					09回</option>
+				<option value="10" ${paySequence == 10 ? 'selected' : ''}>給与
+					10回</option>
 			</select>
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
@@ -45,7 +61,7 @@ request.setAttribute("pageJs", null);
 	<div class="info-note">${message}</div>
 </c:if>
 <c:if test="${not empty errorMessage}">
-	<div class="info-note" style="color:#c0392b;">${errorMessage}</div>
+	<div class="info-note" style="color: #c0392b;">${errorMessage}</div>
 </c:if>
 
 <%--
@@ -55,55 +71,56 @@ request.setAttribute("pageJs", null);
   - 체크 안 한 행은 파라미터로 안 넘어가므로 신청 대상에서 제외된다.
 --%>
 <form action="<%=ctx%>/Payment/paymenttransfer.do" method="post">
-	<input type="hidden" name="action" value="apply">
-	<input type="hidden" name="payYear" value="${payYear}">
-	<input type="hidden" name="payMonth" value="${payMonth}">
-	<input type="hidden" name="paySequence" value="${paySequence}">
+	<input type="hidden" name="action" value="apply"> <input
+		type="hidden" name="payYear" value="${payYear}"> <input
+		type="hidden" name="payMonth" value="${payMonth}"> <input
+		type="hidden" name="paySequence" value="${paySequence}">
 
 	<section class="card">
 		<div class="card-header">
-			<h2 class="section-title">이체 신청 대상</h2>
+			<h2 class="section-title">振替申請対象</h2>
 		</div>
 		<div class="card-body">
 			<div class="table-wrap">
 				<table class="data-table">
 					<thead>
 						<tr>
-							<th>선택</th>
-							<th>성명</th>
-							<th>부서</th>
-							<th>직위</th>
-							<th>금융기관</th>
-							<th>계좌번호</th>
-							<th>실지급액</th>
+							<th>選択</th>
+							<th>名前</th>
+							<th>部署</th>
+							<th>職位</th>
+							<th>金融機関</th>
+							<th>口座番号</th>
+							<th>実支給額</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:choose>
 							<c:when test="${not searched}">
 								<tr>
-									<td colspan="7" style="text-align:center;">귀속연/월/차수를 선택한 뒤 조회하세요.</td>
+									<td colspan="7" style="text-align: center;">帰属年・月・次数を選択してから照会してください。</td>
 								</tr>
 							</c:when>
 							<c:when test="${empty transferList}">
 								<tr>
-									<td colspan="7" style="text-align:center;">조회된 이체 대상이 없습니다.</td>
+									<td colspan="7" style="text-align: center;">照会された振込対象がありません。</td>
 								</tr>
 							</c:when>
 							<c:otherwise>
 								<c:forEach var="row" items="${transferList}">
 									<tr>
 										<td>
-											<%-- 체크된 행만 서버로 전달. value=PAYROLL_EMPLOYEE_ID --%>
-											<input type="checkbox" name="payrollEmployeeId"
-												value="${row.payrollEmployeeId}" checked>
+											<%-- 체크된 행만 서버로 전달. value=PAYROLL_EMPLOYEE_ID --%> <input
+											type="checkbox" name="payrollEmployeeId"
+											value="${row.payrollEmployeeId}" checked>
 										</td>
 										<td>${row.employeeName}</td>
 										<td>${empty row.department ? '-' : row.department}</td>
 										<td>${empty row.position ? '-' : row.position}</td>
 										<td>${empty row.bankName ? '-' : row.bankName}</td>
 										<td>${empty row.bankAccount ? '-' : row.bankAccount}</td>
-										<td><fmt:formatNumber value="${row.netPayAmount}" pattern="#,###"/></td>
+										<td><fmt:formatNumber value="${row.netPayAmount}"
+												pattern="#,###" /></td>
 									</tr>
 								</c:forEach>
 							</c:otherwise>
@@ -112,31 +129,33 @@ request.setAttribute("pageJs", null);
 				</table>
 			</div>
 			<div class="tfoot-summary">
-				<span>신청 인원 ${targetCount}명</span>
-				<span>이체 신청액 <fmt:formatNumber value="${totalAmount}" pattern="#,###"/>원</span>
+				<span>申込人数 ${targetCount}人</span> <span>振替申請額 <fmt:formatNumber
+						value="${totalAmount}" pattern="#,###" />円
+				</span>
 			</div>
 		</div>
 	</section>
 
 	<section class="card">
 		<div class="card-header">
-			<h2 class="section-title">신청정보</h2>
+			<h2 class="section-title">申請情報</h2>
 		</div>
 		<div class="card-body">
 			<dl class="bank-box">
-				<dt>출금은행</dt>
-				<dd>국민은행</dd>
-				<dt>출금계좌</dt>
+				<dt>出金銀行</dt>
+				<dd>国民銀行</dd>
+				<dt>出金口座</dt>
 				<dd>000-****-0000</dd>
-				<dt>신청일</dt>
+				<dt>申請日</dt>
 				<dd>2026-08-04</dd>
-				<dt>처리방식</dt>
-				<dd>이체신청 내역 저장</dd>
+				<dt>処理方式</dt>
+				<dd>振込申請履歴の保存</dd>
 			</dl>
-			<div class="info-note">실제 은행 이체는 수행하지 않으며, 신청 버튼을 누르면 신청완료 상태로 저장됩니다.</div>
+			<div class="info-note">実際の銀行振込は行われず、申請ボタンを押すと「申請完了」状態で保存されます。</div>
 			<div class="button-row">
 				<%-- 클릭 시 체크된 행 ID만 전송 → PAYROLL_TRANSFER_REQUEST INSERT/UPDATE --%>
-				<button type="submit" class="btn btn-primary" ${empty transferList ? 'disabled' : ''}>급여이체 신청</button>
+				<button type="submit" class="btn btn-primary"
+					${empty transferList ? 'disabled' : ''}>給与振込の申し込み</button>
 			</div>
 		</div>
 	</section>

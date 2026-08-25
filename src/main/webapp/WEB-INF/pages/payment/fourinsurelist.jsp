@@ -2,9 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-request.setAttribute("pageTitle", "4대보험 공제내역");
-request.setAttribute("pageSection", "급여관리");
-request.setAttribute("pageDescription", "귀속연월·차수별 사원의 국민연금, 건강보험, 장기요양보험, 고용보험 공제액을 조회합니다.");
+request.setAttribute("pageTitle", "4大保険控除内訳");
+request.setAttribute("pageSection", "給与管理");
+request.setAttribute("pageDescription", "帰属年月・回数別に、従業員の国民年金、健康保険、長期療養保険、雇用保険の控除額を照会します。");
 request.setAttribute("activeKey", "insurance-deduction");
 request.setAttribute("pageCss", "payroll.css?v=4");
 request.setAttribute("pageJs", null);
@@ -16,25 +16,25 @@ request.setAttribute("pageJs", null);
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
 		<div class="field">
-			<label>귀속연월</label> <input type="month" class="input"
+			<label>帰属年月</label> <input type="month" class="input"
 				name="payYearMonth" value="${payYearMonth}">
 		</div>
 		<div class="field">
-			<label>급여차수</label> <select class="select" name="paySequence">
-				<option value="1" ${paySequence == 1 ? 'selected' : ''}>급여-01차</option>
-				<option value="2" ${paySequence == 2 ? 'selected' : ''}>급여-02차</option>
-				<option value="3" ${paySequence == 3 ? 'selected' : ''}>급여-03차</option>
-				<option value="4" ${paySequence == 4 ? 'selected' : ''}>급여-04차</option>
-				<option value="5" ${paySequence == 5 ? 'selected' : ''}>급여-05차</option>
-				<option value="6" ${paySequence == 6 ? 'selected' : ''}>급여-06차</option>
-				<option value="7" ${paySequence == 7 ? 'selected' : ''}>급여-07차</option>
-				<option value="8" ${paySequence == 8 ? 'selected' : ''}>급여-08차</option>
-				<option value="9" ${paySequence == 9 ? 'selected' : ''}>급여-09차</option>
-				<option value="10" ${paySequence == 10 ? 'selected' : ''}>급여-10차</option>
+			<label>給与回</label> <select class="select" name="paySequence">
+				<option value="1" ${paySequence == 1 ? 'selected' : ''}>給与 01回</option>
+				<option value="2" ${paySequence == 2 ? 'selected' : ''}>給与 02回</option>
+				<option value="3" ${paySequence == 3 ? 'selected' : ''}>給与 03回</option>
+				<option value="4" ${paySequence == 4 ? 'selected' : ''}>給与 04回</option>
+				<option value="5" ${paySequence == 5 ? 'selected' : ''}>給与 05回</option>
+				<option value="6" ${paySequence == 6 ? 'selected' : ''}>給与 06回</option>
+				<option value="7" ${paySequence == 7 ? 'selected' : ''}>給与 07回</option>
+				<option value="8" ${paySequence == 8 ? 'selected' : ''}>給与 08回</option>
+				<option value="9" ${paySequence == 9 ? 'selected' : ''}>給与 09回</option>
+				<option value="10" ${paySequence == 10 ? 'selected' : ''}>給与 10回</option>
 			</select>
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
@@ -45,12 +45,12 @@ request.setAttribute("pageJs", null);
 
 <section class="card">
 	<div class="card-header">
-		<h2 class="section-title">4대보험 공제내역</h2>
+		<h2 class="section-title">4大保険控除内訳</h2>
 	</div>
 	<div class="card-body">
 		<c:if test="${not empty ledger}">
 			<dl class="bank-box">
-				<dt>정산기간</dt>
+				<dt>精算期間</dt>
 				<dd>
 					<c:choose>
 						<c:when
@@ -64,7 +64,7 @@ request.setAttribute("pageJs", null);
 						</c:otherwise>
 					</c:choose>
 				</dd>
-				<dt>급여지급일</dt>
+				<dt>給与支給日</dt>
 				<dd>
 					<c:choose>
 						<c:when test="${empty ledger.paymentDate}">-</c:when>
@@ -81,26 +81,26 @@ request.setAttribute("pageJs", null);
 				<table class="data-table">
 					<thead>
 						<tr>
-							<th colspan="5" class="four-insure-emp-head">사원정보</th>
+							<th colspan="5" class="four-insure-emp-head">社員情報</th>
 						</tr>
 						<tr>
-							<th>구분</th>
-							<th>성명</th>
-							<th>입사일</th>
-							<th>부서</th>
-							<th>직위</th>
+							<th>区分</th>
+							<th>名前</th>
+							<th>入社日</th>
+							<th>部署</th>
+							<th>職位</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:choose>
 							<c:when test="${not searched}">
 								<tr>
-									<td colspan="5" class="center">귀속연월/차수를 선택한 뒤 조회하세요.</td>
+									<td colspan="5" class="center">帰属年月／回数を選択してから照会してください。</td>
 								</tr>
 							</c:when>
 							<c:when test="${empty employeeList}">
 								<tr>
-									<td colspan="5" class="center">조회된 4대보험 공제내역이 없습니다.</td>
+									<td colspan="5" class="center">照会された4大保険の控除内訳はありません。</td>
 								</tr>
 							</c:when>
 							<c:otherwise>
@@ -125,7 +125,7 @@ request.setAttribute("pageJs", null);
 					<c:if test="${searched and not empty employeeList}">
 						<tfoot>
 							<tr>
-								<td colspan="5" class="center">합계</td>
+								<td colspan="5" class="center">合計</td>
 							</tr>
 						</tfoot>
 					</c:if>
@@ -135,40 +135,40 @@ request.setAttribute("pageJs", null);
 				<table class="data-table">
 					<thead>
 						<tr>
-							<th colspan="3" class="four-insure-np-head">국민연금</th>
-							<th colspan="3" class="four-insure-hi-head">건강보험</th>
-							<th colspan="3" class="four-insure-ltc-head">노인장기요양보험</th>
-							<th colspan="3" class="four-insure-ei-head">고용보험</th>
-							<th colspan="3" class="four-insure-grand-head">총 합계</th>
+							<th colspan="3" class="four-insure-np-head">国民年金</th>
+							<th colspan="3" class="four-insure-hi-head">健康保険</th>
+							<th colspan="3" class="four-insure-ltc-head">老人長期療養保険</th>
+							<th colspan="3" class="four-insure-ei-head">雇用保険</th>
+							<th colspan="3" class="four-insure-grand-head">総計</th>
 						</tr>
 						<tr>
-							<th>사업주</th>
-							<th>근로자</th>
-							<th>합계</th>
-							<th>사업주</th>
-							<th>근로자</th>
-							<th>합계</th>
-							<th>사업주</th>
-							<th>근로자</th>
-							<th>합계</th>
-							<th>사업주</th>
-							<th>근로자</th>
-							<th>합계</th>
-							<th>사업주</th>
-							<th>근로자</th>
-							<th>합계</th>
+							<th>事業主</th>
+							<th>労働者</th>
+							<th>合計</th>
+							<th>事業主</th>
+							<th>労働者</th>
+							<th>合計</th>
+							<th>事業主</th>
+							<th>労働者</th>
+							<th>合計</th>
+							<th>事業主</th>
+							<th>労働者</th>
+							<th>合計</th>
+							<th>事業主</th>
+							<th>労働者</th>
+							<th>合計</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:choose>
 							<c:when test="${not searched}">
 								<tr>
-									<td colspan="15" class="center">귀속연월/차수를 선택한 뒤 조회하세요.</td>
+									<td colspan="15" class="center">帰属年月／回数を選択してから照会してください。</td>
 								</tr>
 							</c:when>
 							<c:when test="${empty employeeList}">
 								<tr>
-									<td colspan="15" class="center">조회된 4대보험 공제내역이 없습니다.</td>
+									<td colspan="15" class="center">照会された4大保険の控除内訳はありません。</td>
 								</tr>
 							</c:when>
 							<c:otherwise>
@@ -249,8 +249,8 @@ request.setAttribute("pageJs", null);
 			</div>
 		</div>
 		<div class="tfoot-summary">
-			<span>조회 인원 ${targetCount}명</span> <span>4대보험 합계 <fmt:formatNumber
-					value="${totalAmount}" pattern="#,###" />원
+			<span>照会人数 ${targetCount}人</span> <span>4大社会保険の合計<fmt:formatNumber
+					value="${totalAmount}" pattern="#,###" />円
 			</span>
 		</div>
 	</div>

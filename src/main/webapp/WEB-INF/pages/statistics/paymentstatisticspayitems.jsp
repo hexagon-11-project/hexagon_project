@@ -4,96 +4,93 @@
 <%@ page import="java.text.DecimalFormat"%>
 <%@ page import="statistics.model.EmployeeSalaryStatistics"%>
 <%@ page import="statistics.model.SalaryItemStatistics"%>
-<%!
-private static final String[] DONUT_PALETTE = {
-		"#3f8fc4", "#e76c64", "#6f7b87", "#50a57a", "#d19a43", "#8d75b8", "#58aeb2"
-};
+<%!private static final String[] DONUT_PALETTE = {"#3f8fc4", "#e76c64", "#6f7b87", "#50a57a", "#d19a43", "#8d75b8",
+			"#58aeb2"};
 
-private String nvl(String value) {
-	return value == null ? "" : value;
-}
-
-private String esc(String value) {
-	if (value == null || value.isEmpty()) {
-		return "";
+	private String nvl(String value) {
+		return value == null ? "" : value;
 	}
-	return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
-}
 
-private String formatRatio(Double ratio) {
-	if (ratio == null) {
-		return "0.0%";
-	}
-	return String.format("%.1f%%", ratio);
-}
-
-private String toValuesJson(long... values) {
-	StringBuilder sb = new StringBuilder("[");
-	for (int i = 0; i < values.length; i++) {
-		if (i > 0) {
-			sb.append(',');
+	private String esc(String value) {
+		if (value == null || value.isEmpty()) {
+			return "";
 		}
-		sb.append(values[i]);
+		return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
 	}
-	sb.append(']');
-	return sb.toString();
-}
 
-private String toItemValuesJson(List<SalaryItemStatistics> items) {
-	StringBuilder sb = new StringBuilder("[");
-	if (items != null) {
-		for (int i = 0; i < items.size(); i++) {
+	private String formatRatio(Double ratio) {
+		if (ratio == null) {
+			return "0.0%";
+		}
+		return String.format("%.1f%%", ratio);
+	}
+
+	private String toValuesJson(long... values) {
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < values.length; i++) {
 			if (i > 0) {
 				sb.append(',');
 			}
-			sb.append(items.get(i).getAmount());
+			sb.append(values[i]);
 		}
+		sb.append(']');
+		return sb.toString();
 	}
-	sb.append(']');
-	return sb.toString();
-}
 
-private String escJson(String value) {
-	if (value == null) {
-		return "";
-	}
-	return value.replace("\\", "\\\\").replace("\"", "\\\"");
-}
-
-private String toLabelsJson(String... labels) {
-	StringBuilder sb = new StringBuilder("[");
-	for (int i = 0; i < labels.length; i++) {
-		if (i > 0) {
-			sb.append(',');
+	private String toItemValuesJson(List<SalaryItemStatistics> items) {
+		StringBuilder sb = new StringBuilder("[");
+		if (items != null) {
+			for (int i = 0; i < items.size(); i++) {
+				if (i > 0) {
+					sb.append(',');
+				}
+				sb.append(items.get(i).getAmount());
+			}
 		}
-		sb.append('"').append(escJson(labels[i])).append('"');
+		sb.append(']');
+		return sb.toString();
 	}
-	sb.append(']');
-	return sb.toString();
-}
 
-private String toItemLabelsJson(List<SalaryItemStatistics> items) {
-	StringBuilder sb = new StringBuilder("[");
-	if (items != null) {
-		for (int i = 0; i < items.size(); i++) {
+	private String escJson(String value) {
+		if (value == null) {
+			return "";
+		}
+		return value.replace("\\", "\\\\").replace("\"", "\\\"");
+	}
+
+	private String toLabelsJson(String... labels) {
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < labels.length; i++) {
 			if (i > 0) {
 				sb.append(',');
 			}
-			sb.append('"').append(escJson(nvl(items.get(i).getItemName()))).append('"');
+			sb.append('"').append(escJson(labels[i])).append('"');
 		}
+		sb.append(']');
+		return sb.toString();
 	}
-	sb.append(']');
-	return sb.toString();
-}
 
-private String paletteColor(int index) {
-	return DONUT_PALETTE[index % DONUT_PALETTE.length];
-}
-%>
+	private String toItemLabelsJson(List<SalaryItemStatistics> items) {
+		StringBuilder sb = new StringBuilder("[");
+		if (items != null) {
+			for (int i = 0; i < items.size(); i++) {
+				if (i > 0) {
+					sb.append(',');
+				}
+				sb.append('"').append(escJson(nvl(items.get(i).getItemName()))).append('"');
+			}
+		}
+		sb.append(']');
+		return sb.toString();
+	}
+
+	private String paletteColor(int index) {
+		return DONUT_PALETTE[index % DONUT_PALETTE.length];
+	}%>
 <%
-request.setAttribute("pageTitle", "급여항목 구성 통계");
-request.setAttribute("pageSection", "급여통계");
-request.setAttribute("pageDescription", "귀속연월·사원별 지급항목 금액과 구성비를 원형 그래프와 표로 확인합니다.");
+request.setAttribute("pageTitle", "給与項目構成統計");
+request.setAttribute("pageSection", "給与統計");
+request.setAttribute("pageDescription", "帰属年月・社員別の支給項目金額と構成比を、円グラフと表で確認します。");
 request.setAttribute("activeKey", "item-composition");
 request.setAttribute("pageCss", "statistics.css?v=matrix3");
 request.setAttribute("pageJs", "charts.js?v=donutTip1");
@@ -133,28 +130,29 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 %>
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
-<form action="<%=ctx%>/Statistics/paymentStatisticsPayItems.do" method="get">
+<form action="<%=ctx%>/Statistics/paymentStatisticsPayItems.do"
+	method="get">
 	<section class="filter-bar">
 		<div class="field">
-			<label>귀속연월</label>
-			<input type="month" class="input" name="yearMonth" value="<%=yearMonthValue%>">
+			<label>帰属年月</label> <input type="month" class="input"
+				name="yearMonth" value="<%=yearMonthValue%>">
 		</div>
 		<div class="field">
-			<label>사원</label>
-			<input type="text" class="input" id="employeeNameInput" name="employeeName"
-				value="<%=employeeNameValue%>" placeholder="사원을 선택하세요" readonly
+			<label>社員</label> <input type="text" class="input"
+				id="employeeNameInput" name="employeeName"
+				value="<%=employeeNameValue%>" placeholder="社員を選択してください" readonly
 				style="cursor: pointer;"
 				data-employee-popup-url="<%=ctx%>/Statistics/paymentStatisticsPayItemsEmployeePopup.do"
 				onclick="openEmployeePopup()">
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 <section class="card chart-card">
 	<div class="card-header">
-		<h2 class="section-title">급여항목 구성</h2>
+		<h2 class="section-title">給与項目の構成</h2>
 	</div>
 	<div class="card-body">
 		<%
@@ -163,76 +161,75 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 		<div class="empty-state"><%=esc(errorMessage)%></div>
 		<%
 		} else {
-			long totalPay = stats == null ? 0L : stats.getTotalPayAmount();
-			long totalDeduction = stats == null ? 0L : stats.getTotalDeductionAmount();
+		long totalPay = stats == null ? 0L : stats.getTotalPayAmount();
+		long totalDeduction = stats == null ? 0L : stats.getTotalDeductionAmount();
 		%>
 		<div class="donut-triple">
 			<div class="donut-panel">
 				<div class="chart-canvas-wrap">
-					<canvas data-chart="donut"
-						data-center="지급/공제"
+					<canvas data-chart="donut" data-center="支給／控除"
 						data-labels='<%=toLabelsJson("지급항목", "공제항목")%>'
 						data-values="<%=toValuesJson(totalPay, totalDeduction)%>"></canvas>
 					<div class="chart-tooltip" hidden></div>
 				</div>
-				<p class="chart-note">지급항목 + 공제항목</p>
+				<p class="chart-note">支給項目 + 控除項目</p>
 				<ul class="donut-legend">
-					<li><span class="swatch" style="background:<%=paletteColor(0)%>"></span>
-						지급항목 <%=stats == null ? "0.0%" : formatRatio(stats.getPaymentRatio())%></li>
-					<li><span class="swatch" style="background:<%=paletteColor(1)%>"></span>
-						공제항목 <%=stats == null ? "0.0%" : formatRatio(stats.getDeductionRatio())%></li>
+					<li><span class="swatch"
+						style="background:<%=paletteColor(0)%>"></span> 支給項目 <%=stats == null ? "0.0%" : formatRatio(stats.getPaymentRatio())%></li>
+					<li><span class="swatch"
+						style="background:<%=paletteColor(1)%>"></span> 控除項目 <%=stats == null ? "0.0%" : formatRatio(stats.getDeductionRatio())%></li>
 				</ul>
 			</div>
 			<div class="donut-panel">
 				<div class="chart-canvas-wrap">
-					<canvas data-chart="donut"
-						data-center="지급항목"
+					<canvas data-chart="donut" data-center="支給項目"
 						data-labels='<%=toItemLabelsJson(payItems)%>'
 						data-values="<%=toItemValuesJson(payItems)%>"></canvas>
 					<div class="chart-tooltip" hidden></div>
 				</div>
-				<p class="chart-note">지급 세부항목</p>
+				<p class="chart-note">支払詳細項目</p>
 				<ul class="donut-legend">
 					<%
 					if (payItems.isEmpty()) {
 					%>
-					<li>조회된 지급항목이 없습니다.</li>
+					<li>該当する支給項目はありません。</li>
 					<%
 					} else {
-						for (int i = 0; i < payItems.size(); i++) {
-							SalaryItemStatistics item = payItems.get(i);
+					for (int i = 0; i < payItems.size(); i++) {
+						SalaryItemStatistics item = payItems.get(i);
 					%>
-					<li><span class="swatch" style="background:<%=paletteColor(i)%>"></span>
-						<%=esc(nvl(item.getItemName()))%> <%=formatRatio(item.getCompositionRatio())%></li>
+					<li><span class="swatch"
+						style="background:<%=paletteColor(i)%>"></span> <%=esc(nvl(item.getItemName()))%>
+						<%=formatRatio(item.getCompositionRatio())%></li>
 					<%
-						}
+					}
 					}
 					%>
 				</ul>
 			</div>
 			<div class="donut-panel">
 				<div class="chart-canvas-wrap">
-					<canvas data-chart="donut"
-						data-center="공제항목"
+					<canvas data-chart="donut" data-center="控除項目"
 						data-labels='<%=toItemLabelsJson(deductionItems)%>'
 						data-values="<%=toItemValuesJson(deductionItems)%>"></canvas>
 					<div class="chart-tooltip" hidden></div>
 				</div>
-				<p class="chart-note">공제 세부항목</p>
+				<p class="chart-note">控除の詳細</p>
 				<ul class="donut-legend">
 					<%
 					if (deductionItems.isEmpty()) {
 					%>
-					<li>조회된 공제항목이 없습니다.</li>
+					<li>該当する控除項目はありません。</li>
 					<%
 					} else {
-						for (int i = 0; i < deductionItems.size(); i++) {
-							SalaryItemStatistics item = deductionItems.get(i);
+					for (int i = 0; i < deductionItems.size(); i++) {
+						SalaryItemStatistics item = deductionItems.get(i);
 					%>
-					<li><span class="swatch" style="background:<%=paletteColor(i)%>"></span>
-						<%=esc(nvl(item.getItemName()))%> <%=formatRatio(item.getCompositionRatio())%></li>
+					<li><span class="swatch"
+						style="background:<%=paletteColor(i)%>"></span> <%=esc(nvl(item.getItemName()))%>
+						<%=formatRatio(item.getCompositionRatio())%></li>
 					<%
-						}
+					}
 					}
 					%>
 				</ul>
@@ -245,7 +242,7 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 </section>
 <section class="card">
 	<div class="card-header">
-		<h2 class="section-title">지급·공제 내역</h2>
+		<h2 class="section-title">支給・控除内訳</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
@@ -264,7 +261,7 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 				</colgroup>
 				<thead>
 					<tr>
-						<th class="col-label">지급항목</th>
+						<th class="col-label">支給項目</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < payItems.size() ? payItems.get(i) : null;
@@ -273,13 +270,13 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 						<%
 						}
 						%>
-						<th>합계</th>
+						<th>合計</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<th class="col-label sub-label">ㄴ 금액(원)</th>
+						<th class="col-label sub-label">ㄴ 金額(円)</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < payItems.size() ? payItems.get(i) : null;
@@ -292,7 +289,7 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 						<td></td>
 					</tr>
 					<tr>
-						<th class="col-label sub-label">ㄴ 구성비율</th>
+						<th class="col-label sub-label">ㄴ 構成比率</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < payItems.size() ? payItems.get(i) : null;
@@ -306,7 +303,8 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 					</tr>
 				</tbody>
 			</table>
-			<table class="data-table stats-matrix item-composition-matrix deduction-matrix">
+			<table
+				class="data-table stats-matrix item-composition-matrix deduction-matrix">
 				<colgroup>
 					<col class="col-label-w">
 					<%
@@ -321,7 +319,7 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 				</colgroup>
 				<thead>
 					<tr>
-						<th class="col-label">공제항목</th>
+						<th class="col-label">控除項目</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < deductionItems.size() ? deductionItems.get(i) : null;
@@ -330,13 +328,13 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 						<%
 						}
 						%>
-						<th>합계</th>
-						<th class="net-pay-head">실지급액</th>
+						<th>合計</th>
+						<th class="net-pay-head">実支給額</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<th class="col-label sub-label">ㄴ 금액(원)</th>
+						<th class="col-label sub-label">ㄴ 金額(円)</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < deductionItems.size() ? deductionItems.get(i) : null;
@@ -349,7 +347,7 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 						<td class="net-pay-value" rowspan="2"><%=moneyFormat.format(netPayAmount)%></td>
 					</tr>
 					<tr>
-						<th class="col-label sub-label">ㄴ 구성비율</th>
+						<th class="col-label sub-label">ㄴ 構成比率</th>
 						<%
 						for (int i = 0; i < itemColCount; i++) {
 							SalaryItemStatistics item = i < deductionItems.size() ? deductionItems.get(i) : null;
@@ -404,7 +402,9 @@ long netPayAmount = hasResult ? stats.getNetPayAmount() : 0L;
 <%
 if (errorMessage != null) {
 %>
-<script>alert('<%=errorMessageJs%>');</script>
+<script>alert('<%=errorMessageJs%>
+	');
+</script>
 <%
 }
 %>

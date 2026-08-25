@@ -5,17 +5,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-request.setAttribute("pageTitle", "연도별 전체급여 통계");
-request.setAttribute("pageSection", "급여통계");
-request.setAttribute("pageDescription", "최근 10년 회사 전체 급여총액과 급여인원 추이를 연도별로 확인합니다.");
+request.setAttribute("pageTitle", "年度別給与総額統計");
+request.setAttribute("pageSection", "給与統計");
+request.setAttribute("pageDescription", "過去10年間の会社全体の給与総額と給与支給対象人数の推移を、年度別に確認します。");
 request.setAttribute("activeKey", "paymentstatisticsall");
 request.setAttribute("pageCss", "statistics.css?v=3");
 /* 구버전 charts.js(캐시)는 combo를 못 그림 → 버전 쿼리로 강제 갱신 */
 request.setAttribute("pageJs", "charts.js?v=combo4");
 
 @SuppressWarnings("unchecked")
-List<AnnualTotalStatistics> annualTotalList =
-		(List<AnnualTotalStatistics>) request.getAttribute("annualTotalList");
+List<AnnualTotalStatistics> annualTotalList = (List<AnnualTotalStatistics>) request.getAttribute("annualTotalList");
 if (annualTotalList == null) {
 	annualTotalList = new ArrayList<>();
 }
@@ -30,7 +29,7 @@ for (int i = 0; i < annualTotalList.size(); i++) {
 		barValuesJson.append(',');
 		lineValuesJson.append(',');
 	}
-	labelsJson.append('"').append(row.getYear()).append("년\"");
+	labelsJson.append('"').append(row.getYear()).append("年\"");
 	barValuesJson.append(row.getTotalSalaryAmount() / 1000L);
 	lineValuesJson.append(row.getAvgEmployeeCount());
 }
@@ -49,33 +48,33 @@ int currentYear = java.time.LocalDate.now().getYear();
 <form action="<%=ctx%>/Statistics/paymentStatisticsAll.do" method="get">
 	<section class="filter-bar">
 		<div class="field">
-			<label>기준 연도</label>
-			<select class="select" name="endYear">
+			<label>基準年</label> <select class="select" name="endYear">
 				<%
 				for (int y = currentYear + 1; y >= 2000; y--) {
 				%>
-				<option value="<%=y%>" <%=y == selectedEndYear ? "selected" : ""%>><%=y%>년</option>
+				<option value="<%=y%>" <%=y == selectedEndYear ? "selected" : ""%>><%=y%>年
+				</option>
 				<%
 				}
 				%>
 			</select>
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 
 <section class="card chart-card">
 	<div class="card-header">
-		<h2 class="section-title">최근 10년 전체급여 추이</h2>
+		<h2 class="section-title">最近10年の全給与推移</h2>
 	</div>
 	<div class="card-body">
 		<script>
 			window.paymentStatisticsAllChartData = {
 				labels: <%=labelsJson.toString()%>,
-				bar: { name: "전체 급여액 (천원)", values: <%=barValuesJson.toString()%> },
-				line: { name: "인원 (명)", values: <%=lineValuesJson.toString()%> }
+				bar: { name: "給与総額 (千円)", values: <%=barValuesJson.toString()%> },
+				line: { name: "人数 (人)", values: <%=lineValuesJson.toString()%> }
 			};
 		</script>
 		<div class="chart-canvas-wrap">
@@ -326,16 +325,16 @@ int currentYear = java.time.LocalDate.now().getYear();
 
 <section class="card">
 	<div class="card-header">
-		<h2 class="section-title">연도별 전체급여 내역</h2>
+		<h2 class="section-title">年度別給与総額の内訳</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
 			<table class="data-table stats-matrix">
 				<thead>
 					<tr>
-						<th class="col-label">구분</th>
+						<th class="col-label">区分</th>
 						<c:forEach var="row" items="${annualTotalList}">
-							<th>${row.year}년</th>
+							<th>${row.year}年</th>
 						</c:forEach>
 					</tr>
 				</thead>
@@ -343,62 +342,60 @@ int currentYear = java.time.LocalDate.now().getYear();
 					<c:choose>
 						<c:when test="${empty annualTotalList}">
 							<tr>
-								<td colspan="11" style="text-align:center;">조회된 데이터가 없습니다.</td>
+								<td colspan="11" style="text-align: center;">検索されたデータがありません。</td>
 							</tr>
 						</c:when>
 						<c:otherwise>
 							<tr>
-								<th class="col-label">전체 급여액 (천원)</th>
+								<th class="col-label">給与総額 (千円)</th>
 								<c:forEach var="row" items="${annualTotalList}">
-									<td>
-										<fmt:formatNumber value="${row.totalSalaryAmount / 1000}" pattern="#,###"/>
-									</td>
+									<td><fmt:formatNumber
+											value="${row.totalSalaryAmount / 1000}" pattern="#,###" /></td>
 								</c:forEach>
 							</tr>
 							<tr>
-								<th class="col-label sub-label">└ 증가율</th>
+								<th class="col-label sub-label">└ 増加率</th>
 								<c:forEach var="row" items="${annualTotalList}">
-									<td>
-										<c:choose>
+									<td><c:choose>
 											<c:when test="${empty row.salaryGrowthRate}"></c:when>
 											<c:when test="${row.salaryGrowthRate gt 0}">
-												<span class="rate-up"><fmt:formatNumber value="${row.salaryGrowthRate}" pattern="0.0"/>%</span>
+												<span class="rate-up"><fmt:formatNumber
+														value="${row.salaryGrowthRate}" pattern="0.0" />%</span>
 											</c:when>
 											<c:when test="${row.salaryGrowthRate lt 0}">
-												<span class="rate-down"><fmt:formatNumber value="${row.salaryGrowthRate}" pattern="0.0"/>%</span>
+												<span class="rate-down"><fmt:formatNumber
+														value="${row.salaryGrowthRate}" pattern="0.0" />%</span>
 											</c:when>
 											<c:otherwise>
 												<span class="rate-zero">0.0%</span>
 											</c:otherwise>
-										</c:choose>
-									</td>
+										</c:choose></td>
 								</c:forEach>
 							</tr>
 							<tr>
-								<th class="col-label">인원 (명)</th>
+								<th class="col-label">人数 (人)</th>
 								<c:forEach var="row" items="${annualTotalList}">
-									<td>
-										<fmt:formatNumber value="${row.avgEmployeeCount}" pattern="0.0"/>
-									</td>
+									<td><fmt:formatNumber value="${row.avgEmployeeCount}"
+											pattern="0.0" /></td>
 								</c:forEach>
 							</tr>
 							<tr>
-								<th class="col-label sub-label">└ 증가율</th>
+								<th class="col-label sub-label">└ 増加率</th>
 								<c:forEach var="row" items="${annualTotalList}">
-									<td>
-										<c:choose>
+									<td><c:choose>
 											<c:when test="${empty row.employeeGrowthRate}"></c:when>
 											<c:when test="${row.employeeGrowthRate gt 0}">
-												<span class="rate-up"><fmt:formatNumber value="${row.employeeGrowthRate}" pattern="0.0"/>%</span>
+												<span class="rate-up"><fmt:formatNumber
+														value="${row.employeeGrowthRate}" pattern="0.0" />%</span>
 											</c:when>
 											<c:when test="${row.employeeGrowthRate lt 0}">
-												<span class="rate-down"><fmt:formatNumber value="${row.employeeGrowthRate}" pattern="0.0"/>%</span>
+												<span class="rate-down"><fmt:formatNumber
+														value="${row.employeeGrowthRate}" pattern="0.0" />%</span>
 											</c:when>
 											<c:otherwise>
 												<span class="rate-zero">0.0%</span>
 											</c:otherwise>
-										</c:choose>
-									</td>
+										</c:choose></td>
 								</c:forEach>
 							</tr>
 						</c:otherwise>
