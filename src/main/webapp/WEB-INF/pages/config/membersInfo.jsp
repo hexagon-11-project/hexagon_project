@@ -210,8 +210,6 @@ request.setAttribute("pageJs", null);
 									회사 로고
 						</div>
 						<div class="mini-actions">
-							<button type="button" class="btn btn-sm">등록</button>
-							<button type="button" class="btn btn-sm">삭제</button>
 						</div>
 					</div>
 					<div class="brand-asset">
@@ -221,8 +219,6 @@ request.setAttribute("pageJs", null);
 									직인
 						</div>
 						<div class="mini-actions">
-							<button type="button" class="btn btn-sm">등록</button>
-							<button type="button" class="btn btn-sm">삭제</button>
 						</div>
 					</div>
 				</div>
