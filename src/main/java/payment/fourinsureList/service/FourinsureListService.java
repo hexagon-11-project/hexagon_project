@@ -10,8 +10,8 @@ import payment.fourinsureList.dao.FourinsureListDao;
 import payment.model.PaymentInsuranceLedger;
 
 /**
- * 4대보험 대장 Service.
- * 귀속연·월·차수로 정산기간·급여지급일과 사원별 4대보험 공제액을 조회한다.
+ * 4대보험 대장 조회 Service.
+ * 社会保険(4大保険)台帳の照会Service。
  */
 public class FourinsureListService {
 
@@ -19,7 +19,7 @@ public class FourinsureListService {
 
 	/**
 	 * 귀속연·월·차수로 4대보험 대장을 조회한다.
-	 * 귀속연월이 잘못됐거나 해당 급여차수가 없으면 null을 반환한다.
+	 * 帰属年・月・次数で社会保険(4大保険)台帳を照会する。
 	 */
 	public PaymentInsuranceLedger getInsuranceLedger(String payYear, String payMonth, int paySequence) {
 		String payYearMonth = toPayYearMonth(payYear, payMonth);
@@ -38,7 +38,10 @@ public class FourinsureListService {
 		}
 	}
 
-	/** 귀속연 + 귀속월 → PAY_YEAR_MONTH(YYYYMM) */
+	/**
+	 * 귀속연과 귀속월을 PAY_YEAR_MONTH(YYYYMM)로 합친다.
+	 * 帰属年と帰属月をPAY_YEAR_MONTH(YYYYMM)に結合する。
+	 */
 	public String toPayYearMonth(String payYear, String payMonth) {
 		if (payYear == null || payYear.trim().isEmpty() || payMonth == null || payMonth.trim().isEmpty()) {
 			return null;
@@ -54,25 +57,35 @@ public class FourinsureListService {
 		return year + month;
 	}
 
-	/** 사원별 4대보험 총합계(사업주+근로자)를 모두 더한 전체 합계. */
+	/**
+	 * 사원별 4대보험 총합계(사업주+근로자)를 모두 더한다.
+	 * 社員別の社会保険(4大保険)総計(事業主+労働者)をすべて加算する。
+	 */
 	public long sumInsuranceAmount(List<PaymentInsuranceLedger> employeeList) {
 		long sum = 0L;
 		if (employeeList == null) {
 			return sum;
 		}
 		for (PaymentInsuranceLedger row : employeeList) {
+			// 행 총계 = (국민+건강+장기요양+고용) × 2
+			// 行総計 = (国民年金+健康保険+介護保険+雇用保険) × 2。
 			sum += row.getGrandTotal();
 		}
 		return sum;
 	}
 
-	/** 항목별 전 사원 합계. 사업주/근로자 칸에 넣을 조회 금액만 합산한다. */
+	/**
+	 * 항목별 전 사원 합계를 만든다.
+	 * 項目別の全社員合計を作成する。
+	 */
 	public PaymentInsuranceLedger sumColumnTotals(List<PaymentInsuranceLedger> employeeList) {
 		PaymentInsuranceLedger totals = new PaymentInsuranceLedger();
 		if (employeeList == null) {
 			return totals;
 		}
 		for (PaymentInsuranceLedger row : employeeList) {
+			// 한 쪽(조회 금액)만 누적한다
+			// 一方(照会金額)だけを累積する。
 			totals.setNationalPension(totals.getNationalPension() + row.getNationalPension());
 			totals.setHealthInsurance(totals.getHealthInsurance() + row.getHealthInsurance());
 			totals.setLongTermCare(totals.getLongTermCare() + row.getLongTermCare());

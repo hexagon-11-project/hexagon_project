@@ -5,41 +5,53 @@ import java.util.List;
 
 /**
  * 사원별 해당 연·월 급여 통계 1건.
- * 연도, 월, 이름으로 조회한 사원의 지급내역·공제항목과 합계를 담는다.
+ * 社員別の該当年・月給与統計1件。
+ *
  */
 public class EmployeeSalaryStatistics {
 
-	/** 연도 */
+	/** 연도
+	 * 年度。 */
 	private int year;
 
-	/** 월 (1~12) */
+	/** 월 (1~12)
+	 * 月 (1〜12)。 */
 	private int month;
 
-	/** 사원아이디 */
+	/** 사원아이디
+	 * 社員ID。 */
 	private String employeeId;
 
-	/** 사원이름 */
+	/** 사원이름
+	 * 社員名。 */
 	private String employeeName;
 
-	/** 지급합계 */
+	/** 지급합계
+	 * 支給合計。 */
 	private long totalPayAmount;
 
-	/** 공제합계 */
+	/** 공제합계
+	 * 控除合計。 */
 	private long totalDeductionAmount;
 
-	/** 실지급액 (지급합계 - 공제합계) */
+	/** 실지급액 (지급합계 - 공제합계)
+	 * 実支給額（支給合計 - 控除合計）。 */
 	private long netPayAmount;
 
-	/** 지급항목 비율 (%) — 지급합계 / (지급합계 + 공제합계). 합계가 0이면 null */
+	// 지급항목 비율 (%)
+	// 支給項目比率 (%)。
 	private Double paymentRatio;
 
-	/** 공제항목 비율 (%) — 공제합계 / (지급합계 + 공제합계). 합계가 0이면 null */
+	// 공제항목 비율 (%)
+	// 控除項目比率 (%)。
 	private Double deductionRatio;
 
-	/** 지급 세부항목 (기본급, 식비, 수당 등) */
+	// 지급 세부항목 (기본급, 식비, 수당 등)
+	// 支給明細項目（基本給、食費、手当など）。
 	private List<SalaryItemStatistics> payItems = new ArrayList<>();
 
-	/** 공제 세부항목 (국민연금, 건강보험 등) */
+	// 공제 세부항목 (국민연금, 건강보험 등)
+	// 控除明細項目（国民年金、健康保険など）。
 	private List<SalaryItemStatistics> deductionItems = new ArrayList<>();
 
 	public EmployeeSalaryStatistics() {

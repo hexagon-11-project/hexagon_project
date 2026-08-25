@@ -11,15 +11,16 @@ import payment.model.PaymentItemLedger;
 import payment.paymentpayitempart.dao.PaymentpayitempartDao;
 
 /**
- * 항목별 대장 Service.
- * 지급/공제 통합 항목 목록과, 기간·항목으로 사원별 내역·합계를 조회한다.
+ * 항목별 대장 조회 Service.
+ * 項目別台帳の照会Service。
  */
 public class PaymentpayitempartService {
 
 	private PaymentpayitempartDao paymentpayitempartDao = new PaymentpayitempartDao();
 
 	/**
-	 * 셀렉트 박스용 지급항목+공제항목 통합 목록 조회.
+	 * 셀렉트 박스용 지급항목+공제항목 통합 목록을 조회한다.
+	 * セレクトボックス用の支給項目+控除項目の統合一覧を照会する。
 	 */
 	public List<PaymentItemLedger> getItemList(int companyId) {
 		Connection conn = null;
@@ -34,9 +35,8 @@ public class PaymentpayitempartService {
 	}
 
 	/**
-	 * 시작·종료 연월과 선택한 항목으로 기간 안 모든 사원의 내역을 조회한다.
-	 * itemSelectValue 형식은 셀렉트 박스 value와 같다. 예: PAY:1001, DEDUCTION:2001
-	 * 값이 없거나 형식이 잘못되면 빈 목록을 반환한다.
+	 * 시작·종료 연월과 선택한 항목으로 기간 안 사원 내역을 조회한다.
+	 * 開始・終了年月と選択した項目で期間内の社員明細を照会する。
 	 */
 	public List<PaymentItemLedger> getEmployeeItemLedger(int companyId,
 			int startYear, int startMonth, int endYear, int endMonth, String itemSelectValue) {
@@ -59,7 +59,8 @@ public class PaymentpayitempartService {
 	}
 
 	/**
-	 * 사원별 기간 합계를 모두 더한 전체 합계.
+	 * 사원별 기간 합계를 모두 더한다.
+	 * 社員別の期間合計をすべて加算する。
 	 */
 	public long sumTotalAmount(List<PaymentItemLedger> employeeList) {
 		long sum = 0L;
@@ -74,7 +75,7 @@ public class PaymentpayitempartService {
 
 	/**
 	 * 셀렉트 박스 value를 항목 구분·아이디로 나눈다.
-	 * 형식이 올바르지 않으면 null.
+	 * セレクトボックスのvalueを項目区分・IDに分ける。
 	 */
 	public PaymentItemLedger parseSelectValue(String itemSelectValue) {
 		if (itemSelectValue == null) {

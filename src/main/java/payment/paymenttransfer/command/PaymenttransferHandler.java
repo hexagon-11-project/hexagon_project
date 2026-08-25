@@ -13,21 +13,22 @@ import payment.paymenttransfer.service.PaymenttransferService;
 
 /**
  * 급여이체 신청 화면 컨트롤러.
+ * 給与振込申請画面のコントローラー。
  *
- * [조회] GET + search=Y
- *   - 귀속연/월/차수로 이체 대상 목록 조회
- *
- * [신청] POST + action=apply
- *   - JSP 체크박스(name=payrollEmployeeId)에서 체크된 값만 파라미터로 전달됨
- *   - 체크된 행이 1건 이상이면 PAYROLL_TRANSFER_REQUEST에 저장
- *   - ※ 테이블 UK(PAYROLL_ID) 때문에 사원마다 INSERT하지 않고, 해당 급여작업 1건만 INSERT/UPDATE
  */
 public class PaymenttransferHandler implements CommandHandler {
 
+	// 신청 화면 JSP 경로
+	// 申請画面のJSPパス。
 	private static final String FORM_VIEW = "/WEB-INF/pages/payroll/paymenttransfer.jsp";
 
 	private PaymenttransferService transferService = new PaymenttransferService();
 
+	/**
+	 * 조회 또는 이체 신청을 처리한 뒤 화면을 반환한다.
+	 * 照会または振込申請を処理したあと画面を返す。
+	 *
+	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		String payYear = req.getParameter("payYear");
@@ -36,6 +37,7 @@ public class PaymenttransferHandler implements CommandHandler {
 		String action = req.getParameter("action");
 
 		// 신청 후에도 목록을 다시 보여주기 위해 searched=true 유지
+		// 申請後も一覧を再表示するためsearched=trueを維持する。
 		boolean searched = "Y".equals(req.getParameter("search")) || "apply".equals(action);
 
 		if (payYear == null || payYear.trim().isEmpty() || payMonth == null || payMonth.trim().isEmpty()) {
@@ -54,9 +56,13 @@ public class PaymenttransferHandler implements CommandHandler {
 		}
 
 		// ===== 급여이체 신청 버튼(POST) 처리 =====
+		// ===== 給与振込申請ボタン(POST)の処理 =====
 		// 체크된 체크박스만 request에 넘어온다. (체크 안 한 행은 파라미터 자체가 없음)
+		// チェックされたチェックボックスだけがrequestに渡る。(チェックしていない行はパラメータ自体がない)。
 		if ("apply".equals(action) && "POST".equalsIgnoreCase(req.getMethod())) {
-			String[] selected = req.getParameterValues("payrollEmployeeId"); // 체크된 행들의 ID 배열
+			// name=payrollEmployeeId 인 체크박스만 배열로 받는다
+			// name=payrollEmployeeIdのチェックボックスだけを配列で受け取る。
+			String[] selected = req.getParameterValues("payrollEmployeeId"); // 체크된 행들의 ID 배열 / チェックされた行のID配列。
 			try {
 				int appliedCount = transferService.applyTransferRequest(payYear, payMonth, paySequence, selected);
 				if (appliedCount > 0) {

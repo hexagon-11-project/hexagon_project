@@ -14,30 +14,35 @@ import statistics.model.AnnualTotalStatistics;
 
 /**
  * 연도별 전체급여 통계 Dao.
- * PAYROLL / PAYROLL_EMPLOYEE를 연도 단위로 집계한다.
+ * 年度別給与総額統計Dao。
  *
- * PAY_YEAR_MONTH 컬럼이 CHAR(6) 이므로 연도 비교는
- * 'YYYY01' ~ 'YYYY12' 범위로 처리한다.
  */
 public class PaymentStatisticsAllDao {
 
+	// 그래프/표에 보여줄 연도 개수
+	// グラフ・表に表示する年数。
 	private static final int YEAR_SPAN = 10;
 
 	/**
 	 * 선택 연도 기준으로 과거 10년간의 연도별 전체급여 통계를 조회한다.
-	 * 예: endYear=2026 → 2017~2026
-	 * 증가율 계산을 위해 직전 연도(fromYear - 1) 데이터도 함께 조회한다.
+	 * 選択年を基準に過去10年間の年度別給与総額統計を照会する。
+	 *
 	 */
 	public List<AnnualTotalStatistics> selectAnnualTotalByEndYear(Connection conn, int companyId, int endYear)
 			throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
+		// 10년 구간의 시작 연도
+		// 10年区間の開始年。
 		int fromYear = endYear - YEAR_SPAN + 1;
+		// 증가율 계산용 직전 연도
+		// 増加率計算用の直前の年。
 		int queryFromYear = fromYear - 1;
 
 		try {
 			// CHAR(6) PAY_YEAR_MONTH 대비: 연월 문자열 범위로 필터
+			// CHAR(6) PAY_YEAR_MONTH向け: 年月文字列範囲でフィルタする。
 			String sql = "SELECT PAY_YEAR, "
 					+ "NVL(SUM(MONTH_SALARY), 0) AS TOTAL_SALARY_AMOUNT, "
 					+ "NVL(AVG(EMP_CNT), 0) AS AVG_EMPLOYEE_COUNT "
@@ -57,10 +62,16 @@ public class PaymentStatisticsAllDao {
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, companyId);
+			// 조회 시작: 직전 연도 1월
+			// 照会開始: 直前の年の1月。
 			pstmt.setString(2, queryFromYear + "01");
+			// 조회 끝: 선택 연도 12월
+			// 照会終了: 選択年の12月。
 			pstmt.setString(3, endYear + "12");
 			rs = pstmt.executeQuery();
 
+			// 연도 → 집계 행
+			// 年度 → 集計行。
 			Map<Integer, AnnualTotalStatistics> yearMap = new HashMap<>();
 			while (rs.next()) {
 				int year = rs.getInt("PAY_YEAR");
@@ -71,6 +82,8 @@ public class PaymentStatisticsAllDao {
 				yearMap.put(year, row);
 			}
 
+			// 화면용 10년 목록 + 전년 대비 증가율
+			// 画面用10年一覧 + 前年比増加率。
 			return buildTenYearList(yearMap, fromYear, endYear);
 		} finally {
 			JdbcUtil.close(rs);
@@ -78,18 +91,28 @@ public class PaymentStatisticsAllDao {
 		}
 	}
 
-	/** fromYear~endYear 목록을 만들고 전년 대비 증가율을 채운다. */
+	/**
+	 * fromYear~endYear 목록을 만들고 전년 대비 증가율을 채운다.
+	 * fromYear〜endYear一覧を作り前年比増加率を入れる。
+	 *
+	 */
 	private List<AnnualTotalStatistics> buildTenYearList(Map<Integer, AnnualTotalStatistics> yearMap, int fromYear,
 			int endYear) {
 		List<AnnualTotalStatistics> result = new ArrayList<>(YEAR_SPAN);
 
 		for (int year = fromYear; year <= endYear; year++) {
 			AnnualTotalStatistics current = yearMap.getOrDefault(year, emptyRow(year));
+			// 전년 행
+			// 前年行。
 			AnnualTotalStatistics previous = yearMap.get(year - 1);
 
+			// 급여 증가율
+			// 給与増加率。
 			current.setSalaryGrowthRate(calcGrowthRate(
 					previous == null ? null : previous.getTotalSalaryAmount(),
 					current.getTotalSalaryAmount()));
+			// 인원 증가율
+			// 人数増加率。
 			current.setEmployeeGrowthRate(calcGrowthRate(
 					previous == null ? null : previous.getAvgEmployeeCount(),
 					current.getAvgEmployeeCount()));
@@ -99,6 +122,11 @@ public class PaymentStatisticsAllDao {
 		return result;
 	}
 
+	/**
+	 * 데이터가 없는 연도의 빈 행을 만든다.
+	 * データがない年の空行を作る。
+	 *
+	 */
 	private AnnualTotalStatistics emptyRow(int year) {
 		AnnualTotalStatistics row = new AnnualTotalStatistics();
 		row.setYear(year);
@@ -107,7 +135,11 @@ public class PaymentStatisticsAllDao {
 		return row;
 	}
 
-	/** 전년 대비 증가율(%). 전년 없거나 0이면 null. */
+	/**
+	 * 전년 대비 증가율(%). 전년 없거나 0이면 null.
+	 * 前年比増加率(%)。前年がないか0ならnull。
+	 *
+	 */
 	private Double calcGrowthRate(Number previous, Number current) {
 		if (previous == null) {
 			return null;

@@ -2,10 +2,20 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.LinkedHashSet"%>
 <%@ page import="config.employee.model.Employee"%>
-<%!private String nvl(String value) {
+<%!/**
+	 * null이면 빈 문자열로 바꾼다.
+	 * nullなら空文字列に変える。
+	 *
+	 */
+	private String nvl(String value) {
 		return value == null ? "" : value;
 	}
 
+	/**
+	 * HTML 특수문자를 이스케이프한다.
+	 * HTML特殊文字をエスケープする。
+	 *
+	 */
 	private String esc(String value) {
 		if (value == null || value.isEmpty()) {
 			return "";
@@ -22,6 +32,8 @@ String empName = nvl((String) request.getAttribute("empName"));
 String selectedDept = nvl((String) request.getAttribute("selectedDept"));
 String selectedStatus = nvl((String) request.getAttribute("selectedStatus"));
 
+// 부서 콤보
+// 部署コンボ。
 LinkedHashSet<String> departments = new LinkedHashSet<String>();
 if (deptList != null) {
 	for (String dept : deptList) {
@@ -37,6 +49,8 @@ if (deptList != null) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>給与統計 社員選択 | HEXAGON PAY</title>
+<%-- 사원 선택 팝업 --%>
+<%-- 社員選択ポップアップ。 --%>
 <style>
 body {
 	font-family: 'Malgun Gothic', sans-serif;
@@ -117,6 +131,8 @@ select, input[type="text"] {
 </head>
 <body>
 	<div class="modal-header">給与統計 社員選択</div>
+	<%-- 검색폼 --%>
+	<%-- 検索フォーム。 --%>
 	<form id="empSearchForm"
 		action="<%=ctx%>/Statistics/paymentStatisticsPayItemsEmployeePopup.do"
 		method="get">
@@ -139,7 +155,8 @@ select, input[type="text"] {
 					<%
 					}
 					%>
-				</select> <select name="status" onchange="this.form.submit()">
+				</select>
+				<select name="status" onchange="this.form.submit()">
 					<option value="">状態別</option>
 					<option value="재직"
 						<%="재직".equals(selectedStatus) ? "selected" : ""%>>在職</option>
@@ -149,6 +166,8 @@ select, input[type="text"] {
 			</div>
 		</div>
 	</form>
+	<%-- 테이블 --%>
+	<%-- テーブル。 --%>
 	<div class="table-scroll">
 		<table class="data-table">
 			<thead>
@@ -191,6 +210,8 @@ select, input[type="text"] {
 		</table>
 	</div>
 	<script>
+		// 사원 선택
+		// 社員選択。
 		function selectEmployee(row) {
 			if (!window.opener || window.opener.closed
 					|| typeof window.opener.applyEmployee !== 'function') {

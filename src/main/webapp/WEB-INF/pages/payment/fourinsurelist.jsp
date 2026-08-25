@@ -1,3 +1,5 @@
+<%-- 4대보험 공제 내역 화면 --%>
+<%-- 社会保険(4大保険)控除内訳画面。 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -12,6 +14,8 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%>
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
+<%-- 조회 조건: 귀속연월과 급여차수 --%>
+<%-- 照会条件: 帰属年月と給与次数。 --%>
 <form action="<%=ctx%>/Payment/fourinsureList.do" method="get">
 	<input type="hidden" name="search" value="Y">
 	<section class="filter-bar">
@@ -39,6 +43,8 @@ request.setAttribute("pageJs", null);
 	</section>
 </form>
 
+<%-- 해당 차수 급여작업이 없을 때 오류 표시 --%>
+<%-- 当該次数の給与作業がないときのエラー表示。 --%>
 <c:if test="${not empty errorMessage}">
 	<div class="info-note" style="color: #c0392b;">${errorMessage}</div>
 </c:if>
@@ -48,6 +54,8 @@ request.setAttribute("pageJs", null);
 		<h2 class="section-title">4大保険控除内訳</h2>
 	</div>
 	<div class="card-body">
+		<%-- 정산기간·급여지급일 헤더 --%>
+		<%-- 精算期間・給与支給日のヘッダー。 --%>
 		<c:if test="${not empty ledger}">
 			<dl class="bank-box">
 				<dt>精算期間</dt>
@@ -76,6 +84,8 @@ request.setAttribute("pageJs", null);
 				</dd>
 			</dl>
 		</c:if>
+		<%-- 왼쪽 고정 사원정보 테이블 --%>
+		<%-- 左側固定の社員情報テーブル。 --%>
 		<div class="four-insure-tables">
 			<div class="four-insure-fixed">
 				<table class="data-table">
@@ -93,11 +103,15 @@ request.setAttribute("pageJs", null);
 					</thead>
 					<tbody>
 						<c:choose>
+							<%-- 아직 조회하지 않은 빈 상태 --%>
+							<%-- まだ照会していない空の状態。 --%>
 							<c:when test="${not searched}">
 								<tr>
 									<td colspan="5" class="center">帰属年月／回数を選択してから照会してください。</td>
 								</tr>
 							</c:when>
+							<%-- 조회했으나 사원이 없는 빈 상태 --%>
+							<%-- 照会したが社員がない空の状態。 --%>
 							<c:when test="${empty employeeList}">
 								<tr>
 									<td colspan="5" class="center">照会された4大保険の控除内訳はありません。</td>
@@ -131,6 +145,8 @@ request.setAttribute("pageJs", null);
 					</c:if>
 				</table>
 			</div>
+			<%-- 오른쪽 4대보험 금액 테이블 --%>
+			<%-- 右側の社会保険(4大保険)金額テーブル。 --%>
 			<div class="four-insure-scroll">
 				<table class="data-table">
 					<thead>
@@ -161,6 +177,8 @@ request.setAttribute("pageJs", null);
 					</thead>
 					<tbody>
 						<c:choose>
+							<%-- 왼쪽 사원표와 같은 빈 상태 분기 --%>
+							<%-- 左側の社員表と同じ空状態の分岐。 --%>
 							<c:when test="${not searched}">
 								<tr>
 									<td colspan="15" class="center">帰属年月／回数を選択してから照会してください。</td>
@@ -174,6 +192,8 @@ request.setAttribute("pageJs", null);
 							<c:otherwise>
 								<c:forEach var="row" items="${employeeList}">
 									<tr>
+										<%-- 국민연금: 사업주=근로자=조회액, 합계는 ×2 --%>
+										<%-- 国民年金: 事業主=労働者=照会額、合計は×2。 --%>
 										<td class="amount"><fmt:formatNumber
 												value="${row.nationalPension}" pattern="#,###" /></td>
 										<td class="amount"><fmt:formatNumber
@@ -248,6 +268,8 @@ request.setAttribute("pageJs", null);
 				</table>
 			</div>
 		</div>
+		<%-- 조회 인원과 4대보험 전체 합계 --%>
+		<%-- 照会人数と社会保険(4大保険)の全体合計。 --%>
 		<div class="tfoot-summary">
 			<span>照会人数 ${targetCount}人</span> <span>4大社会保険の合計<fmt:formatNumber
 					value="${totalAmount}" pattern="#,###" />円

@@ -16,18 +16,21 @@ import payment.paymenttransferlist.dao.PaymenttransferlistDao;
 
 /**
  * 급여이체 신청 조회 Service.
- * 신청기간(REQUEST_DATE) 기준으로 PAYROLL_TRANSFER_REQUEST 내역을 조회한다.
+ * 給与振込申請照会Service。
+ *
  */
 public class PaymenttransferlistService {
 
+	// ISO 날짜 형식
+	// ISO日付形式。
 	private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
 	private PaymenttransferlistDao transferListDao = new PaymenttransferlistDao();
 
 	/**
 	 * 신청기간 안의 이체신청 결과 목록 조회.
-	 * @param startDate yyyy-MM-dd
-	 * @param endDate yyyy-MM-dd
+	 * 申請期間内の振込申請結果一覧を照会する。
+	 *
 	 */
 	public List<PaymentTransferRequest> getTransferRequestList(String startDate, String endDate) {
 		Date start = toSqlDate(startDate);
@@ -50,6 +53,11 @@ public class PaymenttransferlistService {
 		}
 	}
 
+	/**
+	 * 목록의 이체금액 합계를 구한다.
+	 * 一覧の振込金額合計を求める。
+	 *
+	 */
 	public long sumTransferAmount(List<PaymentTransferRequest> list) {
 		long sum = 0L;
 		if (list == null) {
@@ -61,6 +69,11 @@ public class PaymenttransferlistService {
 		return sum;
 	}
 
+	/**
+	 * yyyy-MM-dd 문자열을 SQL Date로 변환한다.
+	 * yyyy-MM-dd文字列をSQL Dateに変換する。
+	 *
+	 */
 	private Date toSqlDate(String value) {
 		if (value == null || value.trim().isEmpty()) {
 			return null;

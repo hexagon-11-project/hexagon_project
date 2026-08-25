@@ -12,16 +12,25 @@ import statistics.paymentstatisticsallmonth.service.PaymentStatisticsAllMonthSer
 
 /**
  * 월별 전체급여 통계 화면 핸들러.
+ * 月別給与総額統計画面ハンドラ。
  *
- * 선택 연도의 1월~12월 통계를 조회한다.
  */
 public class PaymentStatisticsAllMonthHandler implements CommandHandler {
 
+	// 통계 화면 JSP 경로
+	// 統計画面JSPパス。
 	private static final String FORM_VIEW = "/WEB-INF/pages/statistics/paymentstatisticsallmonth.jsp";
+	// 기본 회사 ID
+	// 既定の会社ID。
 	private static final int DEFAULT_COMPANY_ID = 1001;
 
 	private PaymentStatisticsAllMonthService paymentStatisticsAllMonthService = new PaymentStatisticsAllMonthService();
 
+	/**
+	 * 선택 연도 1~12월 통계를 조회해 화면에 넘긴다.
+	 * 選択年の1〜12月統計を照会して画面に渡す。
+	 *
+	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		int companyId = DEFAULT_COMPANY_ID;
@@ -35,7 +44,11 @@ public class PaymentStatisticsAllMonthHandler implements CommandHandler {
 		return FORM_VIEW;
 	}
 
-	/** 요청 연도가 없거나 잘못되면 올해를 사용한다. */
+	/**
+	 * 요청 연도가 없거나 잘못되면 올해를 사용한다.
+	 * リクエスト年がないか不正なら今年を使う。
+	 *
+	 */
 	private int parseYear(String yearParam) {
 		int currentYear = LocalDate.now().getYear();
 		if (yearParam == null || yearParam.trim().isEmpty()) {

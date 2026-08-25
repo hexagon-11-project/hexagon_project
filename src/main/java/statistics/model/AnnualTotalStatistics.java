@@ -2,23 +2,29 @@ package statistics.model;
 
 /**
  * 연도별 전체급여 통계 1건.
- * 선택 연도부터 10년 구간을 표시할 때 연도 단위로 사용한다.
+ * 年度別給与総額統計1件。
+ *
  */
 public class AnnualTotalStatistics {
 
-	/** 연도 */
+	/** 연도
+	 * 年度。 */
 	private int year;
 
-	/** 연간 전체 급여액 */
+	/** 연간 전체 급여액
+	 * 年間給与総額。 */
 	private long totalSalaryAmount;
 
-	/** 전년 대비 급여 증가율 (%) — 전년 데이터가 없으면 null */
+	// 전년 대비 급여 증가율 (%)
+	// 前年比給与増加率 (%)。
 	private Double salaryGrowthRate;
 
-	/** 연간 사원수 평균 (월별 급여인원 평균 등) */
+	/** 연간 사원수 평균 (월별 급여인원 평균 등)
+	 * 年間社員数平均（月別給与人数平均など）。 */
 	private double avgEmployeeCount;
 
-	/** 전년 대비 사원수 증가율 (%) — 전년 데이터가 없으면 null */
+	// 전년 대비 사원수 증가율 (%)
+	// 前年比社員数増加率 (%)。
 	private Double employeeGrowthRate;
 
 	public AnnualTotalStatistics() {

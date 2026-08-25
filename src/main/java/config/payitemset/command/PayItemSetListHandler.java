@@ -8,23 +8,37 @@ import config.dnLItemSet.service.AttendanceTypeListService;
 import config.payitemset.service.DeductionItemSetListService;
 import config.payitemset.service.PayItemSetListService;
 
+/**
+ * 급여항목 설정 화면의 목록 데이터를 조회한다.
+ * 給与項目設定画面の一覧データを照会する。
+ */
 public class PayItemSetListHandler implements CommandHandler {
 
 	private PayItemSetListService listService = new PayItemSetListService();
 	private AttendanceTypeListService attendanceTypeListService = new AttendanceTypeListService();
 	private DeductionItemSetListService deductionItemSetListService = new DeductionItemSetListService();
 
+	/**
+	 * 목록을 request 에 담고 payItemSet.jsp 경로를 반환한다.
+	 * 一覧をrequestに入れてpayItemSet.jspパスを返す。
+	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
+		// 조회 기준 회사 ID 를 정한다
+		// 照会基準の会社IDを決める。
 		int companyId = 1001;
 
+		// 화면 테이블·셀렉트에 쓸 목록과 선택 건을 바인딩한다
+		// 画面テーブル・セレクトに使う一覧と選択件をバインドする。
 		req.setAttribute("payItemList", listService.getList(companyId));
 		req.setAttribute("attendanceTypeList", attendanceTypeListService.getList(companyId));
 		req.setAttribute("deductionItemList", deductionItemSetListService.getList(companyId));
 		req.setAttribute("selectedPayItem", null);
 		req.setAttribute("selectedDeductionItem", null);
 
+		// JSP 경로를 반환한다.
+		// JSPパスを返す。
 		return "/WEB-INF/pages/config/payItemSet.jsp";
 	}
 

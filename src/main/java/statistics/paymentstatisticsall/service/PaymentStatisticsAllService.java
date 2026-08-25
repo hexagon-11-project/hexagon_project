@@ -11,7 +11,8 @@ import statistics.paymentstatisticsall.dao.PaymentStatisticsAllDao;
 
 /**
  * 연도별 전체급여 통계 Service.
- * 선택 연도 기준 과거 10년 집계를 조회한다.
+ * 年度別給与総額統計Service。
+ *
  */
 public class PaymentStatisticsAllService {
 
@@ -19,7 +20,8 @@ public class PaymentStatisticsAllService {
 
 	/**
 	 * 선택 연도(endYear) 기준 과거 10년 통계 목록 조회.
-	 * 예: endYear=2026 → 2017~2026
+	 * 選択年(endYear)基準の過去10年統計一覧照会。
+	 *
 	 */
 	public List<AnnualTotalStatistics> getAnnualTotalList(int companyId, int endYear) {
 		Connection conn = null;
