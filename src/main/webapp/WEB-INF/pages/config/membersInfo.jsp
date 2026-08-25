@@ -205,14 +205,9 @@ request.setAttribute("pageJs", null);
 					<div class="brand-asset">
 						<div class="brand-title">회사로고</div>
 						<div class="brand-preview">
-							<c:choose>
-								<c:when test="${not empty companyInfo.logoPath}">
-									<img src="${pageContext.request.contextPath}${companyInfo.logoPath}" alt="회사로고" style="max-height: 80px; max-width: 100%;">
-								</c:when>
-								<c:otherwise>
+									<img src="${pageContext.request.contextPath}/assets/images/Logo.png" alt="회사로고" style="max-height: 80px; max-width: 100%;">
+
 									회사 로고
-								</c:otherwise>
-							</c:choose>
 						</div>
 						<div class="mini-actions">
 							<button type="button" class="btn btn-sm">등록</button>
@@ -222,14 +217,8 @@ request.setAttribute("pageJs", null);
 					<div class="brand-asset">
 						<div class="brand-title">회사도장</div>
 						<div class="brand-preview seal-preview">
-							<c:choose>
-								<c:when test="${not empty companyInfo.sealPath}">
-									<img src="${pageContext.request.contextPath}${companyInfo.sealPath}" alt="직인" style="max-height: 80px; max-width: 100%;">
-								</c:when>
-								<c:otherwise>
+									<img src="${pageContext.request.contextPath}/assets/images/Seal.png" alt="직인" style="max-height: 80px; max-width: 100%;">
 									직인
-								</c:otherwise>
-							</c:choose>
 						</div>
 						<div class="mini-actions">
 							<button type="button" class="btn btn-sm">등록</button>
