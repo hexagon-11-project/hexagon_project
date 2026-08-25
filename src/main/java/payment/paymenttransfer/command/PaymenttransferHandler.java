@@ -1,5 +1,6 @@
 package payment.paymenttransfer.command;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,11 +38,14 @@ public class PaymenttransferHandler implements CommandHandler {
 		// 신청 후에도 목록을 다시 보여주기 위해 searched=true 유지
 		boolean searched = "Y".equals(req.getParameter("search")) || "apply".equals(action);
 
-		if (payYear == null || payYear.trim().isEmpty()) {
-			payYear = "2026";
-		}
-		if (payMonth == null || payMonth.trim().isEmpty()) {
-			payMonth = "08";
+		if (payYear == null || payYear.trim().isEmpty() || payMonth == null || payMonth.trim().isEmpty()) {
+			LocalDate today = LocalDate.now();
+			if (payYear == null || payYear.trim().isEmpty()) {
+				payYear = String.valueOf(today.getYear());
+			}
+			if (payMonth == null || payMonth.trim().isEmpty()) {
+				payMonth = String.format("%02d", today.getMonthValue());
+			}
 		}
 
 		int paySequence = 1;

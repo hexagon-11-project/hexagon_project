@@ -33,7 +33,7 @@ public class PaymentMntDayWorkerDAO {
         String insertSql = "INSERT INTO PAYROLL "
                 + "(PAYROLL_ID, COMPANY_ID, PAY_YEAR_MONTH, PAY_SEQUENCE, "
                 + " SETTLEMENT_START_DATE, SETTLEMENT_END_DATE, PAYMENT_DATE, REG_ID, MOD_ID) "
-                + "VALUES ((SELECT NVL(MAX(PAYROLL_ID), 0) + 1 FROM PAYROLL), "
+                + "VALUES (PAYROLL_SEQ.NEXTVAL, "
                 + " 1001, ?, ?, SYSDATE, SYSDATE, SYSDATE, 'admin', 'admin')";
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
             pstmt.setString(1, payYearMonth);
@@ -157,7 +157,7 @@ public class PaymentMntDayWorkerDAO {
         String sql = "INSERT INTO PAYROLL_EMPLOYEE "
                 + "(PAYROLL_EMPLOYEE_ID, PAYROLL_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, "
                 + " TOTAL_PAY_AMOUNT, TOTAL_DEDUCTION_AMOUNT, NET_PAY_AMOUNT, REG_ID, MOD_ID) "
-                + "SELECT (SELECT NVL(MAX(PAYROLL_EMPLOYEE_ID), 0) FROM PAYROLL_EMPLOYEE) + 1, "
+                + "SELECT PAYROLL_EMPLOYEE_SEQ.NEXTVAL, "
                 + " ?, e.EMPLOYEE_ID, e.EMPLOYMENT_TYPE, '일반', 0, 0, 0, 'admin', 'admin' "
                 + "FROM EMPLOYEE e WHERE e.EMPLOYEE_ID = ? "
                 + "  AND NOT EXISTS (SELECT 1 FROM PAYROLL_EMPLOYEE p "
@@ -405,7 +405,7 @@ public class PaymentMntDayWorkerDAO {
             if (count == 0) {
                 String insertSql = "INSERT INTO PAYROLL_DEDUCTION_DETAIL "
                         + "(PAYROLL_DEDUCTION_DETAIL_ID, PAYROLL_EMPLOYEE_ID, DEDUCTION_ITEM_ID, AMOUNT, REG_ID, MOD_ID) "
-                        + "VALUES ((SELECT NVL(MAX(PAYROLL_DEDUCTION_DETAIL_ID), 0) + 1 FROM PAYROLL_DEDUCTION_DETAIL), "
+                        + "VALUES (PAYROLL_DEDUCT_DETAIL_SEQ.NEXTVAL, "
                         + "?, ?, ?, 'admin', 'admin')";
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setLong(1, payrollEmployeeId);
