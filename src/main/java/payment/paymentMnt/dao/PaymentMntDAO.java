@@ -558,7 +558,7 @@ public class PaymentMntDAO {
                    + "    total_pay_amount, total_deduction_amount, net_pay_amount, reg_id, mod_id"
                    + ") "
                    + "SELECT "
-                   + "    (SELECT NVL(MAX(payroll_employee_id), 0) FROM PAYROLL_EMPLOYEE) + ROWNUM, "
+                   + "    PAYROLL_EMPLOYEE_SEQ.NEXTVAL, "
                    + "    ?, "
                    + "    e.employee_id, "
                    + "    e.employment_type, "
@@ -588,7 +588,7 @@ public class PaymentMntDAO {
                    + "    payroll_pay_detail_id, payroll_employee_id, pay_item_id, amount, reg_id, mod_id"
                    + ") "
                    + "SELECT "
-                   + "    (SELECT NVL(MAX(payroll_pay_detail_id), 0) FROM PAYROLL_PAY_DETAIL) + 1, "
+                   + "    PAYROLL_PAY_DETAIL_SEQ.NEXTVAL, "
                    + "    p.payroll_employee_id, "
                    + "    CASE WHEN e.employment_type IN ('일용직','DAILY') THEN ? ELSE ? END, " // ★ 일용직은 일용급여 항목, 그 외는 기본급 항목 - 실데이터의 EMPLOYMENT_TYPE이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함
                    + "    e.base_wage_amount, "
@@ -732,7 +732,7 @@ public class PaymentMntDAO {
 
             if (count == 0) { // 수정된 게 없다면 (기존 데이터가 없다는 뜻이므로 INSERT)
                 String insertSql = "INSERT INTO PAYROLL_PAY_DETAIL (PAYROLL_PAY_DETAIL_ID, PAYROLL_EMPLOYEE_ID, PAY_ITEM_ID, AMOUNT, REG_ID, MOD_ID) "
-                                 + "VALUES ((SELECT NVL(MAX(PAYROLL_PAY_DETAIL_ID), 0) + 1 FROM PAYROLL_PAY_DETAIL), ?, ?, ?, 'admin', 'admin')";
+                                 + "VALUES (PAYROLL_PAY_DETAIL_SEQ.NEXTVAL, ?, ?, ?, 'admin', 'admin')";
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setLong(1, empId);
                     insertStmt.setInt(2, itemId);
@@ -754,7 +754,7 @@ public class PaymentMntDAO {
 
             if (count == 0) {
                 String insertSql = "INSERT INTO PAYROLL_DEDUCTION_DETAIL (PAYROLL_DEDUCTION_DETAIL_ID, PAYROLL_EMPLOYEE_ID, DEDUCTION_ITEM_ID, AMOUNT, REG_ID, MOD_ID) "
-                                 + "VALUES ((SELECT NVL(MAX(PAYROLL_DEDUCTION_DETAIL_ID), 0) + 1 FROM PAYROLL_DEDUCTION_DETAIL), ?, ?, ?, 'admin', 'admin')";
+                                 + "VALUES (PAYROLL_DEDUCT_DETAIL_SEQ.NEXTVAL, ?, ?, ?, 'admin', 'admin')";
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setLong(1, empId);
                     insertStmt.setInt(2, itemId);
@@ -975,7 +975,7 @@ public class PaymentMntDAO {
                 if (rs.next() && rs.getInt(1) == 0) {
                     // ★ 수정된 부분: SYSDATE를 추가하여 날짜 빈칸(NULL) 에러 방지
                     String insertSql = "INSERT INTO PAYROLL (PAYROLL_ID, COMPANY_ID, PAY_YEAR_MONTH, PAY_SEQUENCE, SETTLEMENT_START_DATE, SETTLEMENT_END_DATE, PAYMENT_DATE, REG_ID, MOD_ID) "
-                                     + "VALUES ((SELECT NVL(MAX(PAYROLL_ID), 0) + 1 FROM PAYROLL), 1001, ?, ?, SYSDATE, SYSDATE, SYSDATE, 'admin', 'admin')";
+                                     + "VALUES (PAYROLL_SEQ.NEXTVAL, 1001, ?, ?, SYSDATE, SYSDATE, SYSDATE, 'admin', 'admin')";
                     try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                         insertStmt.setString(1, yearMonth);
                         insertStmt.setInt(2, seq);
