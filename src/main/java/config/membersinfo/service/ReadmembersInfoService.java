@@ -14,9 +14,7 @@ public class ReadmembersInfoService {
 	public CompanyInfo getCompanyInfo(int companyId) {
 		try (Connection conn = ConnectionProvider.getConnection()) {
 			CompanyInfo companyInfo = companyInfoDao.selectById(conn, companyId);
-//			System.out.println("2");
 			if (companyInfo == null) {
-//				System.out.println("1");
 				throw new CompanyNotFoundException();
 			}
 			return companyInfo;

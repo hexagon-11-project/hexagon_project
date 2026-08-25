@@ -14,14 +14,12 @@ public class RetirementMntPayHandler implements CommandHandler {
 	private RetirementMntService retirementService = new RetirementMntService();
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		// 1. 파라미터 수신
         String employeeId = req.getParameter("employeeId");
         String resignDate = req.getParameter("resignDate"); 
 
-        // 2. 비즈니스 로직 실행 (Service 호출)
         List<MonthlyWage> recent3MonthsWages = retirementService.getRecent3MonthsPayroll(employeeId, resignDate);
 
-        // 3. 순수 문자열 텍스트로 응답 세팅 (JSON 사용 안 함)
+        // 순수 문자열 텍스트로 응답 세팅 (JSON 사용 안 함)
         res.setContentType("text/plain");
         res.setCharacterEncoding("UTF-8");
         PrintWriter out = res.getWriter();
@@ -38,11 +36,9 @@ public class RetirementMntPayHandler implements CommandHandler {
             }
         }
         
-        // 화면으로 조립된 문자열 전송
         out.print(resultString);
         out.flush();
 
-        // 4. 뷰 포워딩 생략
         return null; 
     }
 

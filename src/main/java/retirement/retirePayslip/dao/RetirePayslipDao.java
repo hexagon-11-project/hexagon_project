@@ -14,14 +14,14 @@ import retirement.model.RetirementMntModel;
 
 public class RetirePayslipDao {
 
-	// 리턴 타입 없이 파라미터로 객체를 받아서 값을 채워줌
+	
 	public void selectRetirementStatement(Connection conn, String employeeId, RetirementMntModel statement,
 			CompanyInfo company) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		try {
-// 세금 제외하고 DTO에 있는 항목만 조회
+
 			String sql = "SELECT " + "    E.EMPLOYEE_NAME AS employeeName, "
 					+ "    TO_CHAR(R.CALC_START_DATE, 'YYYY-MM-DD') AS hireDate, "
 					+ "    TO_CHAR(R.CALC_END_DATE, 'YYYY-MM-DD') AS resignDate, "
@@ -35,7 +35,7 @@ public class RetirePayslipDao {
 
 			pstmt = conn.prepareStatement(sql);
 
-// ✅ 파라미터를 세팅할 때 공백을 제거하고 명확하게 정수형(Int)으로 변환해서 던짐
+
 			pstmt.setInt(1, Integer.parseInt(employeeId.trim()));
 
 			rs = pstmt.executeQuery();

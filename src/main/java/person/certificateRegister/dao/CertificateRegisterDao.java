@@ -12,14 +12,12 @@ import person.model.CertificatePrintWorkingModel;
 
 public class CertificateRegisterDao {
 
-	// 파라미터 4개 추가
 	public List<CertificatePrintWorkingModel> getAllCertificateList(Connection conn, String startDate, String endDate, String certType, String empName) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		List<CertificatePrintWorkingModel> list = new ArrayList<>();
 
 		try {
-			//  기본 날짜 조건 포함
 			String sql = "SELECT certificate_issue.issue_no, "
 					   + "       TO_CHAR(certificate_issue.issue_date, 'yyyy-mm-dd') AS issue_date, "
 					   + "       employee.employee_name, "
@@ -99,7 +97,6 @@ public class CertificateRegisterDao {
                 
                 int result = pstmt.executeUpdate();
                 
-                // 정상적으로 1건이 업데이트 되었다면 카운트 증가
                 if (result > 0) {
                     resultCount++;
                 }

@@ -4,12 +4,12 @@ import java.util.List;
 import config.employee.model.Employee;
 
 public class EmployeePage {
-	private int total;        // 전체 사원 수
-	private int currentPage;  // 현재 페이지
+	private int total;        
+	private int currentPage;  
 	private List<Employee> content; // 30명치 사원 데이터
-	private int totalPages;   // 전체 페이지 수
-	private int startPage;    // 하단 시작 번호
-	private int endPage;      // 하단 끝 번호
+	private int totalPages;   
+	private int startPage;    
+	private int endPage;      
 
 	public EmployeePage(int total, int currentPage, int size, List<Employee> content) {
 		this.total = total;

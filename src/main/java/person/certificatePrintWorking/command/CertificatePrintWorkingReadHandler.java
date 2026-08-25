@@ -24,11 +24,11 @@ public class CertificatePrintWorkingReadHandler implements CommandHandler {
             certType = "재직증명서"; 
         }
 
-        // 1. 좌측 리스트 세팅
+        // 좌측 리스트 세팅
         List<Employee> empList = certService.getEmployeeList(searchName);
         req.setAttribute("empList", empList);
 
-        // 2. 우측 상세 데이터 세팅
+        // 우측 상세 데이터 세팅
         if (employeeNo != null && !employeeNo.isEmpty()) {
             Employee empDetail = certService.getEmployeeDetail(employeeNo);
             
@@ -45,12 +45,11 @@ public class CertificatePrintWorkingReadHandler implements CommandHandler {
             }
         }
 
-        // 3. 화면 상태 유지용 세팅
+        // 화면 상태 유지용 세팅
         req.setAttribute("selectedEmpNo", employeeNo);
         req.setAttribute("selectedCertType", certType);
         req.setAttribute("today", LocalDate.now().toString());
 
-        // 4. 리턴할 JSP 뷰 경로 
         return "/WEB-INF/pages/person/certificatePrintWorking.jsp";
     }
 }

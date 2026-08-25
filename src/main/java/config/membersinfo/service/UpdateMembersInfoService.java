@@ -17,7 +17,7 @@ public class UpdateMembersInfoService {
             conn = ConnectionProvider.getConnection();
             conn.setAutoCommit(false); // 트랜잭션 시작
 
-            // DAO의 update 메서드 호출
+          
             companyInfoDao.update(conn, info);
 
             conn.commit(); // 성공 시 커밋

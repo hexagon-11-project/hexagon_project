@@ -21,7 +21,7 @@ public class CertificateRegisterReadHandler implements CommandHandler {
 		String certType = request.getParameter("certType");
 		String empName = request.getParameter("empName");
 		
-		// 1. 날짜 기본값 세팅 (최초 접속 시 파라미터가 비어있을 때)
+		// 날짜 기본값 세팅 (최초 접속 시 파라미터가 비어있을 때)
 		if (startDate == null || endDate == null) {
 			LocalDate today = LocalDate.now();
 			LocalDate firstDay = today.withDayOfMonth(1);
@@ -35,19 +35,15 @@ public class CertificateRegisterReadHandler implements CommandHandler {
 		if (certType == null) certType = "전체";
 		if (empName == null) empName = "";
 		
-		// JSP에서 검색어와 조건을 계속 유지할 수 있게 request에 저장
 		request.setAttribute("startDate", startDate);
 		request.setAttribute("endDate", endDate);
 		request.setAttribute("certType", certType);
 		request.setAttribute("empName", empName);
 		
-		// 2. Service 호출 시 4개의 파라미터를 넘겨주도록 변경
 		List<CertificatePrintWorkingModel> certList = registerService.getCertificateList(startDate, endDate, certType, empName);
 		
-		// 3. JSP 화면에서 뿌려줄 수 있게 request 영역에 세팅
 		request.setAttribute("certList", certList);
 		
-		// 4. 화면을 띄워줄 JSP 파일의 실제 경로 리턴
 		return "/WEB-INF/pages/person/certificateRegister.jsp"; 
 	}
 }

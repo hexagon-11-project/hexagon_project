@@ -26,7 +26,7 @@ public class RetirePayslipReadHandler implements CommandHandler {
      
         String employeeId = req.getParameter("employeeId");
         
-        // 3. 기존 모델 사용[cite: 14]
+        // 3. 기존 모델 사용
         RetirementMntModel statement = new RetirementMntModel();
         CompanyInfo company = new CompanyInfo();
         

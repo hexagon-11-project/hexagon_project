@@ -28,7 +28,7 @@ public class EmployeeCardDao {
 		ResultSet rs = null;
 
 		try {
-			// 1. 인적사항 및 퇴직정보를 메인 테이블(EMPLOYEE)에서 한 번에 조회
+			//  인적사항 및 퇴직정보를 메인 테이블(EMPLOYEE)에서 한 번에 조회
 			String empSql = "SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID = ?";
 			pstmt = conn.prepareStatement(empSql);
 			pstmt.setInt(1, employeeId);
@@ -294,7 +294,7 @@ public class EmployeeCardDao {
 	}
 
 	
-	// 새로 추가된 전체 사원 목록 조회 메서드 (드롭박스용)
+	// 새로 추가된 전체 사원 목록 조회 메서드 
 	
 	public List<EmployeeCard> selectAllEmployees(Connection conn) throws SQLException {
 		List<EmployeeCard> list = new ArrayList<>();
