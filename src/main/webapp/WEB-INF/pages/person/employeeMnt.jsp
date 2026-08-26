@@ -52,10 +52,6 @@ request.setAttribute("pageJs", null);
 	</form>
 
 	<div class="search-strip">
-		<select class="select"><option>고용형태별</option></select>
-		<select class="select"><option>상태별</option></select>
-		<select class="select"><option>30개 보기</option></select>
-		<button type="button" class="btn">정렬기준 설정하기</button>
 	</div>
 </div>
 
@@ -79,13 +75,11 @@ request.setAttribute("pageJs", null);
 			</thead>
 			<tbody>
 				<c:forEach var="emp" items="${employeePage.content}">
-					<!-- hover 시 행을 클릭할 수 있는 느낌을 주기 위해 CSS 추가 (선택사항) -->
 					<tr style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
 						<td><input type="checkbox" name="empId" value="${emp.employeeId}"></td>
 						<td>${emp.employmentType}</td>
 						<td>${emp.employeeNo}</td>
 						
-						<!-- 사원 성명에 a 태그 추가 (사원등록 페이지로 employeeId 전달) -->
 						<td>
 							<strong>
 								<a href="${pageContext.request.contextPath}/Config/employeeIns1.do?employeeId=${emp.employeeId}" style="text-decoration: underline; color: #0056b3;">
