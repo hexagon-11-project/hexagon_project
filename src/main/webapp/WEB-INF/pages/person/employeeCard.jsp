@@ -566,13 +566,9 @@ request.setAttribute("pageJs", null);
 
 				<div
 					style="margin-top: 30px; margin-bottom: 20px; padding: 0 40px; display: flex; justify-content: space-between; align-items: center;">
-					<div>
-						<label style="cursor: pointer;"><input type="checkbox"
-							checked> 대표자 표기</label>
-					</div>
 					<div
 						style="text-align: center; font-size: 16px; font-weight: bold; line-height: 1.5;">
-						(주)헥사곤아이티<br>대표이사
+						(주)헥사곤아이티<br>
 					</div>
 					<div
 						style="width: 80px; display: flex; align-items: center; justify-content: center;">
