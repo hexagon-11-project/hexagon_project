@@ -78,6 +78,108 @@ public class RetirementProcessReadDao {
             JdbcUtil.close(pstmt);
         }
     }
+    
+    
+    
+ // 검색 조건에 맞는 전체 데이터 갯수 카운트 
+    public int getRetirementCount(Connection conn, String searchName, String status) throws SQLException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            String sql = "SELECT COUNT(*) FROM employee e WHERE 1=1 ";
+
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                sql += "AND e.employee_name LIKE ? ";
+            }
+            if (status != null && !status.equals("전체보기") && !status.trim().isEmpty()) {
+                sql += "AND e.retirement_yn = ? ";
+            }
+
+            pstmt = conn.prepareStatement(sql);
+            int paramIndex = 1;
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + searchName.trim() + "%");
+            }
+            if (status != null && !status.equals("전체보기") && !status.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, status);
+            }
+
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } finally {
+            JdbcUtil.close(rs);
+            JdbcUtil.close(pstmt);
+        }
+    }
+
+    // // 30명씩 자른 퇴직자 데이터와 하단 페이지 번호 계산
+    public List<RetirementProcessModel> getRetirementListByPaging(Connection conn, String searchName, String status, int firstRow, int endRow) throws SQLException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<RetirementProcessModel> list = new ArrayList<>();
+
+        try {
+            String baseQuery = "SELECT e.retirement_yn, e.employee_no, e.employee_name, "
+                             + "       e.department, e.position, "
+                             + "       TO_CHAR(e.hire_date, 'yyyy-mm-dd') AS hire_date, "
+                             + "       TO_CHAR(e.resign_date, 'yyyy-mm-dd') AS resign_date, "
+                             + "       NVL(rp.interim_settlement_yn, 'N') AS interim_settlement_yn, "
+                             + "       NVL(rp.retirement_settlement_yn, 'N') AS retirement_settlement_yn "
+                             + "FROM employee e "
+                             + "LEFT JOIN retirement_pay rp ON e.employee_id = rp.employee_id "
+                             + "WHERE 1=1 ";
+
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                baseQuery += "AND e.employee_name LIKE ? ";
+            }
+            if (status != null && !status.equals("전체보기") && !status.trim().isEmpty()) {
+                baseQuery += "AND e.retirement_yn = ? ";
+            }
+            baseQuery += "ORDER BY e.employee_no ASC";
+
+            String sql = "SELECT * FROM ("
+                       + "    SELECT ROWNUM rnum, a.* FROM ("
+                       +          baseQuery
+                       + "    ) a WHERE ROWNUM <= ?"
+                       + ") WHERE rnum >= ?";
+
+            pstmt = conn.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + searchName.trim() + "%");
+            }
+            if (status != null && !status.equals("전체보기") && !status.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, status);
+            }
+            
+            pstmt.setInt(paramIndex++, endRow);
+            pstmt.setInt(paramIndex++, firstRow);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                RetirementProcessModel model = new RetirementProcessModel();
+                model.setRetirementYn(rs.getString("retirement_yn"));
+                model.setEmployeeNo(rs.getString("employee_no"));
+                model.setEmployeeName(rs.getString("employee_name"));
+                model.setDepartment(rs.getString("department"));
+                model.setPosition(rs.getString("position"));
+                model.setHireDate(rs.getString("hire_date"));
+                model.setResignDate(rs.getString("resign_date"));
+                model.setInterimSettlementYn(rs.getString("interim_settlement_yn"));
+                model.setRetirementSettlementYn(rs.getString("retirement_settlement_yn"));
+                list.add(model);
+            }
+            return list;
+        } finally {
+            JdbcUtil.close(rs);
+            JdbcUtil.close(pstmt);
+        }
+    }
        
 
             public int updateRetirementProcess(Connection conn, RetirementProcessModel model) throws SQLException {

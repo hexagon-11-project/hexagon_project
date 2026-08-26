@@ -1,22 +1,27 @@
 package retirement.retireProcess.command;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
-import retirement.model.RetirementProcessModel;
 import retirement.retireProcess.service.RetirementProcessReadService;
+import retirement.retireProcess.service.RetirementProcessPage;
 
 public class RetirementProcessReadHandler implements CommandHandler {
 
-	private RetirementProcessReadService retirementService = new RetirementProcessReadService();
+    private RetirementProcessReadService retirementService = new RetirementProcessReadService();
 
     @Override
     public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
         
-        // 1. 파라미터 수신
+        //  페이지 번호 받기 (기본값 1)
+        String pageVal = req.getParameter("page");
+        int pageNum = 1;
+        if (pageVal != null && !pageVal.isEmpty()) {
+            pageNum = Integer.parseInt(pageVal);
+        }
+
+       
         String searchName = req.getParameter("searchName");
         String status = req.getParameter("status"); 
         
@@ -24,15 +29,14 @@ public class RetirementProcessReadHandler implements CommandHandler {
             status = "전체보기"; 
         }
 
-        // 2. 비즈니스 로직 실행 (Service 호출)
-        List<RetirementProcessModel> retirementList = retirementService.getRetirementEmployeeList(searchName, status);
+        //  30개씩 분할된 데이터를 가진 Page 객체 호출
+        RetirementProcessPage retirementPage = retirementService.getRetirementProcessPage(pageNum, searchName, status);
         
-        // 3. JSP 출력을 위한 데이터 세팅
-        req.setAttribute("retirementList", retirementList);
+       
+        req.setAttribute("retirementPage", retirementPage);
         req.setAttribute("searchName", searchName);
         req.setAttribute("status", status);
 
-        // 4. JSP View 포워딩
         return "/WEB-INF/pages/retirement/retireProcess.jsp";
     }
 }
