@@ -132,6 +132,69 @@ public class DeductionItemDao {
 	}
 
 	/**
+	 * 같은 회사·같은 공제항목명이 있는지 본다.
+	 * 同じ会社・同じ控除項目名があるかを見る。
+	 */
+	public boolean existsByName(Connection conn, int companyId, String deductionItemName, Integer excludeDeductionItemId)
+			throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			if (excludeDeductionItemId == null) {
+				pstmt = conn.prepareStatement(
+						"SELECT 1 FROM DEDUCTION_ITEM WHERE COMPANY_ID = ? AND DEDUCTION_ITEM_NAME = ? AND ROWNUM = 1");
+				pstmt.setInt(1, companyId);
+				pstmt.setString(2, deductionItemName);
+			} else {
+				pstmt = conn.prepareStatement(
+						"SELECT 1 FROM DEDUCTION_ITEM WHERE COMPANY_ID = ? AND DEDUCTION_ITEM_NAME = ? AND DEDUCTION_ITEM_ID <> ? AND ROWNUM = 1");
+				pstmt.setInt(1, companyId);
+				pstmt.setString(2, deductionItemName);
+				pstmt.setInt(3, excludeDeductionItemId);
+			}
+
+			rs = pstmt.executeQuery();
+			return rs.next();
+
+		} finally {
+
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+
+		}
+
+	}
+
+	/**
+	 * 급여 공제상세에서 이 항목을 쓰는지 본다.
+	 * 給与控除明細でこの項目を使っているかを見る。
+	 */
+	public boolean existsPayrollUsage(Connection conn, int deductionItemId) throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			pstmt = conn.prepareStatement(
+					"SELECT 1 FROM PAYROLL_DEDUCTION_DETAIL WHERE DEDUCTION_ITEM_ID = ? AND ROWNUM = 1");
+			pstmt.setInt(1, deductionItemId);
+			rs = pstmt.executeQuery();
+			return rs.next();
+
+		} finally {
+
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+
+		}
+
+	}
+
+	/**
 	 * 공제항목을 신규 등록한다.
 	 * 控除項目を新規登録する。
 	 */
@@ -185,7 +248,7 @@ public class DeductionItemDao {
 	 * 공제항목을 수정한다.
 	 * 控除項目を更新する。
 	 */
-	public void update(Connection conn, DeductionItem item) throws SQLException {
+	public int update(Connection conn, DeductionItem item) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -216,7 +279,7 @@ public class DeductionItemDao {
 			pstmt.setString(6, item.getModId());
 			pstmt.setInt(7, item.getDeductionItemId());
 			pstmt.setInt(8, item.getCompanyId());
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 
 		} finally {
 
@@ -232,7 +295,7 @@ public class DeductionItemDao {
 	 * 공제항목을 PK로 삭제한다.
 	 * 控除項目をPKで削除する。
 	 */
-	public void delete(Connection conn, int deductionItemId) throws SQLException {
+	public int delete(Connection conn, int deductionItemId) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -242,7 +305,7 @@ public class DeductionItemDao {
 			// WHEREはPKだけを見る。
 			pstmt = conn.prepareStatement("DELETE FROM DEDUCTION_ITEM WHERE DEDUCTION_ITEM_ID = ?");
 			pstmt.setInt(1, deductionItemId);
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 
 		} finally {
 

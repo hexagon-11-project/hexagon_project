@@ -13,48 +13,54 @@ import jdbc.JdbcUtil;
  * 控除項目を更新する。
  */
 public class DeductionItemSetUpdateService {
-	
+
 	private DeductionItemDao deductionItemDao = new DeductionItemDao();
-	
+
 	/**
 	 * 공제항목 한 건을 갱신한다.
 	 * 控除項目1件を更新する。
 	 */
 	public void update(DeductionItem item) {
-		
+
 		Connection conn = null;
-		
+
 		try {
-			
-			// 커넥션을 연다.
-			// コネクションを開く。
+
 			conn = ConnectionProvider.getConnection();
-			// 자동 커밋을 끈다.
-			// 自動コミットを切る。
 			conn.setAutoCommit(false);
-			
-			deductionItemDao.update(conn, item);
-			
-			// 여기까지 오면 DB에 확정한다.
-			// ここまで来ればDBへ確定する。
+
+			if (deductionItemDao.selectById(conn, item.getDeductionItemId()) == null) {
+				throw new PayItemSetException("対象の控除項目が見つかりません。");
+			}
+
+			if (deductionItemDao.existsByName(conn, item.getCompanyId(), item.getDeductionItemName(),
+					item.getDeductionItemId())) {
+				throw new PayItemSetException("同じ名前の控除項目がすでに登録されています。");
+			}
+
+			int updated = deductionItemDao.update(conn, item);
+			if (updated == 0) {
+				throw new PayItemSetException("対象の控除項目が見つかりません。");
+			}
+
 			conn.commit();
-			
-		} catch (SQLException e) {
-			
-			// 실패하면 롤백한다.
-			// 失敗すればロールバックする。
+
+		} catch (PayItemSetException e) {
+
 			JdbcUtil.rollback(conn);
-			
-			throw new RuntimeException(e);
-			
+			throw e;
+
+		} catch (SQLException e) {
+
+			JdbcUtil.rollback(conn);
+			throw PayItemSetException.fromSql(e);
+
 		} finally {
-			
-			// 커넥션을 반드시 닫는다.
-			// コネクションは必ず閉じる。
+
 			JdbcUtil.close(conn);
-			
+
 		}
-		
+
 	}
 
 }

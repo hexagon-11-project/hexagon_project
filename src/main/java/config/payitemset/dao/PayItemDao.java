@@ -270,10 +270,73 @@ public class PayItemDao {
 	}
 
 	/**
+	 * 같은 회사·같은 지급항목명이 있는지 본다.
+	 * 同じ会社・同じ支給項目名があるかを見る。
+	 */
+	public boolean existsByName(Connection conn, int companyId, String payItemName, Integer excludePayItemId)
+			throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			if (excludePayItemId == null) {
+				pstmt = conn.prepareStatement(
+						"SELECT 1 FROM PAY_ITEM WHERE COMPANY_ID = ? AND PAY_ITEM_NAME = ? AND ROWNUM = 1");
+				pstmt.setInt(1, companyId);
+				pstmt.setString(2, payItemName);
+			} else {
+				pstmt = conn.prepareStatement(
+						"SELECT 1 FROM PAY_ITEM WHERE COMPANY_ID = ? AND PAY_ITEM_NAME = ? AND PAY_ITEM_ID <> ? AND ROWNUM = 1");
+				pstmt.setInt(1, companyId);
+				pstmt.setString(2, payItemName);
+				pstmt.setInt(3, excludePayItemId);
+			}
+
+			rs = pstmt.executeQuery();
+			return rs.next();
+
+		} finally {
+
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+
+		}
+
+	}
+
+	/**
+	 * 급여 지급상세에서 이 항목을 쓰는지 본다.
+	 * 給与支給明細でこの項目を使っているかを見る。
+	 */
+	public boolean existsPayrollUsage(Connection conn, int payItemId) throws SQLException {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+
+			pstmt = conn.prepareStatement(
+					"SELECT 1 FROM PAYROLL_PAY_DETAIL WHERE PAY_ITEM_ID = ? AND ROWNUM = 1");
+			pstmt.setInt(1, payItemId);
+			rs = pstmt.executeQuery();
+			return rs.next();
+
+		} finally {
+
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+
+		}
+
+	}
+
+	/**
 	 * 지급항목을 수정한다.
 	 * 支給項目を更新する。
 	 */
-	public void update(Connection conn, PayItem item) throws SQLException {
+	public int update(Connection conn, PayItem item) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -354,7 +417,7 @@ public class PayItemDao {
 			// WHEREのバインドはSETの次の順である。
 			pstmt.setInt(11, item.getPayItemId());
 			pstmt.setInt(12, item.getCompanyId());
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 
 		} finally {
 
@@ -370,7 +433,7 @@ public class PayItemDao {
 	 * 지급항목을 PK로 삭제한다.
 	 * 支給項目をPKで削除する。
 	 */
-	public void delete(Connection conn, int payItemId) throws SQLException {
+	public int delete(Connection conn, int payItemId) throws SQLException {
 
 		PreparedStatement pstmt = null;
 
@@ -382,7 +445,7 @@ public class PayItemDao {
 			pstmt.setInt(1, payItemId);
 			// DELETE를 실행한다.
 			// DELETEを実行する。
-			pstmt.executeUpdate();
+			return pstmt.executeUpdate();
 
 		} finally {
 
