@@ -3,6 +3,13 @@
 <%!private String nz(String s) {
 		return s == null ? "" : s;
 	}
+
+	private String getAttrOrParam(javax.servlet.http.HttpServletRequest req, String key) {
+		Object attr = req.getAttribute(key);
+		if (attr != null) return attr.toString();
+		return nz(req.getParameter(key));
+}
+
 	private String eq(String submitted, String optionValue) {
 		return optionValue.equals(submitted) ? "selected" : "";
 	}
@@ -355,11 +362,11 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= licenseRowCount; i++) {
-								String licName = nz(request.getParameter("licenseName" + i));
-								String licDate = nz(request.getParameter("licenseDate" + i));
-								String licOrg = nz(request.getParameter("licenseOrg" + i));
-								String licGrade = nz(request.getParameter("licenseGrade" + i));
-								String licMemo = nz(request.getParameter("licenseMemo" + i));
+								String licName = getAttrOrParam(request, "licenseName" + i);
+								String licDate = getAttrOrParam(request, "licenseDate" + i);
+								String licOrg = getAttrOrParam(request, "licenseOrg" + i);
+								String licGrade = getAttrOrParam(request, "licenseGrade" + i);
+								String licMemo = getAttrOrParam(request, "licenseMemo" + i);
 							%>
 							<tr>
 								<td><input type="checkbox" name="licenseDel<%=i%>"></td>
@@ -412,13 +419,13 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= trainingRowCount; i++) {
-								String trType = nz(request.getParameter("trainingType" + i));
-								String trName = nz(request.getParameter("trainingName" + i));
-								String trOrg = nz(request.getParameter("trainingOrg" + i));
-								String trStart = nz(request.getParameter("trainingStart" + i));
-								String trEnd = nz(request.getParameter("trainingEnd" + i));
-								String trCost = nz(request.getParameter("trainingCost" + i));
-								String trRefund = nz(request.getParameter("trainingRefund" + i));
+								String trType = getAttrOrParam(request, "trainingType" + i);
+								String trName = getAttrOrParam(request, "trainingName" + i);
+								String trOrg = getAttrOrParam(request, "trainingOrg" + i);
+								String trStart = getAttrOrParam(request, "trainingStart" + i);
+								String trEnd = getAttrOrParam(request, "trainingEnd" + i);
+								String trCost = getAttrOrParam(request, "trainingCost" + i);
+								String trRefund = getAttrOrParam(request, "trainingRefund" + i);
 							%>
 							<tr>
 								<td><input type="checkbox" name="trainingDel<%=i%>"></td>
@@ -479,11 +486,11 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= rewardRowCount; i++) {
-								String rwType = nz(request.getParameter("rewardType" + i));
-								String rwDate = nz(request.getParameter("rewardDate" + i));
-								String rwName = nz(request.getParameter("rewardName" + i));
-								String rwContent = nz(request.getParameter("rewardContent" + i));
-								String rwMemo = nz(request.getParameter("rewardMemo" + i));
+								String rwType = getAttrOrParam(request, "rewardType" + i);
+								String rwDate = getAttrOrParam(request, "rewardDate" + i);
+								String rwName = getAttrOrParam(request, "rewardName" + i);
+								String rwContent = getAttrOrParam(request, "rewardContent" + i);
+								String rwMemo = getAttrOrParam(request, "rewardMemo" + i);
 							%>
 							<tr>
 								<td><input type="checkbox" name="rewardDel<%=i%>"></td>
@@ -547,12 +554,12 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= appointmentRowCount; i++) {
-								String apType = nz(request.getParameter("apptType" + i));
-								String apDate = nz(request.getParameter("apptDate" + i));
-								String apDept = nz(request.getParameter("apptDept" + i));
-								String apPosition = nz(request.getParameter("apptPosition" + i));
-								String apDuty = nz(request.getParameter("apptDuty" + i));
-								String apMemo = nz(request.getParameter("apptMemo" + i));
+								String apType = getAttrOrParam(request, "apptType" + i);
+								String apDate = getAttrOrParam(request, "apptDate" + i);
+								String apDept = getAttrOrParam(request, "apptDept" + i);
+								String apPosition = getAttrOrParam(request, "apptPosition" + i);
+								String apDuty = getAttrOrParam(request, "apptDuty" + i);
+								String apMemo = getAttrOrParam(request, "apptMemo" + i);
 							%>
 							<tr>
 								<td><input type="checkbox" name="apptDel<%=i%>"></td>

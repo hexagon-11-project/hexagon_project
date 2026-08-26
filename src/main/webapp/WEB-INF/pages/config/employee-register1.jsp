@@ -1,7 +1,28 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="config.employee.model.Employee"%>
+<%
+// 사원현황에서 이름 클릭으로 진입한 경우 - DB에서 불러온 사원 데이터
+Employee loadEmployee = (Employee) request.getAttribute("loadEmployee");
+%>
 <%!
 	// null이면 빈 문자열로 (input value에 "null" 글자가 그대로 찍히는 것 방지)
 	private String nz(String s) { return s == null ? "" : s; }
+
+	// request attribute → getParameter 순으로 값 읽기 (loadAllSubTableData가 setAttribute로 값 세팅하므로)
+	private String getAttrOrParam(javax.servlet.http.HttpServletRequest req, String key) {
+		Object attr = req.getAttribute(key);
+		if (attr != null) return attr.toString();
+		return nz(req.getParameter(key));
+	}
+
+	// 전화번호 문자열을 지역번호-국번-번호 3부분으로 분리
+	private String[] splitPhone(String phone) {
+		if (phone == null || phone.isBlank()) return new String[]{"", "", ""};
+		String[] parts = phone.split("-");
+		if (parts.length == 3) return parts;
+		if (parts.length == 2) return new String[]{parts[0], parts[1], ""};
+		return new String[]{phone, "", ""};
+	}
 	// select의 option에 넣을 selected 속성 문자열
 	private String eq(String submitted, String optionValue) {
 		return optionValue.equals(submitted) ? "selected" : "";
@@ -26,7 +47,7 @@ request.setAttribute("pageJs", null);
 		<div class="employee-profile-box">
 			<div class="employee-photo-placeholder" id="photoBox" onclick="document.getElementById('photoSelectDialog').classList.add('open');" style="cursor:pointer;">
 				<%
-				String currentPhoto = nz(request.getParameter("photoPath"));
+				String currentPhoto = loadEmployee != null && loadEmployee.getPhotoPath() != null ? loadEmployee.getPhotoPath() : nz(request.getParameter("photoPath"));
 				if (!currentPhoto.isEmpty()) {
 				%>
 				<img src="<%=request.getContextPath()%><%=currentPhoto%>" style="width:100%;height:100%;object-fit:cover;">
@@ -42,13 +63,13 @@ request.setAttribute("pageJs", null);
 				<dt>사원번호</dt>
 				<dd>${defaultEmpNo}</dd>
 				<dt>성명</dt>
-				<dd><%=nz(request.getParameter("employeeName"))%></dd>
+				<dd><%=loadEmployee != null ? nz(loadEmployee.getEmployeeName()) : nz(request.getParameter("employeeName"))%></dd>
 				<dt>부서</dt>
-				<dd><%=nz(request.getParameter("department"))%></dd>
+				<dd><%=loadEmployee != null ? nz(loadEmployee.getDepartment()) : nz(request.getParameter("department"))%></dd>
 				<dt>직위</dt>
-				<dd><%=nz(request.getParameter("position"))%></dd>
+				<dd><%=loadEmployee != null ? nz(loadEmployee.getPosition()) : nz(request.getParameter("position"))%></dd>
 				<dt>입사일</dt>
-				<dd><%=nz(request.getParameter("hireDate"))%></dd>
+				<dd><%=loadEmployee != null && loadEmployee.getHireDate() != null ? loadEmployee.getHireDate().toString() : nz(request.getParameter("hireDate"))%></dd>
 			</dl>
 			<div class="mini-actions">
 				<button type="button" class="btn btn-sm" onclick="document.getElementById('photoSelectDialog').classList.add('open');">등록</button>
@@ -105,63 +126,98 @@ request.setAttribute("pageJs", null);
 			<input type="hidden" name="familyRowCount" value="<%=familyRowCount%>">
 			<input type="hidden" name="educationRowCount" value="<%=educationRowCount%>">
 			<input type="hidden" name="careerRowCount" value="<%=careerRowCount%>">
-			<input type="hidden" name="photoPath" id="photoPathInput" value="<%=nz(request.getParameter("photoPath"))%>">
+			<input type="hidden" name="photoPath" id="photoPathInput" value="<%=currentPhoto%>">
+			<%
+			String existingEmployeeId = loadEmployee != null
+				? String.valueOf(loadEmployee.getEmployeeId())
+				: nz(request.getParameter("existingEmployeeId"));
+			String existingEmployeeNo = loadEmployee != null
+				? loadEmployee.getEmployeeNo()
+				: nz(request.getParameter("existingEmployeeNo"));
+			if (!existingEmployeeId.isEmpty()) {
+			%>
+			<input type="hidden" name="existingEmployeeId" value="<%=existingEmployeeId%>">
+			<input type="hidden" name="existingEmployeeNo" value="<%=existingEmployeeNo%>">
+			<%
+			}
+			%>
 
 
 			<section class="source-section">
 				<div class="source-section-title">기본정보</div>
 				<%
 				// 서버 왕복(부양가족 [추가] 등) 후에도 그대로 채워 넣기 위해, 제출된 값을 미리 다 읽어둔다.
-				String v_employmentType = nz(request.getParameter("employmentType"));
-				String v_employeeName = nz(request.getParameter("employeeName"));
-				String v_employeeNameEn = nz(request.getParameter("employeeNameEn"));
-				String v_hireDate = nz(request.getParameter("hireDate"));
-				String v_resignDate = nz(request.getParameter("resignDate"));
-				String v_department = nz(request.getParameter("department"));
-				String v_position = nz(request.getParameter("position"));
-				String v_domForYn = nz(request.getParameter("domForYn"));
-				String v_rrnFront = nz(request.getParameter("residentRegNoFront"));
-				String v_rrnBack = nz(request.getParameter("residentRegNoBack"));
-				String v_phone1 = nz(request.getParameter("phone1"));
-				String v_phone2 = nz(request.getParameter("phone2"));
-				String v_phone3 = nz(request.getParameter("phone3"));
-				String v_mobile1 = nz(request.getParameter("mobile1"));
-				String v_mobile2 = nz(request.getParameter("mobile2"));
-				String v_mobile3 = nz(request.getParameter("mobile3"));
-				String v_email = nz(request.getParameter("email"));
-				String v_sns = nz(request.getParameter("sns"));
-				String v_empIncomeType = nz(request.getParameter("empIncomeType"));
-				if (v_empIncomeType.isEmpty()) { v_empIncomeType = "근로소득자 갑근세"; } // 최초 진입 시 기본 선택값
-				String v_bankName = nz(request.getParameter("bankName"));
-				String v_bankAccount = nz(request.getParameter("bankAccount"));
-				String v_insNoNP = nz(request.getParameter("insuranceNoNP"));
-				String v_insAcqNP = nz(request.getParameter("acquisitionDateNP"));
-				String v_insLossNP = nz(request.getParameter("lossDateNP"));
-				String v_insNoHI = nz(request.getParameter("insuranceNoHI"));
-				String v_insAcqHI = nz(request.getParameter("acquisitionDateHI"));
-				String v_insLossHI = nz(request.getParameter("lossDateHI"));
-				String v_insNoEI = nz(request.getParameter("insuranceNoEI"));
-				String v_insAcqEI = nz(request.getParameter("acquisitionDateEI"));
-				String v_insLossEI = nz(request.getParameter("lossDateEI"));
-				String v_insNoII = nz(request.getParameter("insuranceNoII"));
-				String v_insAcqII = nz(request.getParameter("acquisitionDateII"));
-				String v_insLossII = nz(request.getParameter("lossDateII"));
-				String v_baseWageAmount = nz(request.getParameter("baseWageAmount"));
+				// 사원현황에서 이름 클릭으로 진입한 경우 - DB에서 불러온 Employee 객체값을 request 파라미터처럼 세팅
+				if (loadEmployee != null) {
+					// phone/mobile을 지역번호-국번-번호로 분리해서 세팅
+					String[] phoneParts = splitPhone(nz(loadEmployee.getPhone()));
+					String[] mobileParts = splitPhone(nz(loadEmployee.getMobile()));
+					// 주민번호 앞뒤 분리
+					String rrn = nz(loadEmployee.getResidentRegNo());
+					String rrnFront = rrn.length() >= 6 ? rrn.substring(0, 6) : rrn;
+					String rrnBack = rrn.length() > 6 ? rrn.substring(7) : "";
+					request.setAttribute("_emp_loaded", "true");
+					// 아래 getParameter들이 null을 반환하지 않도록 request에 세팅
+					request.setAttribute("emp", loadEmployee);
+				}
+
+				String v_employmentType = loadEmployee != null ? nz(loadEmployee.getEmploymentType()) : nz(request.getParameter("employmentType"));
+				String v_employeeName = loadEmployee != null ? nz(loadEmployee.getEmployeeName()) : nz(request.getParameter("employeeName"));
+				String v_employeeNameEn = loadEmployee != null ? nz(loadEmployee.getEmployeeNameEn()) : nz(request.getParameter("employeeNameEn"));
+				String v_hireDate = loadEmployee != null && loadEmployee.getHireDate() != null ? loadEmployee.getHireDate().toString() : nz(request.getParameter("hireDate"));
+				String v_resignDate = loadEmployee != null && loadEmployee.getResignDate() != null ? loadEmployee.getResignDate().toString() : nz(request.getParameter("resignDate"));
+				String v_department = loadEmployee != null ? nz(loadEmployee.getDepartment()) : nz(request.getParameter("department"));
+				String v_position = loadEmployee != null ? nz(loadEmployee.getPosition()) : nz(request.getParameter("position"));
+				String v_domForYn = loadEmployee != null ? nz(loadEmployee.getDomForYn()) : nz(request.getParameter("domForYn"));
+				String rrn = loadEmployee != null ? nz(loadEmployee.getResidentRegNo()) : "";
+				String v_rrnFront = loadEmployee != null ? (rrn.length() >= 6 ? rrn.substring(0, 6) : rrn) : nz(request.getParameter("residentRegNoFront"));
+				String v_rrnBack = loadEmployee != null ? (rrn.length() > 6 ? rrn.substring(7) : "") : nz(request.getParameter("residentRegNoBack"));
+				String[] phoneParts = loadEmployee != null ? splitPhone(nz(loadEmployee.getPhone())) : new String[]{"", "", ""};
+				String v_phone1 = loadEmployee != null ? phoneParts[0] : nz(request.getParameter("phone1"));
+				String v_phone2 = loadEmployee != null ? phoneParts[1] : nz(request.getParameter("phone2"));
+				String v_phone3 = loadEmployee != null ? phoneParts[2] : nz(request.getParameter("phone3"));
+				String[] mobileParts = loadEmployee != null ? splitPhone(nz(loadEmployee.getMobile())) : new String[]{"", "", ""};
+				String v_mobile1 = loadEmployee != null ? mobileParts[0] : nz(request.getParameter("mobile1"));
+				String v_mobile2 = loadEmployee != null ? mobileParts[1] : nz(request.getParameter("mobile2"));
+				String v_mobile3 = loadEmployee != null ? mobileParts[2] : nz(request.getParameter("mobile3"));
+				String v_email = loadEmployee != null ? nz(loadEmployee.getEmail()) : nz(request.getParameter("email"));
+				String v_sns = loadEmployee != null ? nz(loadEmployee.getSns()) : nz(request.getParameter("sns"));
+				String v_empIncomeType = loadEmployee != null ? nz(loadEmployee.getEmpIncomeType()) : nz(request.getParameter("empIncomeType"));
+				if (v_empIncomeType.isEmpty()) { v_empIncomeType = "근로소득자 갑근세"; }
+				String v_bankName = loadEmployee != null ? nz(loadEmployee.getBankName()) : nz(request.getParameter("bankName"));
+				String v_bankAccount = loadEmployee != null ? nz(loadEmployee.getBankAccount()) : nz(request.getParameter("bankAccount"));
+				String v_insNoNP = getAttrOrParam(request, "insuranceNoNP");
+				String v_insAcqNP = getAttrOrParam(request, "acquisitionDateNP");
+				String v_insLossNP = getAttrOrParam(request, "lossDateNP");
+				String v_insNoHI = getAttrOrParam(request, "insuranceNoHI");
+				String v_insAcqHI = getAttrOrParam(request, "acquisitionDateHI");
+				String v_insLossHI = getAttrOrParam(request, "lossDateHI");
+				String v_insNoEI = getAttrOrParam(request, "insuranceNoEI");
+				String v_insAcqEI = getAttrOrParam(request, "acquisitionDateEI");
+				String v_insLossEI = getAttrOrParam(request, "lossDateEI");
+				String v_insNoII = getAttrOrParam(request, "insuranceNoII");
+				String v_insAcqII = getAttrOrParam(request, "acquisitionDateII");
+				String v_insLossII = getAttrOrParam(request, "lossDateII");
+				String v_baseWageAmount = loadEmployee != null && loadEmployee.getBaseWageAmount() > 0
+						? String.valueOf(loadEmployee.getBaseWageAmount()) : nz(request.getParameter("baseWageAmount"));
 				if (v_baseWageAmount.isEmpty()) { v_baseWageAmount = "0"; }
-				String v_nationalPensionBaseAmount = nz(request.getParameter("nationalPensionBaseAmount"));
+				String v_nationalPensionBaseAmount = loadEmployee != null && loadEmployee.getNationalPensionBaseAmount() > 0
+						? String.valueOf(loadEmployee.getNationalPensionBaseAmount()) : nz(request.getParameter("nationalPensionBaseAmount"));
 				if (v_nationalPensionBaseAmount.isEmpty()) { v_nationalPensionBaseAmount = "0"; }
-				String v_healthInsuranceBaseAmount = nz(request.getParameter("healthInsuranceBaseAmount"));
+				String v_healthInsuranceBaseAmount = loadEmployee != null && loadEmployee.getHealthInsuranceBaseAmount() > 0
+						? String.valueOf(loadEmployee.getHealthInsuranceBaseAmount()) : nz(request.getParameter("healthInsuranceBaseAmount"));
 				if (v_healthInsuranceBaseAmount.isEmpty()) { v_healthInsuranceBaseAmount = "0"; }
-				String v_employmentInsuranceAmount = nz(request.getParameter("employmentInsuranceAmount"));
+				String v_employmentInsuranceAmount = loadEmployee != null && loadEmployee.getEmploymentInsuranceAmount() > 0
+						? String.valueOf(loadEmployee.getEmploymentInsuranceAmount()) : nz(request.getParameter("employmentInsuranceAmount"));
 				if (v_employmentInsuranceAmount.isEmpty()) { v_employmentInsuranceAmount = "0"; }
-				String v_militaryStatus = nz(request.getParameter("militaryStatus"));
-				String v_militaryBranchCode = nz(request.getParameter("militaryBranchCode"));
-				String v_militaryStartDate = nz(request.getParameter("militaryStartDate"));
-				String v_militaryEndDate = nz(request.getParameter("militaryEndDate"));
-				String v_militaryGrade = nz(request.getParameter("militaryGrade"));
-				String v_militaryBranch = nz(request.getParameter("militaryBranch"));
-				String v_militarySpecialty = nz(request.getParameter("militarySpecialty"));
-				String v_militaryExemptReason = nz(request.getParameter("militaryExemptReason"));
+				String v_militaryStatus = getAttrOrParam(request, "militaryStatus");
+				String v_militaryBranchCode = getAttrOrParam(request, "militaryBranchCode");
+				String v_militaryStartDate = getAttrOrParam(request, "militaryStartDate");
+				String v_militaryEndDate = getAttrOrParam(request, "militaryEndDate");
+				String v_militaryGrade = getAttrOrParam(request, "militaryGrade");
+				String v_militaryBranch = getAttrOrParam(request, "militaryBranch");
+				String v_militarySpecialty = getAttrOrParam(request, "militarySpecialty");
+				String v_militaryExemptReason = getAttrOrParam(request, "militaryExemptReason");
 				%>
 				<table class="source-form-table">
 					<tbody>
@@ -520,9 +576,9 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= familyRowCount; i++) {
-							    String relVal = request.getParameter("familyRelation" + i);
-							    String nameVal = request.getParameter("familyName" + i);
-							    String rrnVal = request.getParameter("familyRrn" + i);
+							    String relVal = getAttrOrParam(request, "familyRelation" + i);
+							    String nameVal = getAttrOrParam(request, "familyName" + i);
+							    String rrnVal = getAttrOrParam(request, "familyRrn" + i);
 							    if (relVal == null) relVal = "";
 							    if (nameVal == null) nameVal = "";
 							    if (rrnVal == null) rrnVal = "";
@@ -549,16 +605,16 @@ request.setAttribute("pageJs", null);
 								</select></td>
 								<td><input class="input" type="text" name="familyName<%=i%>" value="<%=nameVal%>"></td>
 								<td><select class="select" name="familyDomForYn<%=i%>">
-										<option value="" <%=request.getParameter("familyDomForYn"+i) == null || request.getParameter("familyDomForYn"+i).isEmpty() ? "selected" : ""%>>선택</option>
-										<option value="Y" <%="Y".equals(request.getParameter("familyDomForYn"+i)) ? "selected" : ""%>>내국인</option>
-										<option value="N" <%="N".equals(request.getParameter("familyDomForYn"+i)) ? "selected" : ""%>>외국인</option>
+										<option value="" <%=getAttrOrParam(request, "familyDomForYn"+i).isEmpty() ? "selected" : ""%>>선택</option>
+										<option value="Y" <%="Y".equals(getAttrOrParam(request, "familyDomForYn"+i)) ? "selected" : ""%>>내국인</option>
+										<option value="N" <%="N".equals(getAttrOrParam(request, "familyDomForYn"+i)) ? "selected" : ""%>>외국인</option>
 								</select></td>
 								<td><input class="input" type="text" name="familyRrn<%=i%>" value="<%=rrnVal%>"></td>
-								<td><input type="checkbox" name="familyDisabled<%=i%>" <%="on".equals(request.getParameter("familyDisabled"+i)) ? "checked" : ""%>></td>
-								<td><input type="checkbox" name="familyDeduction<%=i%>" <%="on".equals(request.getParameter("familyDeduction"+i)) ? "checked" : ""%>></td>
-								<td><input type="checkbox" name="familyHealthIns<%=i%>" <%="on".equals(request.getParameter("familyHealthIns"+i)) ? "checked" : ""%>></td>
-								<td><input type="checkbox" name="familyCohab<%=i%>" <%="on".equals(request.getParameter("familyCohab"+i)) ? "checked" : ""%>></td>
-								<td><input type="checkbox" name="familyMultiChild<%=i%>" <%="on".equals(request.getParameter("familyMultiChild"+i)) ? "checked" : ""%>></td>
+								<td><input type="checkbox" name="familyDisabled<%=i%>" <%="on".equals(getAttrOrParam(request, "familyDisabled"+i)) ? "checked" : ""%>></td>
+								<td><input type="checkbox" name="familyDeduction<%=i%>" <%="on".equals(getAttrOrParam(request, "familyDeduction"+i)) ? "checked" : ""%>></td>
+								<td><input type="checkbox" name="familyHealthIns<%=i%>" <%="on".equals(getAttrOrParam(request, "familyHealthIns"+i)) ? "checked" : ""%>></td>
+								<td><input type="checkbox" name="familyCohab<%=i%>" <%="on".equals(getAttrOrParam(request, "familyCohab"+i)) ? "checked" : ""%>></td>
+								<td><input type="checkbox" name="familyMultiChild<%=i%>" <%="on".equals(getAttrOrParam(request, "familyMultiChild"+i)) ? "checked" : ""%>></td>
 							</tr>
 							<% } %>
 						</tbody>
@@ -592,11 +648,11 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= educationRowCount; i++) {
-							    String eduSchool = nz(request.getParameter("educationSchool" + i));
-							    String eduMajor = nz(request.getParameter("educationMajor" + i));
-							    String eduStart = nz(request.getParameter("educationStart" + i));
-							    String eduEnd = nz(request.getParameter("educationEnd" + i));
-							    String eduStatus = nz(request.getParameter("educationStatus" + i));
+							    String eduSchool = getAttrOrParam(request, "educationSchool" + i);
+							    String eduMajor = getAttrOrParam(request, "educationMajor" + i);
+							    String eduStart = getAttrOrParam(request, "educationStart" + i);
+							    String eduEnd = getAttrOrParam(request, "educationEnd" + i);
+							    String eduStatus = getAttrOrParam(request, "educationStatus" + i);
 							%>
 							<tr>
 								<td><input type="checkbox" name="educationDel<%=i%>"></td>
@@ -647,11 +703,11 @@ request.setAttribute("pageJs", null);
 						<tbody>
 							<%
 							for (int i = 1; i <= careerRowCount; i++) {
-							    String carCompany = nz(request.getParameter("careerCompany" + i));
-							    String carDept = nz(request.getParameter("careerDept" + i));
-							    String carPosition = nz(request.getParameter("careerPosition" + i));
-							    String carStart = nz(request.getParameter("careerStart" + i));
-							    String carEnd = nz(request.getParameter("careerEnd" + i));
+							    String carCompany = getAttrOrParam(request, "careerCompany" + i);
+							    String carDept = getAttrOrParam(request, "careerDept" + i);
+							    String carPosition = getAttrOrParam(request, "careerPosition" + i);
+							    String carStart = getAttrOrParam(request, "careerStart" + i);
+							    String carEnd = getAttrOrParam(request, "careerEnd" + i);
 							    String carDuty = nz(request.getParameter("careerDuty" + i));
 							%>
 							<tr>
@@ -775,7 +831,7 @@ request.setAttribute("pageJs", null);
 		<div class="dialog-body">
 			<div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; padding:8px 0;">
 				<%
-				for (int pi = 1; pi <= 5; pi++) {
+				for (int pi = 1; pi <= 6; pi++) {
 					String pPath = "/assets/img/profile/" + pi + ".jpg";
 					String currentSelected = nz(request.getParameter("photoPath"));
 				%>
