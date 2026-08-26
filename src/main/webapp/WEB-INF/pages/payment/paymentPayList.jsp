@@ -29,10 +29,6 @@ body { min-width: 1200px; background: #fff; }
 .ppl-table tbody td.ppl-num { text-align: right; padding-right: 12px; }
 .ppl-table tfoot td { background: #fcf8e3; font-weight: bold; }
 
-.ppl-pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; font-size: 13px; }
-.ppl-pagination a { color: #337ab7; text-decoration: none; }
-.ppl-pagination .ppl-page-num { display: inline-block; min-width: 22px; text-align: center; padding: 2px 6px; border: 1px solid #337ab7; border-radius: 3px; color: #337ab7; font-weight: bold; }
-
 .ppl-back-wrap { text-align: center; margin-top: 20px; }
 .ppl-back-btn { display: inline-block; background: #d9d9d9; color: #333; font-size: 14px; font-weight: bold;
 	padding: 10px 30px; border-radius: 20px; text-decoration: none; border: none; cursor: pointer; }
@@ -153,12 +149,6 @@ body { min-width: 1200px; background: #fff; }
 				</tr>
 			</tfoot>
 		</table>
-
-		<div class="ppl-pagination">
-			<a href="javascript:void(0);">‹ 이전페이지</a>
-			<span class="ppl-page-num">1</span>
-			<a href="javascript:void(0);">다음페이지 ›</a>
-		</div>
 
 		<div class="ppl-back-wrap">
 			<a class="ppl-back-btn" href="${pageContext.request.contextPath}/Payment/paymentRegisterList.do">급여대장 목록</a>

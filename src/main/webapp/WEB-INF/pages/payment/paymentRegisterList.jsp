@@ -23,10 +23,6 @@ body { min-width: 1200px; background: #fff; }
 .prl-table tr.prl-total-row td { background: #fcf8e3; font-weight: bold; }
 .prl-btn-del { background: #fff; border: 1px solid #ccc; color: #d9534f; padding: 3px 10px; font-size: 12px; border-radius: 3px; cursor: pointer; }
 .prl-btn-del:hover { background: #fdf3f2; }
-
-.prl-pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; font-size: 13px; }
-.prl-pagination a { color: #337ab7; text-decoration: none; }
-.prl-pagination .prl-page-num { display: inline-block; min-width: 22px; text-align: center; padding: 2px 6px; border: 1px solid #337ab7; border-radius: 3px; color: #337ab7; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -106,12 +102,6 @@ body { min-width: 1200px; background: #fff; }
 				</tr>
 			</tbody>
 		</table>
-
-		<div class="prl-pagination">
-			<a href="javascript:void(0);">‹ 이전페이지</a>
-			<span class="prl-page-num">1</span>
-			<a href="javascript:void(0);">다음페이지 ›</a>
-		</div>
 	</main>
 
 	<%@ include file="../../jspf/app-end.jspf"%>
