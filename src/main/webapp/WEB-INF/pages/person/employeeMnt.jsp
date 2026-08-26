@@ -46,17 +46,12 @@ request.setAttribute("pageJs", null);
 			</select>
 			<input class="input" type="text" name="keyword" value="${param.keyword}" placeholder="검색어 입력">
 			
-			<!--  전체보기 옆에 검색 버튼 추가 -->
 			<button type="submit" class="btn btn-primary">검색</button>
 			<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/Person/employeeMnt.do'">전체보기</button>
 		</div>
 	</form>
 
 	<div class="search-strip">
-		<select class="select"><option>고용형태별</option></select>
-		<select class="select"><option>상태별</option></select>
-		<select class="select"><option>30개 보기</option></select>
-		<button type="button" class="btn">정렬기준 설정하기</button>
 	</div>
 </div>
 
@@ -80,12 +75,19 @@ request.setAttribute("pageJs", null);
 			</thead>
 			<tbody>
 				<c:forEach var="emp" items="${employeePage.content}">
-					<tr>
+					<tr style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
 						<td><input type="checkbox" name="empId" value="${emp.employeeId}"></td>
-
 						<td>${emp.employmentType}</td>
 						<td>${emp.employeeNo}</td>
-						<td><strong>${emp.employeeName}</strong></td>
+						
+						<td>
+							<strong>
+								<a href="${pageContext.request.contextPath}/Config/employeeIns1.do?employeeId=${emp.employeeId}" style="text-decoration: underline; color: #0056b3;">
+									${emp.employeeName}
+								</a>
+							</strong>
+						</td>
+						
 						<td>${emp.department}</td>
 						<td>${emp.position}</td>
 						<td>${emp.birthDate}</td>
@@ -133,7 +135,6 @@ request.setAttribute("pageJs", null);
 <div class="source-bottom-actions">
 	<button type="button" class="btn btn-primary"
 		onclick="location.href='${pageContext.request.contextPath}/Config/employeeIns1.do'">신규사원등록</button>
-	<!-- <button type="submit" class="btn">선택 삭제</button> -->
 	<button type="submit" form="deleteForm" class="btn">선택 삭제</button>
 </div>
 

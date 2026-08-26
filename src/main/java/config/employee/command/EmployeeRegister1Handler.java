@@ -28,8 +28,26 @@ public class EmployeeRegister1Handler implements CommandHandler {
 
     // 1. GET 요청: 사원 등록 폼 화면을 보여줄 때 처리
     private String processForm(HttpServletRequest request, HttpServletResponse response) {
-        String nextEmpNo = registerService.generateNextEmpNo();
-        request.setAttribute("defaultEmpNo", nextEmpNo);
+        String employeeIdParam = request.getParameter("employeeId");
+
+        if (employeeIdParam != null && !employeeIdParam.isBlank()) {
+            // 사원현황에서 이름 클릭 - 기존 사원 데이터를 폼에 채워서 보여줌
+            int employeeId = Integer.parseInt(employeeIdParam);
+            Employee emp = registerService.getEmployeeById(employeeId);
+            if (emp != null) {
+                request.setAttribute("loadEmployee", emp);
+                request.setAttribute("defaultEmpNo", emp.getEmployeeNo());
+                registerService.loadAllSubTableData(employeeId, request);
+            } else {
+                String nextEmpNo = registerService.generateNextEmpNo();
+                request.setAttribute("defaultEmpNo", nextEmpNo);
+            }
+        } else {
+            // 신규 등록 - 새 사원번호 채번
+            String nextEmpNo = registerService.generateNextEmpNo();
+            request.setAttribute("defaultEmpNo", nextEmpNo);
+        }
+
         return FORM_VIEW;
     }
 
@@ -132,8 +150,21 @@ public class EmployeeRegister1Handler implements CommandHandler {
             emp.setMobile(mobile1 + "-" + mobile2 + "-" + mobile3);
         }
 
-        // 6. 서비스 호출하여 DB 저장 (사원 기본정보 + 부양가족/학력/경력 한 번에)
-        registerService.registerEmployee(emp, request);
+        // 6. 서비스 호출하여 DB 저장 (기존 사원이면 UPDATE, 신규이면 INSERT)
+        String existingEmployeeIdParam = request.getParameter("existingEmployeeId");
+        if (existingEmployeeIdParam != null && !existingEmployeeIdParam.isBlank()) {
+            // 사원현황에서 불러온 기존 사원 수정 - UPDATE
+            emp.setEmployeeId(Integer.parseInt(existingEmployeeIdParam));
+            // 기존 사원번호 그대로 유지 (새로 채번 안 함) - existingEmployeeNo 파라미터 우선 사용
+            String existingEmployeeNo = request.getParameter("existingEmployeeNo");
+            emp.setEmployeeNo((existingEmployeeNo != null && !existingEmployeeNo.isBlank())
+                ? existingEmployeeNo
+                : request.getParameter("employeeNo"));
+            registerService.updateEmployee(emp, request);
+        } else {
+            // 신규 등록 - INSERT
+            registerService.registerEmployee(emp, request);
+        }
 
         // 7. 어느 버튼으로 눌렀는지에 따라 이동할 곳이 다름
         if ("saveAndStay".equals(formAction)) {

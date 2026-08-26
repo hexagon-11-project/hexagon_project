@@ -99,13 +99,22 @@ public class EmployeeDao {
 
     // 3. 사원번호로 1명의 사원 정보를 SELECT (2페이지 진입 시 데이터 불러오기용)
     public Employee selectEmployee(Connection conn, String employeeNo) throws SQLException {
+        return selectEmployeeByCondition(conn, "EMPLOYEE_NO", employeeNo);
+    }
+
+    // 3-1. employeeId로 1명의 사원 정보를 SELECT (사원현황에서 이름 클릭 시 사원등록1 폼 불러오기용)
+    public Employee selectEmployeeById(Connection conn, int employeeId) throws SQLException {
+        return selectEmployeeByCondition(conn, "EMPLOYEE_ID", String.valueOf(employeeId));
+    }
+
+    private Employee selectEmployeeByCondition(Connection conn, String column, String value) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Employee emp = null;
         try {
-            String sql = "SELECT * FROM EMPLOYEE WHERE EMPLOYEE_NO = ?";
+            String sql = "SELECT * FROM EMPLOYEE WHERE " + column + " = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, employeeNo);
+            pstmt.setString(1, value);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -134,6 +143,8 @@ public class EmployeeDao {
                 emp.setHealthInsuranceBaseAmount(rs.getInt("HEALTH_INSURANCE_BASE_AMOUNT"));
                 emp.setEmploymentInsuranceAmount(rs.getInt("EMPLOYMENT_INSURANCE_AMOUNT"));
                 emp.setPhotoPath(rs.getString("PHOTO_PATH"));
+                emp.setBaseWageAmount(rs.getInt("BASE_WAGE_AMOUNT"));
+                emp.setEmpIncomeType(rs.getString("EMP_INCOME_TYPE"));
             }
             return emp;
         } finally {
@@ -148,6 +159,50 @@ public class EmployeeDao {
         try {
             pstmt = conn.prepareStatement("DELETE FROM EMPLOYEE WHERE EMPLOYEE_NO = ?");
             pstmt.setString(1, employeeNo);
+            pstmt.executeUpdate();
+        } finally {
+            JdbcUtil.close(pstmt);
+        }
+    }
+
+    // 4-1. 사원현황에서 불러온 기존 사원 정보 수정 (1페이지 기본정보 UPDATE)
+    public void update(Connection conn, Employee emp) throws SQLException {
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(
+                "UPDATE EMPLOYEE SET "
+                + "EMPLOYMENT_TYPE=?, EMPLOYEE_NAME=?, EMPLOYEE_NAME_EN=?, "
+                + "HIRE_DATE=?, RESIGN_DATE=?, DEPARTMENT=?, POSITION=?, "
+                + "DOM_FOR_YN=?, RESIDENT_REG_NO=?, PHONE=?, MOBILE=?, "
+                + "EMAIL=?, SNS=?, BANK_NAME=?, BANK_ACCOUNT=?, "
+                + "EMP_INCOME_TYPE=?, BASE_WAGE_AMOUNT=?, "
+                + "NATIONAL_PENSION_BASE_AMOUNT=?, HEALTH_INSURANCE_BASE_AMOUNT=?, "
+                + "EMPLOYMENT_INSURANCE_AMOUNT=?, PHOTO_PATH=?, "
+                + "MOD_ID='SYSTEM', UPDATED_AT=SYSDATE "
+                + "WHERE EMPLOYEE_ID=?");
+            int i = 1;
+            pstmt.setString(i++, emp.getEmploymentType());
+            pstmt.setString(i++, emp.getEmployeeName());
+            pstmt.setString(i++, emp.getEmployeeNameEn());
+            pstmt.setDate(i++, emp.getHireDate());
+            pstmt.setDate(i++, emp.getResignDate());
+            pstmt.setString(i++, emp.getDepartment());
+            pstmt.setString(i++, emp.getPosition());
+            pstmt.setString(i++, emp.getDomForYn());
+            pstmt.setString(i++, emp.getResidentRegNo());
+            pstmt.setString(i++, emp.getPhone());
+            pstmt.setString(i++, emp.getMobile());
+            pstmt.setString(i++, emp.getEmail());
+            pstmt.setString(i++, emp.getSns());
+            pstmt.setString(i++, emp.getBankName());
+            pstmt.setString(i++, emp.getBankAccount());
+            pstmt.setString(i++, emp.getEmpIncomeType());
+            pstmt.setInt(i++, emp.getBaseWageAmount());
+            pstmt.setInt(i++, emp.getNationalPensionBaseAmount());
+            pstmt.setInt(i++, emp.getHealthInsuranceBaseAmount());
+            pstmt.setInt(i++, emp.getEmploymentInsuranceAmount());
+            pstmt.setString(i++, emp.getPhotoPath());
+            pstmt.setInt(i++, emp.getEmployeeId());
             pstmt.executeUpdate();
         } finally {
             JdbcUtil.close(pstmt);

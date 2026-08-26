@@ -222,6 +222,151 @@ public class EmployeeRegister1Service {
         return (value == null || value.isEmpty()) ? defaultValue : value;
     }
 
+    // 사원현황에서 불러온 기존 사원 수정 - 기본정보 UPDATE + 서브 테이블 delete-insert
+    public void updateEmployee(Employee emp, HttpServletRequest request) {
+        Connection conn = null;
+        try {
+            conn = ConnectionProvider.getConnection();
+            conn.setAutoCommit(false);
+
+            employeeDao.update(conn, emp);
+            int employeeId = emp.getEmployeeId();
+
+            // 서브 테이블은 기존 데이터 전부 삭제 후 재삽입
+            dependentDao.deleteByEmployeeId(conn, employeeId);
+            educationDao.deleteByEmployeeId(conn, employeeId);
+            careerDao.deleteByEmployeeId(conn, employeeId);
+            insuranceDao.deleteByEmployeeId(conn, employeeId);
+
+            saveDependents(conn, employeeId, request);
+            saveEducations(conn, employeeId, request);
+            saveCareers(conn, employeeId, request);
+            saveInsurances(conn, employeeId, request);
+            saveMilitary(conn, employeeId, request);
+
+            conn.commit();
+        } catch (SQLException e) {
+            JdbcUtil.rollback(conn);
+            throw new RuntimeException("사원 정보 수정 실패", e);
+        } finally {
+            JdbcUtil.close(conn);
+        }
+    }
+
+    // 사원현황에서 이름 클릭 시 사원등록1 폼에 기존 데이터를 불러오기 위한 조회
+    public Employee getEmployeeById(int employeeId) {
+        Connection conn = null;
+        try {
+            conn = ConnectionProvider.getConnection();
+            return employeeDao.selectEmployeeById(conn, employeeId);
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            JdbcUtil.close(conn);
+        }
+    }
+
+    // 부양가족/학력/경력/4대보험/병역 등 별도 테이블 데이터까지 전부 request에 세팅
+    // JSP가 request.getParameter("familyName1") 등으로 읽으므로, 동일한 키로 setAttribute 해줌
+    public void loadAllSubTableData(int employeeId, HttpServletRequest request) {
+        Connection conn = null;
+        try {
+            conn = ConnectionProvider.getConnection();
+
+            // 부양가족
+            java.util.List<EmployeeDependent> dependents = dependentDao.selectByEmployeeId(conn, employeeId);
+            int familyCount = dependents.size() > 0 ? dependents.size() : 1;
+            request.setAttribute("familyRowCount", familyCount);
+            for (int i = 0; i < dependents.size(); i++) {
+                EmployeeDependent d = dependents.get(i);
+                int n = i + 1;
+                request.setAttribute("familyRelation" + n, nz(d.getRelationCode()));
+                request.setAttribute("familyName" + n, nz(d.getDependentName()));
+                request.setAttribute("familyDomForYn" + n, nz(d.getDomForYn()));
+                request.setAttribute("familyRrn" + n, "");
+                request.setAttribute("familyDisabled" + n, "Y".equals(d.getDisabledYn()) ? "on" : "");
+                request.setAttribute("familyDeduction" + n, "Y".equals(d.getPersonalDeductionYn()) ? "on" : "");
+                request.setAttribute("familyHealthIns" + n, "Y".equals(d.getHealthInsuranceYn()) ? "on" : "");
+                request.setAttribute("familyCohab" + n, "Y".equals(d.getCohabitationYn()) ? "on" : "");
+                request.setAttribute("familyMultiChild" + n, "Y".equals(d.getChildUnder20Yn()) ? "on" : "");
+            }
+
+            // 학력
+            java.util.List<EmployeeEducation> educations = educationDao.selectByEmployeeId(conn, employeeId);
+            int eduCount = educations.size() > 0 ? educations.size() : 1;
+            request.setAttribute("educationRowCount", eduCount);
+            for (int i = 0; i < educations.size(); i++) {
+                EmployeeEducation e = educations.get(i);
+                int n = i + 1;
+                request.setAttribute("educationSchool" + n, nz(e.getSchoolName()));
+                request.setAttribute("educationMajor" + n, nz(e.getMajorName()));
+                request.setAttribute("educationStart" + n, e.getStartDate() != null ? e.getStartDate().toString() : "");
+                request.setAttribute("educationEnd" + n, e.getEndDate() != null ? e.getEndDate().toString() : "");
+                request.setAttribute("educationStatus" + n, nz(e.getGraduationStatus()));
+            }
+
+            // 경력
+            java.util.List<EmployeeCareer> careers = careerDao.selectByEmployeeId(conn, employeeId);
+            int carCount = careers.size() > 0 ? careers.size() : 1;
+            request.setAttribute("careerRowCount", carCount);
+            for (int i = 0; i < careers.size(); i++) {
+                EmployeeCareer c = careers.get(i);
+                int n = i + 1;
+                request.setAttribute("careerCompany" + n, nz(c.getCompanyName()));
+                request.setAttribute("careerDept" + n, nz(c.getDepartment()));
+                request.setAttribute("careerPosition" + n, nz(c.getPosition()));
+                request.setAttribute("careerStart" + n, c.getStartDate() != null ? c.getStartDate().toString() : "");
+                request.setAttribute("careerEnd" + n, c.getEndDate() != null ? c.getEndDate().toString() : "");
+            }
+
+            // 4대보험
+            java.util.List<EmployeeInsurance> insurances = insuranceDao.selectByEmployeeId(conn, employeeId);
+            for (EmployeeInsurance ins : insurances) {
+                String code = nz(ins.getInsuranceTypeCode());
+                String no = nz(ins.getInsuranceNo());
+                String acq = ins.getAcquisitionDate() != null ? ins.getAcquisitionDate().toString() : "";
+                String loss = ins.getLossDate() != null ? ins.getLossDate().toString() : "";
+                if ("국민연금".equals(code)) {
+                    request.setAttribute("insuranceNoNP", no);
+                    request.setAttribute("acquisitionDateNP", acq);
+                    request.setAttribute("lossDateNP", loss);
+                } else if ("건강보험".equals(code)) {
+                    request.setAttribute("insuranceNoHI", no);
+                    request.setAttribute("acquisitionDateHI", acq);
+                    request.setAttribute("lossDateHI", loss);
+                } else if ("고용보험".equals(code)) {
+                    request.setAttribute("insuranceNoEI", no);
+                    request.setAttribute("acquisitionDateEI", acq);
+                    request.setAttribute("lossDateEI", loss);
+                } else if ("산재보험".equals(code)) {
+                    request.setAttribute("insuranceNoII", no);
+                    request.setAttribute("acquisitionDateII", acq);
+                    request.setAttribute("lossDateII", loss);
+                }
+            }
+
+            // 병역
+            EmployeeMilitary military = militaryDao.selectByEmployeeId(conn, employeeId);
+            if (military != null) {
+                request.setAttribute("militaryStatus", nz(military.getMilitaryStatusCode()));
+                request.setAttribute("militaryBranchCode", nz(military.getMilitaryBranchCode()));
+                request.setAttribute("militaryStartDate", military.getServiceStartDate() != null ? military.getServiceStartDate().toString() : "");
+                request.setAttribute("militaryEndDate", military.getServiceEndDate() != null ? military.getServiceEndDate().toString() : "");
+                request.setAttribute("militaryGrade", nz(military.getMilitaryGrade()));
+                request.setAttribute("militaryBranch", nz(military.getMilitaryBranch()));
+                request.setAttribute("militarySpecialty", nz(military.getMilitarySpecialty()));
+                request.setAttribute("militaryExemptReason", nz(military.getMilitaryExemptReason()));
+            }
+
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            JdbcUtil.close(conn);
+        }
+    }
+
+    private String nz(String s) { return s == null ? "" : s; }
+
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
