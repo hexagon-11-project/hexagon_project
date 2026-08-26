@@ -848,7 +848,7 @@ body {
 	    });
 	</script>
 	<script>
-    // 1. [선택삭제] : 마우스로 클릭해서 배경색이 바뀐 행을 삭제하는 함수 / 1. [選択削除]：マウスでクリックして背景色が変わった行を削除する関数
+    // 1. [선택삭제] : 마우스로 클릭해서 배경색이 바뀐 행을 실제 DB에서도 삭제하는 함수 / 1. [選択削除]：マウスでクリックして背景色が変わった行を実際にDBからも削除する関数
     function deleteSelectedEmployees() {
         // 선택된 ID가 들어있는 히든 인풋 확인 / 選択されたIDが入っている隠しinputを確認
         var selectedIdInput = document.getElementById("selectedPayrollEmployeeId");
@@ -863,28 +863,52 @@ body {
         }
 
         // 1번 사진 같은 확인창 띄우기 / 1番の画面のような確認ダイアログを表示
-        if (confirm("選択した社員を削除しますか？")) {
+        if (!confirm("選択した社員を削除しますか？")) return;
+
+        var payrollEmployeeId = selectedIdInput ? selectedIdInput.value : "";
+
+        function removeRowAndReset() {
             // 화면에서 해당 행 삭제 / 画面から該当行を削除
             if (targetRow) {
                 targetRow.remove();
             } else {
                 // 만약 스타일로 못 찾았을 경우 #employeeTableBody 안의 모든 행을 돌며 처리 / スタイルで見つからなかった場合、#employeeTableBody内の全行を巡回して処理
-                var rows = document.querySelectorAll("#employeeTableBody tr");
-                // 여기서는 안전하게 배경색이 들어간 행을 다시 탐색 / ここでは安全に背景色が入った行を再度探索
                 var coloredRow = document.querySelector("#employeeTableBody tr[style*='background']");
                 if (coloredRow) coloredRow.remove();
             }
-
             // 히든 인풋 값 초기화 / 隠しinputの値を初期化
             if (selectedIdInput) selectedIdInput.value = "";
-
             alert("選択した社員が削除されました。");
-
-            // (필요시 여기서 우측 급여 입력폼 데이터도 초기화하거나 비우는 로직 추가 가능) / （必要であればここで右側の給与入力フォームデータも初期化・クリアするロジックを追加可能）
         }
+
+        // ★ 아직 이번 급여차수에 등록 안 된 사원(payrollEmployeeId 없음)은 DB에 지울 데이터가 없으므로
+        //   화면에서만 지운다. / ★まだこの給与回に登録されていない社員（payrollEmployeeIdなし）はDBに削除するデータが
+        //   ないため、画面からのみ削除する。
+        if (!payrollEmployeeId) {
+            removeRowAndReset();
+            return;
+        }
+
+        fetch("${pageContext.request.contextPath}/Payment/deleteSelected.do", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "payrollEmployeeIds=" + encodeURIComponent(payrollEmployeeId)
+        })
+        .then(function(res) { return res.text(); })
+        .then(function(data) {
+            if (data === "SUCCESS") {
+                removeRowAndReset();
+            } else {
+                alert("削除中に問題が発生しました。");
+            }
+        })
+        .catch(function(error) {
+            console.error("선택삭제 에러:", error);
+            alert("削除中に問題が発生しました。");
+        });
     }
 
-    // 2. [전체삭제] : 2단계 경고창을 거쳐 전체 사원 목록을 싹 지우는 함수 / 2. [全体削除]：2段階の警告ダイアログを経て全社員一覧をすべて消す関数
+    // 2. [전체삭제] : 2단계 경고창을 거쳐 일용직이 아닌 전체 사원의 급여 데이터를 실제 DB에서 삭제하는 함수 / 2. [全体削除]：2段階の警告ダイアログを経て日雇いではない全社員の給与データを実際にDBから削除する関数
     function deleteAllEmployees() {
         var rows = document.querySelectorAll("#employeeTableBody tr");
 
@@ -894,23 +918,36 @@ body {
         }
 
         // 3번째 사진 같은 1차 경고창 / 3番目の画面のような1次警告ダイアログ
-        if (confirm("■■ 注意!! ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n■ 削除された給与入力情報は復元できません。 ■\n■ 削除しますか？ ■\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")) {
+        if (!confirm("■■ 注意!! ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n■ 削除された給与入力情報は復元できません。 ■\n■ 削除しますか？ ■\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")) return;
 
-            // 2번째 사진 같은 2차 최종 경고창 / 2番目の画面のような2次最終警告ダイアログ
-            if (confirm("■ [全体]の給与入力情報を削除しますか？")) {
+        // 2번째 사진 같은 2차 최종 경고창 / 2番目の画面のような2次最終警告ダイアログ
+        if (!confirm("■ [全体]の給与入力情報を削除しますか？")) return;
 
+        var payrollIdInput = document.getElementById("payrollId");
+        var payrollId = payrollIdInput ? payrollIdInput.value : "";
+
+        fetch("${pageContext.request.contextPath}/Payment/deleteAll.do", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "payrollId=" + encodeURIComponent(payrollId)
+        })
+        .then(function(res) { return res.text(); })
+        .then(function(data) {
+            if (data === "SUCCESS") {
                 // 테이블의 모든 사원 행 삭제 / テーブルの全社員行を削除
-                rows.forEach(function(r) {
-                    r.remove();
-                });
-
+                rows.forEach(function(r) { r.remove(); });
                 // 선택된 ID 히든 인풋 초기화 / 選択されたID隠しinputを初期化
                 var selectedIdInput = document.getElementById("selectedPayrollEmployeeId");
                 if (selectedIdInput) selectedIdInput.value = "";
-
                 alert("全社員および給与情報が削除されました。");
+            } else {
+                alert("削除中に問題が発生しました。");
             }
-        }
+        })
+        .catch(function(error) {
+            console.error("전체삭제 에러:", error);
+            alert("削除中に問題が発生しました。");
+        });
     }
 </script>
 	<script>

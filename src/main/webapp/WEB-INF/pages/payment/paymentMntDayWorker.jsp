@@ -383,22 +383,61 @@ body { min-width: 1200px; }
 	    recalcTotals();
 	}
 
+	// ★ [선택삭제] : 근무기록/공제상세 포함 실제 DB에서 삭제 / ★[選択削除]：勤務記録・控除詳細を含め実際にDBから削除
 	function deleteSelectedEmployees() {
 	    var empId = document.getElementById("selectedEmpId").value;
 	    if (!empId) { alert("削除する労働者を選択してください。"); return; }
-	    if (!confirm("選択した労働者をリストから削除しますか？")) return;
+	    if (!confirm("選択した労働者を削除しますか？")) return;
 
-	    var row = document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]');
-	    if (row) row.remove();
-	    clearDetailPanel();
+	    fetch(CTX + "/Payment/dayWorkerDeleteSelected.do", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	        body: "payrollDayWorkerEmployeeIds=" + encodeURIComponent(empId)
+	    })
+	    .then(function (res) { return res.text(); })
+	    .then(function (data) {
+	        if (data === "SUCCESS") {
+	            var row = document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]');
+	            if (row) row.remove();
+	            clearDetailPanel();
+	            alert("選択した労働者が削除されました。");
+	        } else {
+	            alert("削除中に問題が発生しました。");
+	        }
+	    })
+	    .catch(function (error) {
+	        console.error("선택삭제 에러:", error);
+	        alert("削除中に問題が発生しました。");
+	    });
 	}
 
+	// ★ [전체삭제] : 이 급여차수의 일용직 근로자 전체를 실제 DB에서 삭제 / ★[全体削除]：この給与回の日雇い労働者全体を実際にDBから削除
 	function deleteAllEmployees() {
-	    if (!confirm("画面のすべての労働者をリストから削除しますか？")) return;
+	    if (!confirm("■■ 注意!! ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n■ 削除された給与入力情報は復元できません。 ■\n■ 削除しますか？ ■\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■")) return;
+	    if (!confirm("■ [全体]の給与入力情報を削除しますか？")) return;
 
-	    document.getElementById("employeeTableBody").innerHTML =
-	        '<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">登録された労働者がいません。</td></tr>';
-	    clearDetailPanel();
+	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
+
+	    fetch(CTX + "/Payment/dayWorkerDeleteAll.do", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+	        body: "payrollDayWorkerId=" + encodeURIComponent(payrollDayWorkerId)
+	    })
+	    .then(function (res) { return res.text(); })
+	    .then(function (data) {
+	        if (data === "SUCCESS") {
+	            document.getElementById("employeeTableBody").innerHTML =
+	                '<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">登録された労働者がいません。</td></tr>';
+	            clearDetailPanel();
+	            alert("全労働者および給与情報が削除されました。");
+	        } else {
+	            alert("削除中に問題が発生しました。");
+	        }
+	    })
+	    .catch(function (error) {
+	        console.error("전체삭제 에러:", error);
+	        alert("削除中に問題が発生しました。");
+	    });
 	}
 
 	// ---------------- 저장 / 保存 ----------------

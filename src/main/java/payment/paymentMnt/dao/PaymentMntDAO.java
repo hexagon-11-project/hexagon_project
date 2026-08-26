@@ -810,6 +810,54 @@ public class PaymentMntDAO {
         }
     }
     
+ // [선택삭제] : 지정된 사원별급여(PAYROLL_EMPLOYEE_ID) 목록만 지급/공제 상세 포함 실제 DB 삭제
+ // [選択削除]：指定された社員別給与（PAYROLL_EMPLOYEE_ID）一覧のみ支給・控除詳細を含め実際にDB削除
+    public void deletePayrollEmployeesByIds(Connection conn, List<Long> payrollEmployeeIds) throws SQLException {
+        if (payrollEmployeeIds == null || payrollEmployeeIds.isEmpty()) return;
+        for (Long id : payrollEmployeeIds) {
+            try (PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM PAYROLL_PAY_DETAIL WHERE PAYROLL_EMPLOYEE_ID = ?")) {
+                pstmt.setLong(1, id);
+                pstmt.executeUpdate();
+            }
+            try (PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM PAYROLL_DEDUCTION_DETAIL WHERE PAYROLL_EMPLOYEE_ID = ?")) {
+                pstmt.setLong(1, id);
+                pstmt.executeUpdate();
+            }
+            try (PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM PAYROLL_EMPLOYEE WHERE PAYROLL_EMPLOYEE_ID = ?")) {
+                pstmt.setLong(1, id);
+                pstmt.executeUpdate();
+            }
+        }
+    }
+
+    // [전체삭제] : 해당 급여차수(PAYROLL_ID)의 "일용직이 아닌" 사원만 삭제 (일용직은 급여입력관리(일용직) 화면에서
+    //   같은 PAYROLL_ID를 공유하므로 건드리지 않음)
+    // [全体削除]：該当給与回（PAYROLL_ID）の「日雇いではない」社員のみ削除（日雇いは給与入力管理（日雇い）画面で
+    //   同じPAYROLL_IDを共有するため触れない）
+    public void deleteAllPayrollEmployees(Connection conn, Long payrollId) throws SQLException {
+        String subSelect = "(SELECT pe.PAYROLL_EMPLOYEE_ID FROM PAYROLL_EMPLOYEE pe JOIN EMPLOYEE e "
+                + "ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID WHERE pe.PAYROLL_ID = ? AND e.EMPLOYMENT_TYPE NOT IN ('일용직','DAILY'))";
+
+        try (PreparedStatement p1 = conn.prepareStatement(
+                "DELETE FROM PAYROLL_PAY_DETAIL WHERE PAYROLL_EMPLOYEE_ID IN " + subSelect)) {
+            p1.setLong(1, payrollId);
+            p1.executeUpdate();
+        }
+        try (PreparedStatement p2 = conn.prepareStatement(
+                "DELETE FROM PAYROLL_DEDUCTION_DETAIL WHERE PAYROLL_EMPLOYEE_ID IN " + subSelect)) {
+            p2.setLong(1, payrollId);
+            p2.executeUpdate();
+        }
+        try (PreparedStatement p3 = conn.prepareStatement(
+                "DELETE FROM PAYROLL_EMPLOYEE WHERE PAYROLL_EMPLOYEE_ID IN " + subSelect)) {
+            p3.setLong(1, payrollId);
+            p3.executeUpdate();
+        }
+    }
+
  // 1. 기존 데이터 깔끔하게 지우기 (외래키 오류 방지를 위해 하위 테이블부터 삭제) / 1. 既存データをきれいに削除（外部キーエラー防止のため子テーブルから削除）
     public void deletePayrollEmployeesByPeriod(Connection conn, String currYearMonth, int currSeq) throws SQLException {
         // 공제 상세내역 삭제 / 控除詳細内訳を削除
