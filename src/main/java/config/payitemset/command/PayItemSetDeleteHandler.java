@@ -4,7 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
+import config.model.PayItem;
 import config.payitemset.service.PayItemSetDeleteService;
+import config.payitemset.service.PayItemSetException;
+import config.payitemset.service.PayItemSetSelectService;
 
 /**
  * 선택한 지급항목을 삭제한다.
@@ -13,45 +16,38 @@ import config.payitemset.service.PayItemSetDeleteService;
 public class PayItemSetDeleteHandler implements CommandHandler {
 
 	private PayItemSetDeleteService deleteService = new PayItemSetDeleteService();
+	private PayItemSetSelectService selectService = new PayItemSetSelectService();
+	private PayItemSetFormHelper formHelper = new PayItemSetFormHelper();
 
-	/**
-	 * 지급항목 PK 를 받아 삭제한다.
-	 * 支給項目PKを受けて削除する。
-	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
-		// POST 가 아니면 삭제하지 않는다
-		// POSTでなければ削除しない。
-		if (!"POST".equalsIgnoreCase(req.getMethod())) {
-
-			res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-			return null;
-
+		if (!formHelper.isPost(req)) {
+			return formHelper.redirectList(req, res);
 		}
 
-		String payItemIdParam = req.getParameter("payItemId");
-
-		// 삭제 대상 PK 가 있어야 한다
-		// 削除対象PKがなければならない。
-		if (payItemIdParam == null || payItemIdParam.isBlank()) {
-			res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-			return null;
-
+		try {
+			int payItemId = formHelper.parseRequiredId(req.getParameter("payItemId"),
+					"削除する項目をリストから選択してください。");
+			deleteService.delete(payItemId);
+			return formHelper.redirectList(req, res);
+		} catch (PayItemSetException e) {
+			return formHelper.errorPay(req, e.getMessage(), selectedOrNull(req));
+		} catch (RuntimeException e) {
+			return formHelper.errorPay(req, "保存に失敗しました。", selectedOrNull(req));
 		}
+	}
 
-		int payItemId = Integer.parseInt(req.getParameter("payItemId"));
-
-		deleteService.delete(payItemId);
-
-		// 목록으로 redirect 한다.
-		// 一覧へredirectする。
-		res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-		return null;
-
+	private PayItem selectedOrNull(HttpServletRequest req) {
+		Integer payItemId = formHelper.parseIdOrNull(req.getParameter("payItemId"));
+		if (payItemId == null) {
+			return null;
+		}
+		try {
+			return selectService.getById(payItemId);
+		} catch (RuntimeException e) {
+			return null;
+		}
 	}
 
 }

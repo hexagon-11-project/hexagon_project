@@ -4,7 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import command.CommandHandler;
+import config.model.DeductionItem;
 import config.payitemset.service.DeductionItemSetDeleteService;
+import config.payitemset.service.DeductionItemSetSelectService;
+import config.payitemset.service.PayItemSetException;
 
 /**
  * 선택한 공제항목을 삭제한다.
@@ -13,44 +16,38 @@ import config.payitemset.service.DeductionItemSetDeleteService;
 public class DeductionItemSetDeleteHandler implements CommandHandler {
 
 	private DeductionItemSetDeleteService deleteService = new DeductionItemSetDeleteService();
+	private DeductionItemSetSelectService selectService = new DeductionItemSetSelectService();
+	private PayItemSetFormHelper formHelper = new PayItemSetFormHelper();
 
-	/**
-	 * 공제항목 PK 를 받아 삭제한다.
-	 * 控除項目PKを受けて削除する。
-	 */
 	@Override
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
-		// POST 가 아니면 삭제하지 않는다
-		// POSTでなければ削除しない。
-		if (!"POST".equalsIgnoreCase(req.getMethod())) {
-
-			res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-			return null;
-
+		if (!formHelper.isPost(req)) {
+			return formHelper.redirectList(req, res);
 		}
 
-		String id = req.getParameter("deductionItemId");
-
-		// 삭제 대상 PK 가 있어야 한다
-		// 削除対象PKがなければならない。
-		if (id == null || id.isBlank()) {
-
-			res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-			return null;
-
+		try {
+			int deductionItemId = formHelper.parseRequiredId(req.getParameter("deductionItemId"),
+					"削除する項目をリストから選択してください。");
+			deleteService.delete(deductionItemId);
+			return formHelper.redirectList(req, res);
+		} catch (PayItemSetException e) {
+			return formHelper.errorDeduction(req, e.getMessage(), selectedOrNull(req));
+		} catch (RuntimeException e) {
+			return formHelper.errorDeduction(req, "保存に失敗しました。", selectedOrNull(req));
 		}
+	}
 
-		deleteService.delete(Integer.parseInt(id));
-
-		// 지급 목록 URI 로 redirect 한다.
-		// 支給一覧URIへredirectする。
-		res.sendRedirect(req.getContextPath() + "/Config/payitemsetlist.do");
-
-		return null;
-
+	private DeductionItem selectedOrNull(HttpServletRequest req) {
+		Integer deductionItemId = formHelper.parseIdOrNull(req.getParameter("deductionItemId"));
+		if (deductionItemId == null) {
+			return null;
+		}
+		try {
+			return selectService.getById(deductionItemId);
+		} catch (RuntimeException e) {
+			return null;
+		}
 	}
 
 }

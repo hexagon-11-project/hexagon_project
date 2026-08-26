@@ -76,14 +76,12 @@ body {
 					</thead>
 					<tbody>
 						<%
-						// 비과세 상세 목록을 행으로 그린다
-						// 非課税詳細一覧を行として描画する。
+						int nonTaxRowCount = 0;
 						if (nonTaxDetailList != null) {
 							for (NonTaxDetail item : nonTaxDetailList) {
+								nonTaxRowCount++;
 								String category = item.getNonTaxCategory() != null ? item.getNonTaxCategory() : "";
 								String limitLabel = item.getLimitAmountLabel();
-								// data 속성에 넣을 문자열을 이스케이프한다
-								// data 属性に入れる文字列をエスケープする。
 								String categoryAttr = category.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
 								String limitAttr = limitLabel.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
 						%>
@@ -101,7 +99,14 @@ body {
 							<td><%=item.getStatementPayment() != null ? item.getStatementPayment() : ""%></td>
 						</tr>
 						<%
+							}
 						}
+						if (nonTaxRowCount == 0) {
+						%>
+						<tr>
+							<td colspan="6">表示できる非課税項目がありません。</td>
+						</tr>
+						<%
 						}
 						%>
 					</tbody>

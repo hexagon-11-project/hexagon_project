@@ -26,31 +26,28 @@ public class DeductionItemSetInsertService {
 
 		try {
 
-			// 커넥션을 연다.
-			// コネクションを開く。
 			conn = ConnectionProvider.getConnection();
-			// 자동 커밋을 끈다.
-			// 自動コミットを切る。
 			conn.setAutoCommit(false);
 
-			deductionItemDao.insert(conn, item);
+			if (deductionItemDao.existsByName(conn, item.getCompanyId(), item.getDeductionItemName(), null)) {
+				throw new PayItemSetException("同じ名前の控除項目がすでに登録されています。");
+			}
 
-			// 여기까지 오면 DB에 확정한다.
-			// ここまで来ればDBへ確定する。
+			deductionItemDao.insert(conn, item);
 			conn.commit();
+
+		} catch (PayItemSetException e) {
+
+			JdbcUtil.rollback(conn);
+			throw e;
 
 		} catch (SQLException e) {
 
-			// 실패하면 롤백한다.
-			// 失敗すればロールバックする。
 			JdbcUtil.rollback(conn);
-
-			throw new RuntimeException(e);
+			throw PayItemSetException.fromSql(e);
 
 		} finally {
 
-			// 커넥션을 반드시 닫는다.
-			// コネクションは必ず閉じる。
 			JdbcUtil.close(conn);
 
 		}

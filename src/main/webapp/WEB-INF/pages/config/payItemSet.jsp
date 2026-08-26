@@ -270,21 +270,21 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 				<%-- 追加ボタンである。 --%>
 				<button type="submit" class="btn btn-primary"
 					formaction="<%=ctx%>/Config/payitemsetinsert.do"
-					onclick="if (!document.querySelector('[name=payItemName]').value.trim()) { alert('支給項目を入力してください。'); location.href='<%=ctx%>/Config/payitemsetlist.do'; return false; }">追加</button>
+					onclick="return validatePayItemSubmit(false);">追加</button>
 				<%-- 수정 버튼이다. --%>
 				<%-- 修正ボタンである。 --%>
 				<button type="submit" class="btn btn-blue"
 					formaction="<%=ctx%>/Config/payitemsetupdate.do"
-					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('修正する項目をリストから選択してください。'); return false; }">修正</button>
+					onclick="return validatePayItemSubmit(true);">修正</button>
 				<%-- 삭제 버튼이다. --%>
 				<%-- 削除ボタンである。 --%>
 				<button type="submit" class="btn"
 					formaction="<%=ctx%>/Config/payitemsetdelete.do"
-					onclick="if (!document.querySelector('[name=payItemId]').value) { alert('削除する項目をリストから選択してください。'); return false; } return confirm('選択した支給項目を削除しますか？');">削除</button>
+					onclick="return validatePayItemDelete();">削除</button>
 				<%-- 내용 지우기 버튼이다. --%>
 				<%-- 内容クリアボタンである。 --%>
 				<button type="button" class="btn"
-					onclick="location.href='<%=ctx%>/Config/payitemsetclear.do'">内容
+					onclick="clearPayItemForm('<%=ctx%>/Config/payitemsetclear.do')">内容
 					クリア</button>
 			</div>
 		</form>
@@ -420,26 +420,34 @@ request.setAttribute("pageJs", "pay-item-settings.js");
 				<%-- 控除の追加ボタンである。 --%>
 				<button type="submit" class="btn btn-primary"
 					formaction="<%=ctx%>/Config/deductionitemsetinsert.do"
-					onclick="if (!document.querySelector('[name=deductionItemName]').value.trim()) { alert('控除項目を入力してください。'); return false; }">追加</button>
+					onclick="return validateDeductionItemSubmit(false);">追加</button>
 				<%-- 공제 수정 버튼이다. --%>
 				<%-- 控除の修正ボタンである。 --%>
 				<button type="submit" class="btn btn-blue"
 					formaction="<%=ctx%>/Config/deductionitemsetupdate.do"
-					onclick="if (!document.querySelector('[name=deductionItemId]').value) { alert('修正する項目をリストから選択してください。'); return false; }">修正</button>
+					onclick="return validateDeductionItemSubmit(true);">修正</button>
 				<%-- 공제 삭제 버튼이다. --%>
 				<%-- 控除の削除ボタンである。 --%>
 				<button type="submit" class="btn"
 					formaction="<%=ctx%>/Config/deductionitemsetdelete.do"
-					onclick="if (!document.querySelector('[name=deductionItemId]').value) { alert('削除する項目をリストから選択してください。'); return false; } return confirm('選択した控除項目を削除しますか？');">削除</button>
+					onclick="return validateDeductionItemDelete();">削除</button>
 				<%-- 공제 내용 지우기 버튼이다. --%>
 				<%-- 控除の内容クリアボタンである。 --%>
 				<button type="button" class="btn"
-					onclick="location.href='<%=ctx%>/Config/deductionitemsetclear.do'">内容
+					onclick="clearDeductionItemForm('<%=ctx%>/Config/deductionitemsetclear.do')">内容
 					クリア</button>
 			</div>
 		</form>
 	</div>
 </section>
+<%
+String errorMessage = (String) request.getAttribute("errorMessage");
+if (errorMessage == null) {
+	errorMessage = "";
+}
+String errorMessageAttr = errorMessage.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;");
+%>
+<input type="hidden" id="payItemSetErrorMessage" value="<%=errorMessageAttr%>">
 <%-- 공통 레이아웃을 닫고 페이지 JS 를 붙인다. --%>
 <%-- 共通レイアウトを閉じてページJSを付ける。 --%>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
