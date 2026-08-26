@@ -36,6 +36,7 @@ public class DayWorkerMntUpdateHandler implements CommandHandler {
 
 		DailyWorkRecord item = new DailyWorkRecord();
 		item.setDailyWorkRecordId(dailyWorkRecordId);
+		item.setEmployeeId(Integer.parseInt(employeeIdParam));
 		item.setWorkSiteName(workSiteName);
 		item.setWorkDate(Date.valueOf(req.getParameter("workDate")));
 		item.setDailyWage(parseOrZero(req.getParameter("dailyWage")));
