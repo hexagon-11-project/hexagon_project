@@ -28,7 +28,7 @@ public class CertificateRegisterUpdateHandler implements CommandHandler {
         }
 
        
-        response.sendRedirect(request.getContextPath() + "/Person/certificateRegister.do");
+        response.sendRedirect(request.getContextPath() + "/Person/certificateRegister.do?delete=success");
         
         return null; 
     }

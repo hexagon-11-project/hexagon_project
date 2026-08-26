@@ -23,8 +23,8 @@ public class EmployeeMntDeleteHandler implements CommandHandler {
                 deleteService.deleteEmployees(empIds);
             }
             
-            // 삭제 완료 후 조회 페이지로 강제 이동 (리다이렉트)
-            res.sendRedirect(req.getContextPath() + "/Person/employeeMnt.do");
+            // 삭제 완료 후 조회 페이지로 이동(삭제가 성공했다는 신호)
+            res.sendRedirect(req.getContextPath() + "/Person/employeeMnt.do?delete=success");
             return null;
             
         } else {

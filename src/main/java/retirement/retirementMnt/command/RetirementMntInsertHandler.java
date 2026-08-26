@@ -27,7 +27,7 @@ public class RetirementMntInsertHandler implements CommandHandler {
 
         if (result > 0) {
       
-        	res.sendRedirect(req.getContextPath() + "/Retire/retirementMnt.do");
+        	res.sendRedirect(req.getContextPath() + "/Retire/retirementMnt.do?save=success");
             return null; 
         }else if(result == 0) {
         	// [중복] 이미 해당 사원의 데이터가 존재하는 경우 (DB에서 INSERT를 수행하지 않음)

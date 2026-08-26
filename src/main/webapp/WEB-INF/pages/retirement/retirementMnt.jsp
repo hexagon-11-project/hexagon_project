@@ -278,11 +278,18 @@ request.setAttribute("pageJs", null);
 	window.onload = function() {
 	    var urlParams = new URLSearchParams(window.location.search);
 	    
-	    //  error 값이 'dup'인지 확인
+	    // 저장 성공 시 알림창 띄우기
+	    if (urlParams.get('save') === 'success') {
+	        alert("저장되었습니다.");
+	        
+	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+	    }
+	    
+	    // error 값이 'dup'인지 확인 (중복 저장 방지)
 	    if (urlParams.get('error') === 'dup') {
 	        alert("이미 저장된 내역입니다.");
 	        
-	        // 경고창을 띄운 후, 새로고침 시 계속 경고창이 뜨는 것을 막기 위해 주소창에서 파라미터를 지움
 	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
 	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
 	    }

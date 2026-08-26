@@ -42,8 +42,12 @@ public class CertificatePrintWorkingInsertHandler implements CommandHandler {
         boolean isSaved = service.insertCertificatePrintWorking(model);
 
         if (isSaved) {
-            // req.setAttribute("successMsg", "증명서가 성공적으로 발급/저장되었습니다.");
-        	 return "/WEB-INF/pages/person/certificatePrintWorking.jsp";
+            // URL에 한글(증명서 종류)이 들어가므로 인코딩 처리
+            String encodedCertType = java.net.URLEncoder.encode(certificateTypeCode, "UTF-8");
+            
+            // 저장 완료 신호(save=success)와 함께 화면 리다이렉트
+            res.sendRedirect(req.getContextPath() + "/Person/certificatePrintWorking.do?employeeNo=" + employeeNo + "&certType=" + encodedCertType + "&save=success");
+            return null;
         } else {
             req.setAttribute("errorMsg", "저장에 실패했습니다. 다시 시도해주세요.");
             return "/WEB-INF/pages/person/certificatePrintWorking.jsp";
