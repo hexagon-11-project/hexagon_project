@@ -205,35 +205,20 @@ request.setAttribute("pageJs", null);
 					<div class="brand-asset">
 						<div class="brand-title">회사로고</div>
 						<div class="brand-preview">
-							<c:choose>
-								<c:when test="${not empty companyInfo.logoPath}">
-									<img src="${pageContext.request.contextPath}${companyInfo.logoPath}" alt="회사로고" style="max-height: 80px; max-width: 100%;">
-								</c:when>
-								<c:otherwise>
+									<img src="${pageContext.request.contextPath}/assets/images/Logo.png" alt="회사로고" style="max-height: 80px; max-width: 100%;">
+
 									회사 로고
-								</c:otherwise>
-							</c:choose>
 						</div>
 						<div class="mini-actions">
-							<button type="button" class="btn btn-sm">등록</button>
-							<button type="button" class="btn btn-sm">삭제</button>
 						</div>
 					</div>
 					<div class="brand-asset">
 						<div class="brand-title">회사도장</div>
 						<div class="brand-preview seal-preview">
-							<c:choose>
-								<c:when test="${not empty companyInfo.sealPath}">
-									<img src="${pageContext.request.contextPath}${companyInfo.sealPath}" alt="직인" style="max-height: 80px; max-width: 100%;">
-								</c:when>
-								<c:otherwise>
+									<img src="${pageContext.request.contextPath}/assets/images/Seal.png" alt="직인" style="max-height: 80px; max-width: 100%;">
 									직인
-								</c:otherwise>
-							</c:choose>
 						</div>
 						<div class="mini-actions">
-							<button type="button" class="btn btn-sm">등록</button>
-							<button type="button" class="btn btn-sm">삭제</button>
 						</div>
 					</div>
 				</div>
@@ -306,3 +291,20 @@ request.setAttribute("pageJs", null);
 </form>
 
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // URL 파라미터를 읽어옵니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // save 파라미터 값이 'success'이면 알림창을 띄웁니다.
+        if (urlParams.get('save') === 'success') {
+            alert('저장되었습니다.');
+            
+            // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL에서 파라미터를 정리합니다.
+            const companyId = urlParams.get('id') || '1001';
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?id=" + companyId;
+            window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+        }
+    });
+</script>
