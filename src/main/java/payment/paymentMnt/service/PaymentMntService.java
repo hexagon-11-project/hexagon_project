@@ -127,6 +127,42 @@ public class PaymentMntService {
 		}
 	}
 
+	/** [선택삭제] : 지정된 사원별급여(payrollEmployeeIds) 목록을 지급/공제 상세 포함 실제 DB에서 삭제
+	 *  [選択削除]：指定された社員別給与（payrollEmployeeIds）一覧を支給・控除詳細を含め実際にDBから削除 */
+	public void deleteEmployees(List<Long> payrollEmployeeIds) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			conn.setAutoCommit(false);
+			PaymentMntDAO dao = new PaymentMntDAO();
+			dao.deletePayrollEmployeesByIds(conn, payrollEmployeeIds);
+			conn.commit();
+		} catch (Exception e) {
+			JdbcUtil.rollback(conn);
+			throw new RuntimeException("선택삭제 중 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
+	/** [전체삭제] : 해당 급여차수(payrollId)의 일용직이 아닌 사원 전체를 실제 DB에서 삭제
+	 *  [全体削除]：該当給与回（payrollId）の日雇いではない社員全体を実際にDBから削除 */
+	public void deleteAllEmployees(Long payrollId) {
+		Connection conn = null;
+		try {
+			conn = ConnectionProvider.getConnection();
+			conn.setAutoCommit(false);
+			PaymentMntDAO dao = new PaymentMntDAO();
+			dao.deleteAllPayrollEmployees(conn, payrollId);
+			conn.commit();
+		} catch (Exception e) {
+			JdbcUtil.rollback(conn);
+			throw new RuntimeException("전체삭제 중 오류 발생", e);
+		} finally {
+			JdbcUtil.close(conn);
+		}
+	}
+
 	public List<PaymentMntPayItemDTO> getPayItemList() {
 		Connection conn = null;
 		try {
