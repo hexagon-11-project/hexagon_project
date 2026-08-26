@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>급여대장 | HEXAGON PAY</title>
+<title>給与台帳 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
 body { min-width: 1200px; background: #fff; }
@@ -31,39 +31,39 @@ body { min-width: 1200px; background: #fff; }
 
 	<main class="content-area">
 		<div class="page-header" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="급여대장">
+			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="給与台帳">
 			<div>
-				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">급여대장</h2>
+				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">給与台帳</h2>
 				<p class="text-muted" style="margin: 3px 0 0 0; font-size: 12px; color: #666;">
-					귀속연월별 급여총액과 사원별 급여지급 현황을 보실 수 있습니다. 결재란을 만들어 사용할 수 있습니다.
+					帰属年月別の給与総額と社員別の給与支給状況を確認できます。決裁欄を作成してご利用いただけます。
 				</p>
 			</div>
 		</div>
 
 		<form id="searchForm" action="${pageContext.request.contextPath}/Payment/paymentRegisterList.do" method="GET">
 			<div style="background: #fff; border-bottom: 1px solid #ddd; padding: 10px 5px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 13px;">
-				<strong>＊ 귀속연도</strong>
+				<strong>＊ 帰属年度</strong>
 				<select name="payYear" id="payYear" class="form-control input-sm" style="display: inline-block; width: 90px; padding: 3px 5px;" onchange="reloadPayrollData()">
 					<c:forEach var="year" begin="2005" end="2030">
-						<option value="${year}" <c:if test="${payYear eq year}">selected</c:if>>${year} 년</option>
+						<option value="${year}" <c:if test="${payYear eq year}">selected</c:if>>${year}年</option>
 					</c:forEach>
 				</select>
-				<span style="color: #666;">귀속연도를 선택하시고 급여차수를 클릭하시면 상세내역을 확인하실 수 있습니다.</span>
+				<span style="color: #666;">帰属年度を選択し、給与回をクリックすると詳細内訳を確認できます。</span>
 			</div>
 		</form>
 
 		<table class="prl-table">
 			<thead>
 				<tr>
-					<th>귀속연월</th>
-					<th>급여차수</th>
-					<th>정산기간</th>
-					<th>지급일</th>
-					<th>인원</th>
-					<th>지급총액</th>
-					<th>공제총액</th>
-					<th>실지급액</th>
-					<th>삭제</th>
+					<th>帰属年月</th>
+					<th>給与回</th>
+					<th>精算期間</th>
+					<th>支給日</th>
+					<th>人員</th>
+					<th>支給総額</th>
+					<th>控除総額</th>
+					<th>実支給額</th>
+					<th>削除</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -80,7 +80,7 @@ body { min-width: 1200px; background: #fff; }
 						<td>${fn:substring(row.payYearMonth, 0, 4)}-${fn:substring(row.payYearMonth, 4, 6)}</td>
 						<td>
 							<a class="seq-link" href="${rowDetailUrl}">
-								<fmt:formatNumber value="${row.paySequence}" pattern="'급여-'00'차'" />
+								<fmt:formatNumber value="${row.paySequence}" pattern="'給与-'00'回'" />
 							</a>
 						</td>
 						<td>${row.settlementStartDate} ~ ${row.settlementEndDate}</td>
@@ -89,11 +89,11 @@ body { min-width: 1200px; background: #fff; }
 						<td style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${row.totalPayAmount}" pattern="#,###" /></td>
 						<td style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${row.totalDeductionAmount}" pattern="#,###" /></td>
 						<td style="text-align: right;"><fmt:formatNumber value="${row.netPayAmount}" pattern="#,###" /></td>
-						<td><button type="button" class="prl-btn-del" onclick="event.stopPropagation(); deletePayroll(this)">✕ 삭제</button></td>
+						<td><button type="button" class="prl-btn-del" onclick="event.stopPropagation(); deletePayroll(this)">✕ 削除</button></td>
 					</tr>
 				</c:forEach>
 				<tr class="prl-total-row">
-					<td colspan="4">합계</td>
+					<td colspan="4">合計</td>
 					<td></td>
 					<td id="prlTotalPay" style="text-align: right; color: #337ab7;"><fmt:formatNumber value="${totalPay}" pattern="#,###" /></td>
 					<td id="prlTotalDed" style="text-align: right; color: #d9534f;"><fmt:formatNumber value="${totalDeduction}" pattern="#,###" /></td>
@@ -122,12 +122,12 @@ body { min-width: 1200px; background: #fff; }
 	function deletePayroll(btn) {
 	    var tr = btn.closest("tr");
 	    var payrollId = tr.getAttribute("data-payroll-id");
-	    if (!payrollId) { alert("등록된 급여 데이터가 없어 삭제할 항목이 없습니다."); return; }
+	    if (!payrollId) { alert("登録された給与データがなく、削除する項目がありません。"); return; }
 
-	    var noticeMsg = "[필독] - [삭제기능]\n\n선택하신 급여차수에 해당하는\n\n급여데이터가 전부 삭제됩니다.\n\n"
-	                   + "삭제된 급여대장 및 급여데이터는\n\n복구가 불가능 하오니 다시한번 확인하시고 삭제해주세요.";
+	    var noticeMsg = "[必読] - [削除機能]\n\n選択した給与回に該当する\n\n給与データがすべて削除されます。\n\n"
+	                   + "削除された給与台帳および給与データは\n\n復元できませんので、再度ご確認の上削除してください。";
 	    if (!confirm(noticeMsg)) return;
-	    if (!confirm("[경고] 정말 삭제하시겠습니까?")) return;
+	    if (!confirm("[警告] 本当に削除しますか？")) return;
 
 	    var formData = new URLSearchParams();
 	    formData.append("payrollId", payrollId);
@@ -139,17 +139,17 @@ body { min-width: 1200px; background: #fff; }
 	    }).then(function (res) { return res.text(); })
 	      .then(function (result) {
 	          if (result === "SUCCESS") {
-	              alert("삭제 되었습니다.");
+	              alert("削除されました。");
 	              removeRowAndRecalcTotals(tr);
 	          } else {
-	              alert("삭제 중 문제가 발생했습니다.");
+	              alert("削除中に問題が発生しました。");
 	          }
 	      })
-	      .catch(function () { alert("서버 통신에 실패했습니다."); });
+	      .catch(function () { alert("サーバー通信に失敗しました。"); });
 	}
 
-	// 삭제된 급여차수는 달력처럼 항상 채워지는 목록이라 새로고침해도 그 자리에 빈 줄로 다시 나타나므로,
-	// 화면에서 줄 자체를 완전히 지우고 합계도 즉시 다시 계산한다.
+	// 삭제된 급여차수는 달력처럼 항상 채워지는 목록이라 새로고침해도 그 자리에 빈 줄로 다시 나타나므로, / 削除された給与回はカレンダーのように常に埋まる一覧なので、再読み込みしてもその場所に空行として再び現れるため、
+	// 화면에서 줄 자체를 완전히 지우고 합계도 즉시 다시 계산한다. / 画面上で行そのものを完全に削除し、合計も即座に再計算する。
 	function removeRowAndRecalcTotals(tr) {
 	    tr.parentNode.removeChild(tr);
 

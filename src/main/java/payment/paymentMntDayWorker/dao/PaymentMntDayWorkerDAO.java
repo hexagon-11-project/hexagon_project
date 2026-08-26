@@ -18,14 +18,18 @@ import payment.paymentMntDayWorker.model.PaymentMntDayWorkerDeductionVO;
 // 일용직 급여입력/관리 - 정규직 급여관리(payment.paymentMnt)와 동일한 PAYROLL/PAYROLL_EMPLOYEE/
 // PAYROLL_DEDUCTION_DETAIL 테이블을 공유하고, 일자별 지급내역만 DAILY_WORK_RECORD 테이블을 사용한다.
 // (설계서 PAYROLL.PAYROLL_ID 컬럼 설명: "일반급여와 일용직 입력화면이 같은 PAYROLL_ID 사용")
+// 日雇い給与入力・管理 - 正社員給与管理（payment.paymentMnt）と同一のPAYROLL/PAYROLL_EMPLOYEE/
+// PAYROLL_DEDUCTION_DETAILテーブルを共有し、日別支給内訳のみDAILY_WORK_RECORDテーブルを使用する。
+// （設計書PAYROLL.PAYROLL_IDカラム説明：「一般給与と日雇い入力画面が同じPAYROLL_IDを使用」）
 public class PaymentMntDayWorkerDAO {
 
-    // 실데이터의 EMPLOYMENT_TYPE 값이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함
+    // 실데이터의 EMPLOYMENT_TYPE 값이 '일용직'/'DAILY' 두 가지로 섞여 있어 둘 다 포함 / 実データのEMPLOYMENT_TYPE値が「일용직」/「DAILY」の2種類混在のため両方含む
     private static final String DAILY_TYPE_COND = "e.EMPLOYMENT_TYPE IN ('일용직','DAILY')";
 
-    // ============ 급여차수 헤더 (PAYROLL 공유) ============
+    // ============ 급여차수 헤더 (PAYROLL 공유) / 給与回ヘッダー（PAYROLL共有） ============
 
-    /** 귀속연월+차수에 해당하는 PAYROLL이 없으면 생성하고, PAYROLL_ID를 반환 */
+    /** 귀속연월+차수에 해당하는 PAYROLL이 없으면 생성하고, PAYROLL_ID를 반환
+     *  帰属年月＋回に該当するPAYROLLがなければ生成し、PAYROLL_IDを返す */
     public Long ensurePayrollDayWorkerExists(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         Long id = selectPayrollId(conn, payYearMonth, paySequence);
         if (id != null) return id;
@@ -56,7 +60,8 @@ public class PaymentMntDayWorkerDAO {
         return null;
     }
 
-    /** 정산기간/급여지급일 갱신 (PAYROLL은 정규직 화면과 공유하는 테이블) */
+    /** 정산기간/급여지급일 갱신 (PAYROLL은 정규직 화면과 공유하는 테이블)
+     *  精算期間・給与支給日を更新（PAYROLLは正社員画面と共有するテーブル） */
     public void updatePeriod(Connection conn, Long payrollId, String periodStart, String periodEnd, String payDate) throws SQLException {
         String sql = "UPDATE PAYROLL SET SETTLEMENT_START_DATE = TO_DATE(?, 'YYYY-MM-DD'), "
                 + "SETTLEMENT_END_DATE = TO_DATE(?, 'YYYY-MM-DD'), PAYMENT_DATE = TO_DATE(?, 'YYYY-MM-DD') "
@@ -70,11 +75,14 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    // ============ 근로자 목록 (좌측 테이블) ============
+    // ============ 근로자 목록 (좌측 테이블) / 労働者一覧（左側テーブル） ============
 
     /** 좌측 목록(페이지 새로고침 시): 해당 급여차수(PAYROLL_ID)에 등록되어 있으면서, 실제 근무기록(DAILY_WORK_RECORD)이
      *  있는 일용직 근로자만. (근무기록이 없으면 노출하지 않음. 단, [신규추가] 직후에는 새로고침 없이 화면에 바로 붙이므로
-     *  이 필터와 무관하게 즉시 보인다 - addEmployeesToMain() 참고) */
+     *  이 필터와 무관하게 즉시 보인다 - addEmployeesToMain() 참고)
+     *  左側一覧（ページ再読み込み時）：該当給与回（PAYROLL_ID）に登録されており、実際の勤務記録（DAILY_WORK_RECORD）が
+     *  ある日雇い労働者のみ。（勤務記録がなければ表示しない。ただし[新規追加]直後は再読み込みなしで画面に直接追加するため
+     *  このフィルターとは無関係にすぐ表示される - addEmployeesToMain()参照） */
     public List<PaymentMntDayWorkerEmployeeDTO> getPayrollDayWorkerEmployeeList(Connection conn, Long payrollId) throws SQLException {
         List<PaymentMntDayWorkerEmployeeDTO> list = new ArrayList<>();
         String sql = "SELECT pe.PAYROLL_EMPLOYEE_ID, pe.PAYROLL_ID, pe.EMPLOYEE_ID, "
@@ -96,7 +104,8 @@ public class PaymentMntDayWorkerDAO {
         return list;
     }
 
-    /** [신규추가] 모달용 - 일용직 근로자 검색 (EMPLOYMENT_TYPE = '일용직'/'DAILY', 부서/재직상태 필터) */
+    /** [신규추가] 모달용 - 일용직 근로자 검색 (EMPLOYMENT_TYPE = '일용직'/'DAILY', 부서/재직상태 필터)
+     *  [新規追加]モーダル用 - 日雇い労働者検索（EMPLOYMENT_TYPE = '일용직'/'DAILY'、部署・在職状態フィルター） */
     public List<PaymentMntDayWorkerEmployeeDTO> getModalEmployeeList(Connection conn, String keyword, String department, String status) throws SQLException {
         List<PaymentMntDayWorkerEmployeeDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
@@ -140,7 +149,8 @@ public class PaymentMntDayWorkerDAO {
         return list;
     }
 
-    /** [신규추가] 모달의 부서별 드롭다운 - 일용직 근로자들의 부서 목록만 */
+    /** [신규추가] 모달의 부서별 드롭다운 - 일용직 근로자들의 부서 목록만
+     *  [新規追加]モーダルの部署別ドロップダウン - 日雇い労働者の部署一覧のみ */
     public List<String> getDepartmentList(Connection conn) throws SQLException {
         List<String> list = new ArrayList<>();
         String sql = "SELECT DISTINCT DEPARTMENT FROM EMPLOYEE WHERE EMPLOYMENT_TYPE IN ('일용직','DAILY') "
@@ -152,7 +162,8 @@ public class PaymentMntDayWorkerDAO {
         return list;
     }
 
-    /** 신규추가: 선택한 사원들을 이 급여차수(PAYROLL_EMPLOYEE)에 등록 (이미 있으면 건너뜀) */
+    /** 신규추가: 선택한 사원들을 이 급여차수(PAYROLL_EMPLOYEE)에 등록 (이미 있으면 건너뜀)
+     *  新規追加：選択した社員をこの給与回（PAYROLL_EMPLOYEE）に登録（すでにあれば飛ばす） */
     public void insertDayWorkerEmployees(Connection conn, Long payrollId, List<String> empIds) throws SQLException {
         String sql = "INSERT INTO PAYROLL_EMPLOYEE "
                 + "(PAYROLL_EMPLOYEE_ID, PAYROLL_ID, EMPLOYEE_ID, EMPLOYMENT_TYPE, INCOME_TYPE, "
@@ -173,7 +184,8 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    /** 방금 신규추가(또는 지정)한 사원들만 조회 - 전체 새로고침 없이 해당 행만 화면에 바로 붙이기 위함 */
+    /** 방금 신규추가(또는 지정)한 사원들만 조회 - 전체 새로고침 없이 해당 행만 화면에 바로 붙이기 위함
+     *  今登録（または指定）した社員だけを照会 - 全体再読み込みなしで該当行だけ画面に追加するため */
     public List<PaymentMntDayWorkerEmployeeDTO> getPayrollDayWorkerEmployeesByEmployeeIds(Connection conn, Long payrollId, List<String> empIds) throws SQLException {
         List<PaymentMntDayWorkerEmployeeDTO> list = new ArrayList<>();
         if (empIds == null || empIds.isEmpty()) return list;
@@ -206,7 +218,8 @@ public class PaymentMntDayWorkerDAO {
         return list;
     }
 
-    /** 선택삭제: 일자별내역+공제상세 포함 실제 DB 삭제 (PAYROLL_EMPLOYEE는 정규직과 공유하므로 지정된 행만 삭제) */
+    /** 선택삭제: 일자별내역+공제상세 포함 실제 DB 삭제 (PAYROLL_EMPLOYEE는 정규직과 공유하므로 지정된 행만 삭제)
+     *  選択削除：日別内訳＋控除詳細を含め実際にDBから削除（PAYROLL_EMPLOYEEは正社員と共有するため指定された行のみ削除） */
     public void deleteDayWorkerEmployees(Connection conn, List<Long> payrollEmployeeIds) throws SQLException {
         if (payrollEmployeeIds == null || payrollEmployeeIds.isEmpty()) return;
         for (Long id : payrollEmployeeIds) {
@@ -220,7 +233,8 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    /** 전체삭제: 해당 급여차수(PAYROLL_ID)의 "일용직" 근로자만 삭제 (정규직 근로자는 같은 PAYROLL_ID를 공유하므로 건드리지 않음) */
+    /** 전체삭제: 해당 급여차수(PAYROLL_ID)의 "일용직" 근로자만 삭제 (정규직 근로자는 같은 PAYROLL_ID를 공유하므로 건드리지 않음)
+     *  全体削除：該当給与回（PAYROLL_ID）の「日雇い」労働者のみ削除（正社員労働者は同じPAYROLL_IDを共有するため触れない） */
     public void deleteAllDayWorkerEmployees(Connection conn, Long payrollId) throws SQLException {
         String subSelect = "(SELECT pe.PAYROLL_EMPLOYEE_ID FROM PAYROLL_EMPLOYEE pe JOIN EMPLOYEE e "
                 + "ON pe.EMPLOYEE_ID = e.EMPLOYEE_ID WHERE pe.PAYROLL_ID = ? AND " + DAILY_TYPE_COND + ")";
@@ -242,7 +256,7 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    // ============ 일자별 지급내역 (DAILY_WORK_RECORD) ============
+    // ============ 일자별 지급내역 (DAILY_WORK_RECORD) / 日別支給内訳（DAILY_WORK_RECORD） ============
 
     public List<PaymentMntDayWorkerDailyVO> selectDailyList(Connection conn, Long payrollEmployeeId) throws SQLException {
         List<PaymentMntDayWorkerDailyVO> list = new ArrayList<>();
@@ -278,7 +292,9 @@ public class PaymentMntDayWorkerDAO {
     }
 
     /** DAILY_WORK_RECORD는 EMPLOYEE_ID/WORK_SITE_NAME/DAILY_WAGE가 NOT NULL이라 사원정보를 함께 조회해 채운다.
-     *  이 화면에는 현장(site) 입력 UI가 없어 WORK_SITE_NAME은 사원 부서명으로 대체한다. */
+     *  이 화면에는 현장(site) 입력 UI가 없어 WORK_SITE_NAME은 사원 부서명으로 대체한다.
+     *  DAILY_WORK_RECORDはEMPLOYEE_ID/WORK_SITE_NAME/DAILY_WAGEがNOT NULLのため社員情報も一緒に照会して埋める。
+     *  この画面には現場（site）入力UIがないため、WORK_SITE_NAMEは社員の部署名で代替する。 */
     public void insertDailyList(Connection conn, Long payrollEmployeeId, List<PaymentMntDayWorkerDailyVO> dailyList) throws SQLException {
         if (dailyList == null || dailyList.isEmpty()) return;
 
@@ -295,7 +311,7 @@ public class PaymentMntDayWorkerDAO {
                 }
             }
         }
-        if (empId == null) return; // 존재하지 않는 사원별급여 행이면 스킵
+        if (empId == null) return; // 존재하지 않는 사원별급여 행이면 스킵 / 存在しない社員別給与行であればスキップ
 
         String sql = "INSERT INTO DAILY_WORK_RECORD "
                 + "(DAILY_WORK_RECORD_ID, EMPLOYEE_ID, PAYROLL_EMPLOYEE_ID, WORK_SITE_NAME, WORK_DATE, "
@@ -326,10 +342,11 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    // ============ 공제항목 (PAYROLL_DEDUCTION_DETAIL, DEDUCTION_ITEM 마스터 공유) ============
-    // 화면 공제항목 패널은 DEDUCTION_ITEM 마스터에 실제 등록된 항목만큼만 동적으로 그려진다.
+    // ============ 공제항목 (PAYROLL_DEDUCTION_DETAIL, DEDUCTION_ITEM 마스터 공유) / 控除項目（PAYROLL_DEDUCTION_DETAIL、DEDUCTION_ITEMマスタ共有） ============
+    // 화면 공제항목 패널은 DEDUCTION_ITEM 마스터에 실제 등록된 항목만큼만 동적으로 그려진다. / 画面の控除項目パネルはDEDUCTION_ITEMマスタに実際に登録された項目分だけ動的に描画される。
 
-    /** 공제항목 마스터 목록 (화면 공제항목 패널을 이 목록 기준으로 렌더링) */
+    /** 공제항목 마스터 목록 (화면 공제항목 패널을 이 목록 기준으로 렌더링)
+     *  控除項目マスタ一覧（画面の控除項目パネルをこの一覧基準でレンダリング） */
     public List<PaymentMntDayWorkerDeductionItemDTO> selectDeductionItemList(Connection conn) throws SQLException {
         List<PaymentMntDayWorkerDeductionItemDTO> list = new ArrayList<>();
         String sql = "SELECT DEDUCTION_ITEM_ID, DEDUCTION_ITEM_NAME FROM DEDUCTION_ITEM WHERE USE_YN = 'Y' ORDER BY DISPLAY_ORDER, DEDUCTION_ITEM_ID";
@@ -363,7 +380,8 @@ public class PaymentMntDayWorkerDAO {
         return vo;
     }
 
-    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null) */
+    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null)
+     *  控除項目マスタから名前でDEDUCTION_ITEM_IDを照会（なければnull） */
     public Long selectDeductionItemIdByName(Connection conn, String deductionItemName) throws SQLException {
         String sql = "SELECT DEDUCTION_ITEM_ID FROM DEDUCTION_ITEM WHERE DEDUCTION_ITEM_NAME = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -386,7 +404,8 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    /** 전달된 항목(DEDUCTION_ITEM_ID)마다 있으면 UPDATE, 없으면 INSERT */
+    /** 전달된 항목(DEDUCTION_ITEM_ID)마다 있으면 UPDATE, 없으면 INSERT
+     *  渡された項目（DEDUCTION_ITEM_ID）ごとに、あればUPDATE、なければINSERT */
     public void upsertDeduction(Connection conn, PaymentMntDayWorkerDeductionVO d) throws SQLException {
         for (Map.Entry<Integer, Long> entry : d.getAmounts().entrySet()) {
             upsertOneDeductionItem(conn, d.getPayrollDayWorkerEmployeeId(), entry.getKey(), nz(entry.getValue()));
@@ -417,7 +436,7 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    // ============ 합계 갱신 ============
+    // ============ 합계 갱신 / 合計更新 ============
 
     public void updateEmployeeTotals(Connection conn, Long payrollEmployeeId, long totalPay, long totalDed, long netPay) throws SQLException {
         String sql = "UPDATE PAYROLL_EMPLOYEE SET TOTAL_PAY_AMOUNT = ?, TOTAL_DEDUCTION_AMOUNT = ?, NET_PAY_AMOUNT = ? "
@@ -431,9 +450,10 @@ public class PaymentMntDayWorkerDAO {
         }
     }
 
-    // ============ 종합정보 ============
+    // ============ 종합정보 / 総合情報 ============
 
-    /** 해당 급여차수(PAYROLL_ID)의 "일용직" 근로자만 집계 (정규직 근로자는 제외) */
+    /** 해당 급여차수(PAYROLL_ID)의 "일용직" 근로자만 집계 (정규직 근로자는 제외)
+     *  該当給与回（PAYROLL_ID）の「日雇い」労働者のみ集計（正社員労働者は除外） */
     public Map<String, Object> selectSummary(Connection conn, Long payrollId) throws SQLException {
         Map<String, Object> map = new HashMap<>();
         String sql = "SELECT COUNT(*) AS CNT, NVL(SUM(pe.TOTAL_PAY_AMOUNT), 0) AS PAY_TOTAL, "

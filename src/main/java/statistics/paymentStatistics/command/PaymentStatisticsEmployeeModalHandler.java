@@ -12,6 +12,7 @@ import payment.paymentMnt.dao.PaymentMntDAO;
 import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 
 // 연도별 개인연봉 통계 화면의 "대상자 선택" 팝업 - 급여지급 사원선택(paymentMnt) 모달과 동일한 사원 검색/페이징 로직을 재사용한다.
+// 年度別個人年俸統計画面の「対象者選択」ポップアップ - 給与支給社員選択（paymentMnt）モーダルと同一の社員検索・ページングロジックを再利用する。
 public class PaymentStatisticsEmployeeModalHandler implements CommandHandler {
 
     @Override

@@ -44,7 +44,8 @@ public class PaymentPayListService {
         return result;
     }
 
-    /** 조회기간 안의 모든 달을 채워서 반환한다 - 실제 급여 데이터가 있는 달은 그대로, 없는 달은 0으로 채운 빈 행을 넣는다. */
+    /** 조회기간 안의 모든 달을 채워서 반환한다 - 실제 급여 데이터가 있는 달은 그대로, 없는 달은 0으로 채운 빈 행을 넣는다.
+     *  照会期間内のすべての月を埋めて返す - 実際の給与データがある月はそのまま、ない月は0で埋めた空行を入れる。 */
     private List<PaymentPayListRowDTO> fillMissingMonths(List<PaymentPayListRowDTO> existingRows, String startYearMonth, String endYearMonth) {
         Map<String, PaymentPayListRowDTO> byMonth = new HashMap<>();
         for (PaymentPayListRowDTO row : existingRows) {

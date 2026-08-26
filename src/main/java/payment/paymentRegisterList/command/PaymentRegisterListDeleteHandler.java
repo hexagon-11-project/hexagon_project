@@ -7,6 +7,7 @@ import command.CommandHandler;
 import payment.paymentRegisterList.service.PaymentRegisterListService;
 
 // 급여대장 목록에서 [삭제] 버튼 클릭 시 급여차수(PAYROLL) 삭제
+// 給与台帳一覧で[削除]ボタンクリック時に給与回（PAYROLL）を削除
 public class PaymentRegisterListDeleteHandler implements CommandHandler {
 
     private PaymentRegisterListService service = new PaymentRegisterListService();

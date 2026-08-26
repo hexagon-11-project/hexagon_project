@@ -15,6 +15,9 @@ import statistics.paymentStatistics.dto.PersonalAnnualStatistics;
  * 연도별 개인연봉 통계 Dao.
  * PAYROLL / PAYROLL_EMPLOYEE를 사원 1인 기준으로 연도 단위 집계한다.
  * PAY_YEAR_MONTH 컬럼이 CHAR(6)이므로 연도 비교는 'YYYY01' ~ 'YYYY12' 범위로 처리한다.
+ * 年度別個人年俸統計Dao。
+ * PAYROLL / PAYROLL_EMPLOYEEを社員1人単位で年度単位に集計する。
+ * PAY_YEAR_MONTHカラムがCHAR(6)のため、年度比較は'YYYY01'～'YYYY12'範囲で処理する。
  */
 public class PaymentStatisticsDao {
 
@@ -23,6 +26,8 @@ public class PaymentStatisticsDao {
     /**
      * 선택 연도(endYear) 기준 과거 10년간, 해당 사원(employeeName)의 연도별 급여 통계를 조회한다.
      * 예: endYear=2026 → 2017~2026. 증가율 계산을 위해 직전 연도(fromYear - 1) 데이터도 함께 조회한다.
+     * 選択年度（endYear）基準で過去10年間、該当社員（employeeName）の年度別給与統計を照会する。
+     * 例：endYear=2026 → 2017～2026。増加率計算のため直前年度（fromYear - 1）データも一緒に照会する。
      */
     public List<PersonalAnnualStatistics> selectPersonalAnnualByEndYear(Connection conn, String employeeName, int endYear)
             throws SQLException {
@@ -69,7 +74,8 @@ public class PaymentStatisticsDao {
         }
     }
 
-    /** fromYear~endYear 목록을 만들고 전년 대비 증가율을 채운다. */
+    /** fromYear~endYear 목록을 만들고 전년 대비 증가율을 채운다.
+     *  fromYear～endYear一覧を作り、前年比増加率を埋める。 */
     private List<PersonalAnnualStatistics> buildTenYearList(Map<Integer, PersonalAnnualStatistics> yearMap, int fromYear, int endYear) {
         List<PersonalAnnualStatistics> result = new ArrayList<>(YEAR_SPAN);
 
@@ -92,7 +98,8 @@ public class PaymentStatisticsDao {
         return row;
     }
 
-    /** 전년 대비 증가율(%). 전년 없거나 0이면 null. */
+    /** 전년 대비 증가율(%). 전년 없거나 0이면 null.
+     *  前年比増加率（%）。前年がないか0であればnull。 */
     private Double calcGrowthRate(Long previous, long current) {
         if (previous == null || previous == 0L) {
             return null;

@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>급여명세서 | HEXAGON PAY</title>
+<title>給与明細書 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
 body { min-width: 1200px; background: #fff; }
@@ -77,11 +77,11 @@ body { min-width: 1200px; background: #fff; }
 
 	<main class="content-area">
 		<div class="page-header" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="급여명세서">
+			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="給与明細書">
 			<div>
-				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">급여명세서</h2>
+				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">給与明細書</h2>
 				<p class="text-muted" style="margin: 3px 0 0 0; font-size: 12px; color: #666;">
-					사원을 선택하면 해당사원의 급여명세서가 자동으로 작성됩니다.
+					社員を選択すると、該当社員の給与明細書が自動で作成されます。
 				</p>
 			</div>
 		</div>
@@ -89,35 +89,35 @@ body { min-width: 1200px; background: #fff; }
 		<form id="pslFilterForm" action="${pageContext.request.contextPath}/Payment/paymentPayslip.do" method="GET">
 			<div class="psl-filter-bar">
 				<div>
-					<strong>* 귀속연월</strong>&nbsp;
+					<strong>* 帰属年月</strong>&nbsp;
 					<select name="payYear" onchange="document.getElementById('pslFilterForm').submit()">
 						<c:forEach var="year" begin="2020" end="2030">
-							<option value="${year}" <c:if test="${payYear eq year}">selected</c:if>>${year} 년</option>
+							<option value="${year}" <c:if test="${payYear eq year}">selected</c:if>>${year}年</option>
 						</c:forEach>
 					</select>
 					<select name="payMonth" onchange="document.getElementById('pslFilterForm').submit()">
 						<c:forEach var="month" begin="1" end="12">
 							<fmt:formatNumber value="${month}" pattern="00" var="formattedMonth" />
-							<option value="${formattedMonth}" <c:if test="${payMonth eq formattedMonth}">selected</c:if>>${formattedMonth} 월</option>
+							<option value="${formattedMonth}" <c:if test="${payMonth eq formattedMonth}">selected</c:if>>${formattedMonth}月</option>
 						</c:forEach>
 					</select>
 				</div>
 				<div>
-					<strong>* 급여차수</strong>&nbsp;
+					<strong>* 給与回</strong>&nbsp;
 					<select name="paySequence" onchange="document.getElementById('pslFilterForm').submit()">
 						<c:forEach var="seq" begin="1" end="10">
 							<fmt:formatNumber value="${seq}" pattern="00" var="formattedSeq" />
-							<option value="${seq}" <c:if test="${paySequence eq seq}">selected</c:if>>급여-${formattedSeq}</option>
+							<option value="${seq}" <c:if test="${paySequence eq seq}">selected</c:if>>給与-${formattedSeq}</option>
 						</c:forEach>
 					</select>
 				</div>
 				<div>
-					<strong>* 정산기간</strong>&nbsp;
+					<strong>* 精算期間</strong>&nbsp;
 					<span class="psl-static">${result.settlementStartDate}</span> ~
 					<span class="psl-static">${result.settlementEndDate}</span>
 				</div>
 				<div>
-					<strong>* 급여지급일</strong>&nbsp;
+					<strong>* 給与支給日</strong>&nbsp;
 					<span class="psl-static">${result.paymentDate}</span>
 				</div>
 			</div>
@@ -125,22 +125,22 @@ body { min-width: 1200px; background: #fff; }
 
 		<div class="psl-toolbar">
 			<div class="psl-search">
-				<input type="text" id="pslSearchInput" placeholder="검색어 입력" onkeydown="if(event.key==='Enter'){pslSearch();}">
+				<input type="text" id="pslSearchInput" placeholder="検索語を入力" onkeydown="if(event.key==='Enter'){pslSearch();}">
 				<button type="button" onclick="pslSearch()">🔍</button>
 			</div>
-			<button type="button" class="psl-btn" onclick="pslShowAll()">전체보기</button>
+			<button type="button" class="psl-btn" onclick="pslShowAll()">全体表示</button>
 		</div>
 
 		<div class="psl-layout">
-			<!-- 좌측: 사원 목록 -->
+			<!-- 좌측: 사원 목록 / 左側：社員一覧 -->
 			<div class="psl-list">
 				<table>
 					<thead>
 						<tr>
 							<th style="width: 34px;"><input type="checkbox" id="pslCheckAll" onclick="pslToggleAll(this)"></th>
-							<th>구분</th>
-							<th>성명</th>
-							<th>실지급액</th>
+							<th>区分</th>
+							<th>氏名</th>
+							<th>実支給額</th>
 						</tr>
 					</thead>
 					<tbody id="pslEmployeeBody">
@@ -153,84 +153,84 @@ body { min-width: 1200px; background: #fff; }
 						</c:forEach>
 						<c:if test="${empty result.employeeList}">
 							<tr>
-								<td colspan="4" style="padding: 25px; color: #666;">등록된 급여 데이터가 없습니다.</td>
+								<td colspan="4" style="padding: 25px; color: #666;">登録された給与データがありません。</td>
 							</tr>
 						</c:if>
 					</tbody>
 				</table>
 			</div>
 
-			<!-- 우측: 급여명세서 미리보기 -->
+			<!-- 우측: 급여명세서 미리보기 / 右側：給与明細書プレビュー -->
 			<div class="psl-preview">
 				<div class="psl-sheet">
 					<div class="psl-sheet-head">
 						<div class="psl-logo" id="pslLogoBlock">
 							<span class="psl-logo-mark" id="pslLogoMark">HEXAGON</span>
 							<button type="button" class="psl-logo-close" id="pslLogoCloseBtn" onclick="pslToggleLogo(false)">✕</button>
-							<span class="psl-logo-placeholder" id="pslLogoPlaceholder" onclick="pslToggleLogo(true)">로고 표시</span>
+							<span class="psl-logo-placeholder" id="pslLogoPlaceholder" onclick="pslToggleLogo(true)">ロゴ表示</span>
 						</div>
-						<div class="psl-sheet-title">${payYear}년 ${payMonth}월 급여명세서</div>
+						<div class="psl-sheet-title">${payYear}年 ${payMonth}月 給与明細書</div>
 					</div>
 
 					<table class="psl-info-table">
 						<tr>
-							<th>성명</th><td id="pslInfoName">&nbsp;</td>
-							<th>생년월일</th><td id="pslInfoResident">&nbsp;</td>
+							<th>氏名</th><td id="pslInfoName">&nbsp;</td>
+							<th>生年月日</th><td id="pslInfoResident">&nbsp;</td>
 						</tr>
 						<tr>
-							<th>부서</th><td id="pslInfoDept">&nbsp;</td>
-							<th>직급</th><td id="pslInfoPosition">&nbsp;</td>
+							<th>部署</th><td id="pslInfoDept">&nbsp;</td>
+							<th>職級</th><td id="pslInfoPosition">&nbsp;</td>
 						</tr>
 						<tr>
-							<th>입사일</th><td id="pslInfoHireDate">&nbsp;</td>
-							<th>급여지급일</th><td>${result.paymentDate}</td>
+							<th>入社日</th><td id="pslInfoHireDate">&nbsp;</td>
+							<th>給与支給日</th><td>${result.paymentDate}</td>
 						</tr>
 					</table>
 
-					<div class="psl-section-header">지급 항목</div>
+					<div class="psl-section-header">支給項目</div>
 					<table class="psl-detail-table">
 						<thead>
-							<tr><th>항목명</th><th>금액</th><th>산출식 또는 산출방법</th></tr>
+							<tr><th>項目名</th><th>金額</th><th>算出式または算出方法</th></tr>
 						</thead>
 						<tbody id="pslPayItemsBody">
-							<tr class="psl-blank-row"><td colspan="3">사원을 선택해주세요.</td></tr>
+							<tr class="psl-blank-row"><td colspan="3">社員を選択してください。</td></tr>
 						</tbody>
 						<tfoot>
-							<tr class="psl-sum-row"><td colspan="2">합계</td><td id="pslPaySum">&nbsp;</td></tr>
+							<tr class="psl-sum-row"><td colspan="2">合計</td><td id="pslPaySum">&nbsp;</td></tr>
 						</tfoot>
 					</table>
 
-					<div class="psl-section-header">공제 항목</div>
+					<div class="psl-section-header">控除項目</div>
 					<table class="psl-detail-table">
 						<thead>
-							<tr><th>항목명</th><th>금액</th><th>산출식 또는 산출방법</th></tr>
+							<tr><th>項目名</th><th>金額</th><th>算出式または算出方法</th></tr>
 						</thead>
 						<tbody id="pslDedItemsBody">
-							<tr class="psl-blank-row"><td colspan="3">사원을 선택해주세요.</td></tr>
+							<tr class="psl-blank-row"><td colspan="3">社員を選択してください。</td></tr>
 						</tbody>
 						<tfoot>
-							<tr class="psl-sum-row"><td colspan="2">합계</td><td id="pslDedSum">&nbsp;</td></tr>
+							<tr class="psl-sum-row"><td colspan="2">合計</td><td id="pslDedSum">&nbsp;</td></tr>
 						</tfoot>
 					</table>
 
 					<table class="psl-net-table">
 						<tr>
-							<td class="psl-net-label">실수령액</td>
+							<td class="psl-net-label">実受領額</td>
 							<td class="psl-net-value" id="pslNetValue">&nbsp;</td>
 						</tr>
 					</table>
 
-					<p class="psl-thanks">귀하의 노고에 감사드리며, 수고 많으셨습니다.</p>
+					<p class="psl-thanks">貴殿のご尽力に感謝いたします。お疲れ様でした。</p>
 
 					<div class="psl-sign">
 						<label>
-							<input type="checkbox" id="pslShowSign" checked onchange="pslToggleSign(this)"> 대표자 표기
+							<input type="checkbox" id="pslShowSign" checked onchange="pslToggleSign(this)"> 代表者表記
 						</label>
-						<div class="psl-sign-name">HEXAGON PAY<br><span id="pslSignTitle">대표이사</span></div>
+						<div class="psl-sign-name">HEXAGON PAY<br><span id="pslSignTitle">代表取締役</span></div>
 						<div class="psl-seal" id="pslSealBlock">
-							<div class="psl-seal-mark" id="pslSealMark">직인</div>
+							<div class="psl-seal-mark" id="pslSealMark">社印</div>
 							<button type="button" class="psl-seal-close" id="pslSealCloseBtn" onclick="pslToggleSeal(false)">✕</button>
-							<div class="psl-seal-placeholder" id="pslSealPlaceholder" onclick="pslToggleSeal(true)">직인 표시</div>
+							<div class="psl-seal-placeholder" id="pslSealPlaceholder" onclick="pslToggleSeal(true)">社印表示</div>
 						</div>
 					</div>
 				</div>
@@ -241,7 +241,7 @@ body { min-width: 1200px; background: #fff; }
 	<%@ include file="../../jspf/app-end.jspf"%>
 
 	<script>
-	// 컨트롤러가 조회한 사원별 지급/공제 내역 (payrollEmployeeId를 key로 하는 JSON)
+	// 컨트롤러가 조회한 사원별 지급/공제 내역 (payrollEmployeeId를 key로 하는 JSON) / コントローラーが照会した社員別支給・控除内訳（payrollEmployeeIdをキーとするJSON）
 	var pslEmployeeDetail = <%= request.getAttribute("employeeDetailJson") %>;
 
 	function pslRenderItems(tbodyId, items) {
@@ -250,7 +250,7 @@ body { min-width: 1200px; background: #fff; }
 	    if (!items || items.length === 0) {
 	        var emptyRow = document.createElement("tr");
 	        emptyRow.className = "psl-blank-row";
-	        emptyRow.innerHTML = "<td colspan=\"3\">내역이 없습니다.</td>";
+	        emptyRow.innerHTML = "<td colspan=\"3\">内訳がありません。</td>";
 	        tbody.appendChild(emptyRow);
 	        return;
 	    }

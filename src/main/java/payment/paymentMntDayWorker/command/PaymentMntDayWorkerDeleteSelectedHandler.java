@@ -11,6 +11,7 @@ import command.CommandHandler;
 import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // [선택삭제] - 체크된 근로자(payrollDayWorkerEmployeeIds, 콤마구분)를 DB에서 실제 삭제
+// [選択削除] - チェックされた労働者（payrollDayWorkerEmployeeIds、カンマ区切り）をDBから実際に削除
 public class PaymentMntDayWorkerDeleteSelectedHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();

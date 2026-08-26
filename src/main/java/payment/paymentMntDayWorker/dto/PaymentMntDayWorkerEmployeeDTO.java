@@ -1,20 +1,21 @@
 package payment.paymentMntDayWorker.dto;
 
 // 좌측 근로자 목록 1행 DTO (EMPLOYEE + PAYROLL_EMPLOYEE JOIN 결과, 정규직 화면과 테이블 공유)
+// 左側労働者一覧1行DTO（EMPLOYEE + PAYROLL_EMPLOYEE JOIN結果、正社員画面とテーブル共有）
 public class PaymentMntDayWorkerEmployeeDTO {
 
     private Long payrollDayWorkerEmployeeId; // PAYROLL_EMPLOYEE_ID (PK)
     private Long payrollDayWorkerId;         // PAYROLL_ID (FK)
-    private String employeeId;               // 사원아이디 (EMPLOYEE PK)
-    private String employeeNo;               // 사원번호
-    private String employeeName;             // 성명
-    private String employmentType;           // 구분 (예: 일용직)
-    private String department;               // 부서
-    private String position;                 // 직위
-    private String status;                   // 상태 (재직/퇴직) - [신규추가] 모달용
-    private Long totalPayAmount;             // 지급총액
-    private Long totalDeductionAmount;       // 공제총액
-    private Long netPayAmount;               // 실지급액
+    private String employeeId;               // 사원아이디 (EMPLOYEE PK) / 社員ID（EMPLOYEE PK）
+    private String employeeNo;               // 사원번호 / 社員番号
+    private String employeeName;             // 성명 / 氏名
+    private String employmentType;           // 구분 (예: 일용직) / 区分（例：日雇い）
+    private String department;               // 부서 / 部署
+    private String position;                 // 직위 / 職位
+    private String status;                   // 상태 (재직/퇴직) - [신규추가] 모달용 / 状態（在職/退職）- [新規追加]モーダル用
+    private Long totalPayAmount;             // 지급총액 / 支給総額
+    private Long totalDeductionAmount;       // 공제총액 / 控除総額
+    private Long netPayAmount;               // 실지급액 / 実支給額
 
     public Long getPayrollDayWorkerEmployeeId() { return payrollDayWorkerEmployeeId; }
     public void setPayrollDayWorkerEmployeeId(Long payrollDayWorkerEmployeeId) { this.payrollDayWorkerEmployeeId = payrollDayWorkerEmployeeId; }

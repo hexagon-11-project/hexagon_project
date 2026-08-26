@@ -1,6 +1,7 @@
 package payment.paymentMntDayWorker.dto;
 
 // 공제항목 마스터(DEDUCTION_ITEM) 1행 - 화면 공제항목 패널을 DB 기준으로 동적으로 그리기 위한 DTO
+// 控除項目マスタ（DEDUCTION_ITEM）1行 - 画面の控除項目パネルをDB基準で動的に描画するためのDTO
 public class PaymentMntDayWorkerDeductionItemDTO {
 
     private int deductionItemId;

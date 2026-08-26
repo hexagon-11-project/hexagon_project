@@ -4,23 +4,23 @@ import java.util.Date;
 
 public class PaymentMntEmployeeDTO {
     
-    private Long payrollEmployeeId;        // 사원별급여아이디
-    private Long payrollId;                // 급여아이디
-    private String employeeId;             // 사원아이디
-    private String employeeName;           // 사원이름
-    private String employmentType;         // 급여당시 고용형태
-    private String incomeType;             // 소득구분
-    private Long totalPayAmount;           // 지급합계
-    private Long totalDeductionAmount;     // 공제합계
-    private Long netPayAmount;             // 실지급액
-    private Long regId;                    // 등록자 아이디
-    private Long modId;                    // 수정자 아이디
-    private Date createdAt;                // 생성일시
-    private Date updatedAt;                // 수정일시
-    private String department;  // 부서
-    private String position;    // 직위
-    private String employmentstatus;      // 상태
-    private long baseWageAmount;			//기본급
+    private Long payrollEmployeeId;        // 사원별급여아이디 / 社員別給与ID
+    private Long payrollId;                // 급여아이디 / 給与ID
+    private String employeeId;             // 사원아이디 / 社員ID
+    private String employeeName;           // 사원이름 / 社員名
+    private String employmentType;         // 급여당시 고용형태 / 給与当時の雇用形態
+    private String incomeType;             // 소득구분 / 所得区分
+    private Long totalPayAmount;           // 지급합계 / 支給合計
+    private Long totalDeductionAmount;     // 공제합계 / 控除合計
+    private Long netPayAmount;             // 실지급액 / 実支給額
+    private Long regId;                    // 등록자 아이디 / 登録者ID
+    private Long modId;                    // 수정자 아이디 / 修正者ID
+    private Date createdAt;                // 생성일시 / 作成日時
+    private Date updatedAt;                // 수정일시 / 修正日時
+    private String department;  // 부서 / 部署
+    private String position;    // 직위 / 職位
+    private String employmentstatus;      // 상태 / 状態
+    private long baseWageAmount;			//기본급 / 基本給
     
     public String getEmploymentstatus() {
 		return employmentstatus;

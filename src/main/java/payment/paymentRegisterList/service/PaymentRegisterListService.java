@@ -20,7 +20,9 @@ public class PaymentRegisterListService {
     private PaymentRegisterListDAO dao = new PaymentRegisterListDAO();
 
     /** 귀속연도의 1~12월 급여-01차 목록. 아직 급여가 등록되지 않은 달도 0건으로 항상 채워서 반환하고,
-     *  정산기간/지급일은 PAYROLL에 저장된 값과 무관하게 귀속연월 기준(그 달 1일~말일, 다음달 5일)으로 항상 계산한다. */
+     *  정산기간/지급일은 PAYROLL에 저장된 값과 무관하게 귀속연월 기준(그 달 1일~말일, 다음달 5일)으로 항상 계산한다.
+     *  帰属年度の1～12月給与-01回一覧。まだ給与が登録されていない月も0件で常に埋めて返し、
+     *  精算期間・支給日はPAYROLLに保存された値とは無関係に帰属年月基準（その月の1日～末日、翌月5日）で常に計算する。 */
     public List<PaymentRegisterListDTO> getPayrollList(String payYear) {
         Map<String, PaymentRegisterListDTO> dbMap = new HashMap<>();
         Connection conn = null;

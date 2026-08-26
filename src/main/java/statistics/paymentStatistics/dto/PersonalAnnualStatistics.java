@@ -1,13 +1,14 @@
 package statistics.paymentStatistics.dto;
 
 // 연도별 개인연봉 통계 1건 (한 사원의 특정 연도 급여 요약)
+// 年度別個人年俸統計1件（1社員の特定年度給与要約）
 public class PersonalAnnualStatistics {
 
     private int year;
-    private long totalPayAmount;        // 연봉액(연간 지급합계, 천원 단위 아님 - 원 단위 그대로 보관)
-    private Double salaryGrowthRate;    // 전년 대비 증가율(%) - 전년 데이터 없거나 0이면 null
-    private long totalDeductionAmount;  // 연간 공제합계
-    private long netPayAmount;          // 연간 실지급액
+    private long totalPayAmount;        // 연봉액(연간 지급합계, 천원 단위 아님 - 원 단위 그대로 보관) / 年俸額（年間支給合計、千円単位ではなく円単位でそのまま保持）
+    private Double salaryGrowthRate;    // 전년 대비 증가율(%) - 전년 데이터 없거나 0이면 null / 前年比増加率（%）- 前年データがないか0であればnull
+    private long totalDeductionAmount;  // 연간 공제합계 / 年間控除合計
+    private long netPayAmount;          // 연간 실지급액 / 年間実支給額
 
     public int getYear() { return year; }
     public void setYear(int year) { this.year = year; }

@@ -15,6 +15,9 @@ import statistics.paymentstatisticsmonth.dto.PersonalMonthlyStatistics;
  * 월별 개인급여 통계 Dao.
  * PAYROLL / PAYROLL_EMPLOYEE를 사원 1인 기준으로 선택 연도의 월 단위 집계한다.
  * PAY_YEAR_MONTH 컬럼이 CHAR(6)이므로 연월 비교는 'YYYY01' ~ 'YYYY12' 범위로 처리한다.
+ * 月別個人給与統計Dao。
+ * PAYROLL / PAYROLL_EMPLOYEEを社員1人単位で選択年度の月単位に集計する。
+ * PAY_YEAR_MONTHカラムがCHAR(6)のため、年月比較は'YYYY01'～'YYYY12'範囲で処理する。
  */
 public class PaymentStatisticsMonthDao {
 
@@ -22,6 +25,7 @@ public class PaymentStatisticsMonthDao {
 
     /**
      * 선택 연도(year)의 1월~12월, 해당 사원(employeeName)의 월별 급여 통계를 조회한다.
+     * 選択年度（year）の1月～12月、該当社員（employeeName）の月別給与統計を照会する。
      */
     public List<PersonalMonthlyStatistics> selectPersonalMonthlyByYear(Connection conn, String employeeName, int year)
             throws SQLException {
@@ -60,7 +64,8 @@ public class PaymentStatisticsMonthDao {
         }
     }
 
-    /** 1월~12월 목록을 만들고 데이터 없는 달은 0으로 채운다. */
+    /** 1월~12월 목록을 만들고 데이터 없는 달은 0으로 채운다.
+     *  1月～12月一覧を作り、データのない月は0で埋める。 */
     private List<PersonalMonthlyStatistics> buildTwelveMonthList(Map<Integer, PersonalMonthlyStatistics> monthMap, int year) {
         List<PersonalMonthlyStatistics> result = new ArrayList<>(MONTH_COUNT);
 

@@ -50,6 +50,8 @@ public class PaymentPayslipService {
                 Map<Long, List<PaymentPayslipItemDTO>> deductionItems = dao.selectDeductionItemsByPayroll(conn, payrollId);
                 // 일용직은 지급내역이 PAYROLL_PAY_DETAIL이 아니라 DAILY_WORK_RECORD에 저장되고,
                 // 원천징수 세액(소득세/지방소득세)도 PAYROLL_DEDUCTION_DETAIL이 아니라 그 안에 함께 저장된다.
+                // 日雇いは支給内訳がPAYROLL_PAY_DETAILではなくDAILY_WORK_RECORDに保存され、
+                // 源泉徴収税額（所得税・地方所得税）もPAYROLL_DEDUCTION_DETAILではなくその中に一緒に保存される。
                 Map<Long, PaymentPayslipItemDTO> dailyPay = dao.selectDailyPayByPayroll(conn, payrollId);
                 Map<Long, List<PaymentPayslipItemDTO>> dailyTax = dao.selectDailyTaxDeductionsByPayroll(conn, payrollId);
                 for (PaymentPayslipDetailDTO emp : employeeList) {
@@ -88,7 +90,8 @@ public class PaymentPayslipService {
         return "일용직".equals(employmentType) || "DAILY".equals(employmentType);
     }
 
-    /** 사원별 상세를 JS에서 바로 꺼내 쓸 수 있도록 payrollEmployeeId를 key로 하는 JSON 문자열로 조립한다. */
+    /** 사원별 상세를 JS에서 바로 꺼내 쓸 수 있도록 payrollEmployeeId를 key로 하는 JSON 문자열로 조립한다.
+     *  社員別詳細をJSからすぐ取り出して使えるよう、payrollEmployeeIdをキーとするJSON文字列に組み立てる。 */
     public String buildEmployeeDetailJson(List<PaymentPayslipDetailDTO> employeeList) {
         StringBuilder json = new StringBuilder("{");
         for (int i = 0; i < employeeList.size(); i++) {

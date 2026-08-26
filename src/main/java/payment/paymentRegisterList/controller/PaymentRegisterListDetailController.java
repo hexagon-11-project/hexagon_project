@@ -10,6 +10,7 @@ import payment.paymentRegisterList.dto.PaymentRegisterListDetailResult;
 import payment.paymentRegisterList.service.PaymentRegisterListDetailService;
 
 // 급여대장 상세(사원별 지급/공제 내역) 화면 컨트롤러
+// 給与台帳詳細（社員別支給・控除内訳）画面コントローラー
 public class PaymentRegisterListDetailController implements CommandHandler {
 
     private PaymentRegisterListDetailService service = new PaymentRegisterListDetailService();

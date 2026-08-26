@@ -29,10 +29,10 @@ public class PaymentMntPayItemDTO {
         this.calculationMethod = calculationMethod;
     }
     
- // 기존 변수들 아래에 추가
-    private Long bulkPayAmount; // 일괄지급액 (식대 20만원 등)
+ // 기존 변수들 아래에 추가 / 既存変数の下に追加
+    private Long bulkPayAmount; // 일괄지급액 (식대 20만원 등) / 一括支給額（食事代20万ウォンなど）
 
-    // Getter, Setter 추가
+    // Getter, Setter 추가 / Getter, Setter追加
     public Long getBulkPayAmount() {
         return bulkPayAmount;
     }

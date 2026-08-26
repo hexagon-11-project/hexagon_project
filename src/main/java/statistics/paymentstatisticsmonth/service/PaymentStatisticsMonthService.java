@@ -12,6 +12,8 @@ import statistics.paymentstatisticsmonth.dto.PersonalMonthlyStatistics;
 /**
  * 월별 개인급여 통계 Service.
  * 선택 연도, 선택 사원 1인의 1월~12월 통계를 조회한다.
+ * 月別個人給与統計Service。
+ * 選択年度、選択した社員1人の1月～12月統計を照会する。
  */
 public class PaymentStatisticsMonthService {
 

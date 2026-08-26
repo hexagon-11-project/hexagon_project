@@ -9,6 +9,7 @@ import command.CommandHandler;
 import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // [전체삭제] - 현재 급여차수의 모든 근로자+상세를 DB에서 실제 삭제
+// [全体削除] - 現在の給与回のすべての労働者＋詳細をDBから実際に削除
 public class PaymentMntDayWorkerDeleteAllHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();

@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import payment.paymentMnt.service.PaymentMntService;
 
+// 지난급여 불러오기 AJAX 처리
+// 前回給与の読み込みAJAX処理
 public class PaymentMntLoadPrevAjaxHandler implements CommandHandler {
     private PaymentMntService service = new PaymentMntService();
 
@@ -22,9 +24,11 @@ public class PaymentMntLoadPrevAjaxHandler implements CommandHandler {
         int prevSeq = Integer.parseInt(prevSeqStr);
 
         // Service 호출 (기존 데이터 삭제 후 복사, 복사된 건수 받아오기)
+        // サービス呼び出し（既存データ削除後にコピーし、コピーされた件数を受け取る）
         int count = service.loadPreviousPayrollDataWithDelete(prevYearMonth, prevSeq, currYearMonth, currSeq);
 
         // JSON 형태로 결과 응답 (예: {"status":"SUCCESS", "count":8})
+        // JSON形式で結果を応答（例：{"status":"SUCCESS", "count":8}）
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.print("{\"status\":\"SUCCESS\", \"count\":" + count + "}");

@@ -6,7 +6,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>급여입력/관리(일용직) | HEXAGON PAY</title>
+<title>給与入力・管理（日雇い） | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
 body { min-width: 1200px; }
@@ -39,12 +39,12 @@ body { min-width: 1200px; }
 
 	<main class="content-area">
 		<div class="page-header" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="급여입력/관리(일용직)">
+			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="給与入力・管理（日雇い）">
 			<div>
-				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">급여입력/관리(일용직)</h2>
+				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">給与入力・管理（日雇い）</h2>
 				<p class="text-muted" style="margin: 3px 0 0 0; font-size: 12px; color: #666;">
-					일용직 근로자의 급여 및 상여금 정보를 입력, 저장, 관리하는 메뉴입니다.
-					<span style="color: #d9534f; font-weight: bold;">귀속연월, 급여차수를 확인하세요!!</span>
+					日雇い労働者の給与および賞与情報を入力・保存・管理するメニューです。
+					<span style="color: #d9534f; font-weight: bold;">帰属年月、給与回をご確認ください！！</span>
 				</p>
 			</div>
 		</div>
@@ -66,38 +66,38 @@ body { min-width: 1200px; }
 			<div style="background: #c85a5a; padding: 10px 15px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; color: white; margin-bottom: 15px; font-size: 13px;">
 				<div style="display: flex; align-items: center; gap: 15px;">
 					<div style="display: flex; align-items: center; gap: 5px;">
-						<strong>* 귀속연월</strong>&nbsp;
+						<strong>* 帰属年月</strong>&nbsp;
 						<select name="payYear" id="payYear" class="form-control input-sm" style="display: inline-block; width: 80px; background: #fff; color: #333; padding: 3px 5px;" onchange="reloadPayrollData()">
 							<c:forEach var="year" begin="2005" end="2027">
-								<option value="${year}" <c:if test="${selectedYear eq year}">selected</c:if>>${year}년</option>
+								<option value="${year}" <c:if test="${selectedYear eq year}">selected</c:if>>${year}年</option>
 							</c:forEach>
 						</select>&nbsp;
 						<select name="payMonth" id="payMonth" class="form-control input-sm" style="display: inline-block; width: 65px; background: #fff; color: #333; padding: 3px 5px;" onchange="reloadPayrollData()">
 							<c:forEach var="month" begin="1" end="12">
 								<fmt:formatNumber value="${month}" pattern="00" var="formattedMonth" />
-								<option value="${formattedMonth}" <c:if test="${selectedMonth eq formattedMonth}">selected</c:if>>${formattedMonth}월</option>
+								<option value="${formattedMonth}" <c:if test="${selectedMonth eq formattedMonth}">selected</c:if>>${formattedMonth}月</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div style="display: flex; align-items: center; gap: 5px;">
-						<strong>* 급여차수</strong>&nbsp;
+						<strong>* 給与回</strong>&nbsp;
 						<select name="paySequence" id="paySequence" class="form-control input-sm" style="display: inline-block; width: 90px; background: #fff; color: #333; padding: 3px 5px;" onchange="reloadPayrollData()">
 							<c:forEach var="seq" begin="1" end="10">
 								<fmt:formatNumber value="${seq}" pattern="00" var="formattedSeq" />
-								<option value="${formattedSeq}" <c:if test="${(empty param.paySequence and formattedSeq eq '01') or (param.paySequence eq formattedSeq)}">selected</c:if>>급여-${formattedSeq}차</option>
+								<option value="${formattedSeq}" <c:if test="${(empty param.paySequence and formattedSeq eq '01') or (param.paySequence eq formattedSeq)}">selected</c:if>>給与-${formattedSeq}回</option>
 							</c:forEach>
 						</select>
 					</div>
 				</div>
 				<div style="display: flex; align-items: center; gap: 15px;">
 					<div>
-						<strong>* 정산기간</strong>&nbsp;
+						<strong>* 精算期間</strong>&nbsp;
 						<input type="text" id="calcPeriodStart" readonly class="form-control input-sm" style="display: inline-block; width: 95px; background: #fff; color: #333; padding: 3px 5px; text-align: center;">
 						~&nbsp;
 						<input type="text" id="calcPeriodEnd" readonly class="form-control input-sm" style="display: inline-block; width: 95px; background: #fff; color: #333; padding: 3px 5px; text-align: center;">
 					</div>
 					<div>
-						<strong>* 급여지급일</strong>&nbsp;
+						<strong>* 給与支給日</strong>&nbsp;
 						<input type="text" id="payDate" readonly class="form-control input-sm" style="display: inline-block; width: 95px; background: #fff; color: #333; padding: 3px 5px; text-align: center;">
 					</div>
 				</div>
@@ -107,28 +107,28 @@ body { min-width: 1200px; }
 
 		<div style="margin-bottom: 10px; display: flex; gap: 5px;">
 			<button type="button" class="btn btn-primary" onclick="openEmployeeSelectModal()" style="background: #337ab7; color: #fff; border: none; padding: 4px 10px; font-size: 12px;">
-				<i class="fas fa-plus"></i> 신규추가
+				<i class="fas fa-plus"></i> 新規追加
 			</button>
 			<button type="button" class="btn btn-default" onclick="deleteSelectedEmployees()" style="background: #fff; border: 1px solid #ccc; padding: 4px 10px; font-size: 12px;">
-				<i class="fas fa-trash-alt"></i> 선택삭제
+				<i class="fas fa-trash-alt"></i> 選択削除
 			</button>
 			<button type="button" class="btn btn-danger" onclick="deleteAllEmployees()" style="background: #d9534f; color: #fff; border: none; padding: 4px 10px; font-size: 12px;">
-				<i class="fas fa-trash"></i> 전체삭제
+				<i class="fas fa-trash"></i> 全体削除
 			</button>
 		</div>
 
-		<!-- 메인 그리드: 좌측 근로자 목록 / 우측 급여상세 -->
+		<!-- 메인 그리드: 좌측 근로자 목록 / 우측 급여상세 / メイングリッド：左側 労働者一覧 / 右側 給与詳細 -->
 		<div style="display: flex; gap: 15px; align-items: flex-start;">
 
-			<!-- 좌측: 근로자 목록 -->
+			<!-- 좌측: 근로자 목록 / 左側：労働者一覧 -->
 			<div style="flex: 1; background: #fff; border: 1px solid #ddd; padding: 10px;">
 				<table class="dw-table">
 					<thead>
 						<tr>
-							<th>구분</th>
-							<th>성명</th>
-							<th>부서</th>
-							<th>실지급액</th>
+							<th>区分</th>
+							<th>氏名</th>
+							<th>部署</th>
+							<th>実支給額</th>
 						</tr>
 					</thead>
 					<tbody id="employeeTableBody">
@@ -141,37 +141,37 @@ body { min-width: 1200px; }
 							</tr>
 						</c:forEach>
 						<c:if test="${empty employeeList}">
-							<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">등록된 근로자가 없습니다.</td></tr>
+							<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">登録された労働者がいません。</td></tr>
 						</c:if>
 					</tbody>
 				</table>
 			</div>
 
-			<!-- 우측: 급여상세 -->
+			<!-- 우측: 급여상세 / 右側：給与詳細 -->
 			<div style="flex: 1.3; background: #fff; border: 1px solid #ddd; padding: 10px; font-size: 12px;">
 				<input type="hidden" id="selectedEmpId" value="">
 
 				<div style="display: flex; gap: 10px;">
-					<!-- 일자별 지급내역 -->
+					<!-- 일자별 지급내역 / 日別支給内訳 -->
 					<div style="flex: 1.4;">
 						<table class="dw-table" style="table-layout: fixed;">
 							<thead>
-								<tr><th style="width: 26%;">일자</th><th style="width: 14%;">지급율</th><th style="width: 20%;">지급액</th><th style="width: 20%;">소득세</th><th style="width: 20%;">지방소득세</th></tr>
+								<tr><th style="width: 26%;">日付</th><th style="width: 14%;">支給率</th><th style="width: 20%;">支給額</th><th style="width: 20%;">所得税</th><th style="width: 20%;">地方所得税</th></tr>
 							</thead>
 							<tbody id="dailyBody"></tbody>
 						</table>
 						<div style="display: flex; border: 1px solid #ddd; border-top: none; font-weight: bold; text-align: center;">
-							<div style="flex: 1; background: #f4f6f9; padding: 6px;">지급총액 : <span id="payTotalText" style="color: #337ab7;">0</span> 원</div>
+							<div style="flex: 1; background: #f4f6f9; padding: 6px;">支給総額：<span id="payTotalText" style="color: #337ab7;">0</span>円</div>
 						</div>
 					</div>
 
-					<!-- 공제항목 -->
+					<!-- 공제항목 / 控除項目 -->
 					<div style="flex: 1;">
 						<div class="ded-panel-head">
-							<span>공제항목</span>
+							<span>控除項目</span>
 							<span>
-								<button type="button" class="ded-mode-btn active" id="btnMode4ins" onclick="setDeductionMode('4대보험')">4대보험</button>
-								<button type="button" class="ded-mode-btn" id="btnModePeriod" onclick="setDeductionMode('기간단위 소득세')">기간단위 소득세</button>
+								<button type="button" class="ded-mode-btn active" id="btnMode4ins" onclick="setDeductionMode('4대보험')">4大保険</button>
+								<button type="button" class="ded-mode-btn" id="btnModePeriod" onclick="setDeductionMode('기간단위 소득세')">期間単位所得税</button>
 							</span>
 						</div>
 						<table class="dw-table">
@@ -185,41 +185,41 @@ body { min-width: 1200px; }
 							</tbody>
 						</table>
 						<div style="display: flex; justify-content: space-between; background: #fcecec; padding: 6px 10px; font-weight: bold; color: #c0392b;">
-							<span>공제총액</span><span id="deductionTotalText">0</span>
+							<span>控除総額</span><span id="deductionTotalText">0</span>
 						</div>
 					</div>
 				</div>
 
 				<div style="background: #1b3a5c; color: #fff; text-align: center; padding: 10px; font-weight: bold; font-size: 15px; margin-top: 8px; border-radius: 2px;">
-					실지급액 : <span id="netPayText" style="color: #ffd65a;">0</span> 원
+					実支給額：<span id="netPayText" style="color: #ffd65a;">0</span>円
 				</div>
 
 				<div style="text-align: right; margin-top: 10px; display: flex; justify-content: flex-end; gap: 5px;">
-					<button type="button" onclick="saveDetail()" class="btn btn-primary btn-sm" style="background: #337ab7; color: white; border: none; padding: 6px 18px; font-weight: bold;">저장</button>
-					<button type="button" onclick="clearForm()" class="btn btn-default btn-sm" style="background: #ccc; color: #333; border: 1px solid #bbb; padding: 6px 15px;">내용 지우기</button>
+					<button type="button" onclick="saveDetail()" class="btn btn-primary btn-sm" style="background: #337ab7; color: white; border: none; padding: 6px 18px; font-weight: bold;">保存</button>
+					<button type="button" onclick="clearForm()" class="btn btn-default btn-sm" style="background: #ccc; color: #333; border: 1px solid #bbb; padding: 6px 15px;">内容のクリア</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- 종합정보 -->
+		<!-- 종합정보 / 総合情報 -->
 		<div style="margin-top: 25px;">
-			<div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">급여 종합정보</div>
+			<div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">給与総合情報</div>
 			<div style="display: flex; gap: 10px;">
 				<div style="flex: 1; background: #95a5a6; color: white; padding: 15px; border-radius: 4px; text-align: center;">
-					<div style="font-size: 12px;">월 합계</div>
-					<div id="sumCount" style="font-size: 20px; font-weight: bold; margin-top: 5px;">${empty summaryInfo.workerCount ? 0 : summaryInfo.workerCount} 건</div>
+					<div style="font-size: 12px;">月合計</div>
+					<div id="sumCount" style="font-size: 20px; font-weight: bold; margin-top: 5px;">${empty summaryInfo.workerCount ? 0 : summaryInfo.workerCount} 件</div>
 				</div>
 				<div style="flex: 2; background: #5bc0de; color: white; padding: 15px; border-radius: 4px; text-align: center;">
-					<div style="font-size: 12px;">＋ 지급 총액</div>
-					<div id="sumPay" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.payTotal ? 0 : summaryInfo.payTotal}" pattern="#,###" /> 원</div>
+					<div style="font-size: 12px;">＋支給総額</div>
+					<div id="sumPay" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.payTotal ? 0 : summaryInfo.payTotal}" pattern="#,###" />円</div>
 				</div>
 				<div style="flex: 2; background: #d9534f; color: white; padding: 15px; border-radius: 4px; text-align: center;">
-					<div style="font-size: 12px;">－ 공제 총액</div>
-					<div id="sumDeduction" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.deductionTotal ? 0 : summaryInfo.deductionTotal}" pattern="#,###" /> 원</div>
+					<div style="font-size: 12px;">－控除総額</div>
+					<div id="sumDeduction" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.deductionTotal ? 0 : summaryInfo.deductionTotal}" pattern="#,###" />円</div>
 				</div>
 				<div style="flex: 2; background: #4e5d6c; color: white; padding: 15px; border-radius: 4px; text-align: center;">
-					<div style="font-size: 12px;">실지급액</div>
-					<div id="sumNet" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.netPay ? 0 : summaryInfo.netPay}" pattern="#,###" /> 원</div>
+					<div style="font-size: 12px;">実支給額</div>
+					<div id="sumNet" style="font-size: 20px; font-weight: bold; margin-top: 5px;"><fmt:formatNumber value="${empty summaryInfo.netPay ? 0 : summaryInfo.netPay}" pattern="#,###" />円</div>
 				</div>
 			</div>
 		</div>
@@ -231,7 +231,7 @@ body { min-width: 1200px; }
 	var CTX = "${pageContext.request.contextPath}";
 	var rowSeq = 0;
 
-	// ---------------- 정산기간/급여지급일 자동 계산 (paymentMnt와 동일 로직) ----------------
+	// ---------------- 정산기간/급여지급일 자동 계산 (paymentMnt와 동일 로직) / 精算期間・給与支給日の自動計算（paymentMntと同一ロジック） ----------------
 	function updateAutoDates() {
 	    var year = parseInt(document.getElementById("payYear").value, 10);
 	    var month = parseInt(document.getElementById("payMonth").value, 10);
@@ -257,13 +257,13 @@ body { min-width: 1200px; }
 	    document.getElementById("searchForm").submit();
 	}
 
-	// ---------------- 근로자 목록 선택 ----------------
+	// ---------------- 근로자 목록 선택 / 労働者一覧選択 ----------------
 	function selectEmployeeRow(rowEl, empId) {
 	    fetch(CTX + "/Payment/dayWorkerDetailAjax.do?payrollDayWorkerEmployeeId=" + empId)
 	        .then(function (res) { return res.json(); })
 	        .then(function (data) {
 	            if (!data.dailyList || data.dailyList.length === 0) {
-	                alert("해당 월에는 근무일이 없습니다.");
+	                alert("該当月には勤務日がありません。");
 	                return;
 	            }
 
@@ -288,7 +288,7 @@ body { min-width: 1200px; }
 	        .catch(function (err) { console.error("상세 조회 실패:", err); });
 	}
 
-	// ---------------- 일자별 행 ----------------
+	// ---------------- 일자별 행 / 日別行 ----------------
 	function addDailyRow(workDate, rate, payAmt, incomeTax, localTax) {
 	    var id = "row_" + (rowSeq++);
 	    var tr = document.createElement("tr");
@@ -309,7 +309,7 @@ body { min-width: 1200px; }
 	    document.getElementById("btnModePeriod").classList.toggle("active", !is4);
 	}
 
-	// ---------------- 합계 계산 ----------------
+	// ---------------- 합계 계산 / 合計計算 ----------------
 	function recalcTotals() {
 	    var payTotal = 0;
 	    document.querySelectorAll('#dailyBody .f-pay').forEach(function (i) { payTotal += Number(i.value) || 0; });
@@ -324,17 +324,17 @@ body { min-width: 1200px; }
 
 	function won(n) { return (Number(n) || 0).toLocaleString('ko-KR'); }
 
-	// ---------------- 신규추가 모달 ----------------
+	// ---------------- 신규추가 모달 / 新規追加モーダル ----------------
 	function openEmployeeSelectModal() {
 	    var url = CTX + "/Payment/dayWorkerEmployeeAddModal.do";
 	    window.open(url, "DayWorkerEmpSelectModal", "width=600,height=600,left=200,top=100,scrollbars=yes");
 	}
 
-	// 모달(paymentMntDayWorker_employee_add_modal.jsp)에서 호출
-	// 전체 새로고침을 하지 않고 방금 추가한 사원 행만 화면에 붙인다.
-	// (새로고침을 하면 [선택삭제]/[전체삭제]로 화면에서만 지워둔 사원들이 DB 기준으로 다시 나타나 버리기 때문)
+	// 모달(paymentMntDayWorker_employee_add_modal.jsp)에서 호출 / モーダル（paymentMntDayWorker_employee_add_modal.jsp）から呼び出す
+	// 전체 새로고침을 하지 않고 방금 추가한 사원 행만 화면에 붙인다. / 全体再読み込みをせず、今追加した社員行だけを画面に追加する。
+	// (새로고침을 하면 [선택삭제]/[전체삭제]로 화면에서만 지워둔 사원들이 DB 기준으로 다시 나타나 버리기 때문) / （再読み込みすると、[選択削除]/[全体削除]で画面上だけ消した社員がDB基準で再び表示されてしまうため）
 	function addEmployeesToMain(selectedEmpIds) {
-	    if (!selectedEmpIds || selectedEmpIds.length === 0) { alert("선택된 사원이 없습니다."); return; }
+	    if (!selectedEmpIds || selectedEmpIds.length === 0) { alert("選択した社員がいません。"); return; }
 	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
 
 	    var formData = new URLSearchParams();
@@ -347,14 +347,14 @@ body { min-width: 1200px; }
 	        body: formData.toString()
 	    }).then(function (res) { return res.json(); })
 	      .then(function (list) {
-	          if (!list || list.length === 0) { alert("추가된 근로자가 없습니다."); return; }
+	          if (!list || list.length === 0) { alert("追加された労働者がいません。"); return; }
 
 	          var emptyRow = document.getElementById("emptyRow");
 	          if (emptyRow) emptyRow.remove();
 
 	          list.forEach(function (emp) {
 	              var empId = String(emp.payrollEmployeeId);
-	              if (document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]')) return; // 이미 화면에 있으면 중복 추가 방지
+	              if (document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]')) return; // 이미 화면에 있으면 중복 추가 방지 / すでに画面にあれば重複追加を防止
 
 	              var tr = document.createElement("tr");
 	              tr.setAttribute("data-id", empId);
@@ -368,14 +368,14 @@ body { min-width: 1200px; }
 	              document.getElementById("employeeTableBody").appendChild(tr);
 	          });
 
-	          alert("신규 근로자가 추가되었습니다.");
+	          alert("新規労働者が追加されました。");
 	      })
-	      .catch(function () { alert("서버 통신에 실패했습니다."); });
+	      .catch(function () { alert("サーバー通信に失敗しました。"); });
 	}
 
-	// ---------------- 선택삭제 / 전체삭제 (실제 DB 반영) ----------------
-	// 주의: 이 화면의 [선택삭제]/[전체삭제]는 DB 데이터(PAYROLL_EMPLOYEE/DAILY_WORK_RECORD/PAYROLL_DEDUCTION_DETAIL)를
-	// 절대 지우지 않는다. 오직 이 화면의 사원 목록에서만 안 보이게 할 뿐이며, 페이지를 새로고침하면 다시 보인다.
+	// ---------------- 선택삭제 / 전체삭제 (실제 DB 반영) / 選択削除・全体削除（実際のDB反映） ----------------
+	// 주의: 이 화면의 [선택삭제]/[전체삭제]는 DB 데이터(PAYROLL_EMPLOYEE/DAILY_WORK_RECORD/PAYROLL_DEDUCTION_DETAIL)를 / 注意：この画面の[選択削除]/[全体削除]はDBデータ（PAYROLL_EMPLOYEE/DAILY_WORK_RECORD/PAYROLL_DEDUCTION_DETAIL）を
+	// 절대 지우지 않는다. 오직 이 화면의 사원 목록에서만 안 보이게 할 뿐이며, 페이지를 새로고침하면 다시 보인다. / 絶対に削除しない。この画面の社員一覧上でのみ非表示にするだけで、ページを再読み込みすると再び表示される。
 	function clearDetailPanel() {
 	    document.getElementById("selectedEmpId").value = "";
 	    document.getElementById("dailyBody").innerHTML = "";
@@ -385,8 +385,8 @@ body { min-width: 1200px; }
 
 	function deleteSelectedEmployees() {
 	    var empId = document.getElementById("selectedEmpId").value;
-	    if (!empId) { alert("삭제할 근로자를 선택하세요."); return; }
-	    if (!confirm("선택한 근로자를 목록에서 삭제하시겠습니까?")) return;
+	    if (!empId) { alert("削除する労働者を選択してください。"); return; }
+	    if (!confirm("選択した労働者をリストから削除しますか？")) return;
 
 	    var row = document.querySelector('#employeeTableBody tr[data-id="' + empId + '"]');
 	    if (row) row.remove();
@@ -394,21 +394,21 @@ body { min-width: 1200px; }
 	}
 
 	function deleteAllEmployees() {
-	    if (!confirm("화면의 모든 근로자를 목록에서 삭제하시겠습니까?")) return;
+	    if (!confirm("画面のすべての労働者をリストから削除しますか？")) return;
 
 	    document.getElementById("employeeTableBody").innerHTML =
-	        '<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">등록된 근로자가 없습니다.</td></tr>';
+	        '<tr id="emptyRow"><td colspan="4" style="padding: 25px; color: #666;">登録された労働者がいません。</td></tr>';
 	    clearDetailPanel();
 	}
 
-	// ---------------- 저장 ----------------
+	// ---------------- 저장 / 保存 ----------------
 	function buildDetailFormData(empId) {
 	    var formData = new URLSearchParams();
 	    formData.append("payrollDayWorkerEmployeeId", empId);
 
 	    document.querySelectorAll('#dailyBody tr').forEach(function (tr) {
 	        var workDate = tr.querySelector('.f-date').value;
-	        if (!workDate) return; // 일자 없는 빈 행 제외
+	        if (!workDate) return; // 일자 없는 빈 행 제외 / 日付のない空行を除外
 	        formData.append("workDate", workDate);
 	        formData.append("rate", tr.querySelector('.f-rate').value || "1.0");
 	        formData.append("payAmt", tr.querySelector('.f-pay').value || "0");
@@ -427,7 +427,7 @@ body { min-width: 1200px; }
 
 	function saveDetail() {
 	    var empId = document.getElementById("selectedEmpId").value;
-	    if (!empId) { alert("근로자를 먼저 선택하세요."); return; }
+	    if (!empId) { alert("先に労働者を選択してください。"); return; }
 
 	    fetch(CTX + "/Payment/dayWorkerSave.do", {
 	        method: "POST",
@@ -435,14 +435,14 @@ body { min-width: 1200px; }
 	        body: buildDetailFormData(empId).toString()
 	    }).then(function (res) { return res.text(); })
 	      .then(function (result) {
-	          if (result === "SUCCESS") { alert("저장되었습니다."); location.reload(); }
-	          else { alert("저장 중 문제가 발생했습니다."); }
+	          if (result === "SUCCESS") { alert("保存されました。"); location.reload(); }
+	          else { alert("保存中に問題が発生しました。"); }
 	      })
-	      .catch(function () { alert("서버 통신에 실패했습니다."); });
+	      .catch(function () { alert("サーバー通信に失敗しました。"); });
 	}
 
-	// 공제항목 금액을 바꾸고 다른 곳을 클릭(blur)하면 알림/새로고침 없이 바로 DB에 저장하고,
-	// 좌측 목록의 실지급액과 하단 [급여 종합정보]를 그 자리에서 갱신한다.
+	// 공제항목 금액을 바꾸고 다른 곳을 클릭(blur)하면 알림/새로고침 없이 바로 DB에 저장하고, / 控除項目の金額を変更して他の場所をクリック（blur）すると、通知/再読み込みなしですぐDBに保存し、
+	// 좌측 목록의 실지급액과 하단 [급여 종합정보]를 그 자리에서 갱신한다. / 左側一覧の実支給額と下部の[給与総合情報]をその場で更新する。
 	function autoSaveDeduction() {
 	    var empId = document.getElementById("selectedEmpId").value;
 	    if (!empId) return;
@@ -472,18 +472,18 @@ body { min-width: 1200px; }
 	    recalcTotals();
 	}
 
-	// ---------------- 종합정보 ----------------
-	// 서버(DB)에서 이 급여차수의 일용직 사원 전체 합계를 다시 조회해서 하단 4개 박스를 갱신
+	// ---------------- 종합정보 / 総合情報 ----------------
+	// 서버(DB)에서 이 급여차수의 일용직 사원 전체 합계를 다시 조회해서 하단 4개 박스를 갱신 / サーバー（DB）からこの給与回の日雇い社員全体の合計を再照会し、下部の4つのボックスを更新
 	function refreshSummary() {
 	    var payrollDayWorkerId = document.getElementById("payrollDayWorkerId").value;
 	    if (!payrollDayWorkerId) return;
 	    fetch(CTX + "/Payment/dayWorkerSummaryAjax.do?payrollDayWorkerId=" + payrollDayWorkerId)
 	        .then(function (res) { return res.json(); })
 	        .then(function (data) {
-	            document.getElementById("sumCount").innerText = (data.workerCount || 0) + " 건";
-	            document.getElementById("sumPay").innerText = won(data.payTotal) + " 원";
-	            document.getElementById("sumDeduction").innerText = won(data.deductionTotal) + " 원";
-	            document.getElementById("sumNet").innerText = won(data.netPay) + " 원";
+	            document.getElementById("sumCount").innerText = (data.workerCount || 0) + " 件";
+	            document.getElementById("sumPay").innerText = won(data.payTotal) + " 円";
+	            document.getElementById("sumDeduction").innerText = won(data.deductionTotal) + " 円";
+	            document.getElementById("sumNet").innerText = won(data.netPay) + " 円";
 	        })
 	        .catch(function (err) { console.error("종합정보 조회 실패:", err); });
 	}

@@ -10,6 +10,7 @@ import payment.paymentPayList.dto.PaymentPayListResult;
 import payment.paymentPayList.service.PaymentPayListService;
 
 // 사원별 급여내역 화면 컨트롤러
+// 社員別給与内訳画面コントローラー
 public class PaymentPayListController implements CommandHandler {
 
     private PaymentPayListService service = new PaymentPayListService();
@@ -24,7 +25,7 @@ public class PaymentPayListController implements CommandHandler {
         String endYear = request.getParameter("endYear");
         String endMonth = request.getParameter("endMonth");
 
-        // 파라미터가 없으면(최초 진입) 기본값으로 '올해 1월 ~ 이번달'을 사용한다
+        // 파라미터가 없으면(최초 진입) 기본값으로 '올해 1월 ~ 이번달'을 사용한다 / パラメータがなければ（初回アクセス）初期値として「今年1月～今月」を使用する
         LocalDate now = LocalDate.now();
         if (startYear == null || startYear.trim().isEmpty()) { startYear = String.valueOf(now.getYear()); }
         if (startMonth == null || startMonth.trim().isEmpty()) { startMonth = "01"; }

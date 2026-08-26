@@ -13,6 +13,7 @@ import payment.paymentMntDayWorker.model.PaymentMntDayWorkerDeductionVO;
 import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // 좌측 근로자 목록에서 행을 클릭했을 때, 우측 급여상세(일자별 내역 + 공제항목)를 JSON으로 반환
+// 左側労働者一覧で行をクリックした時、右側給与詳細（日別内訳＋控除項目）をJSONで返す
 public class PaymentMntDayWorkerDetailAjaxHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();
@@ -31,6 +32,9 @@ public class PaymentMntDayWorkerDetailAjaxHandler implements CommandHandler {
         // 공제항목(PAYROLL_DEDUCTION_DETAIL)이 이 급여차수엔 아직 저장 안 돼 있으면, 좌측 일자별 지급내역에 이미
         // 계산되어 있는 소득세/지방소득세 합계를 공제항목의 '소득세'/'지방소득세'에 기본값으로 채워서 보여준다.
         // (하단 [급여 종합정보]의 공제총액은 이 일자별 합계 기준이라, 공제항목 패널이 0으로만 보이면 서로 안 맞아 보임)
+        // 控除項目（PAYROLL_DEDUCTION_DETAIL）がこの給与回にまだ保存されていなければ、左側の日別支給内訳ですでに
+        // 計算されている所得税・地方所得税の合計を控除項目の「所得税」/「地方所得税」に初期値として埋めて表示する。
+        // （下部[給与総合情報]の控除総額はこの日別合計基準のため、控除項目パネルが0のままだと互いに合わなく見える）
         if ((deduction == null || deduction.getAmounts().isEmpty()) && dailyList != null && !dailyList.isEmpty()) {
             long sumIncomeTax = 0, sumLocalTax = 0;
             for (PaymentMntDayWorkerDailyVO d : dailyList) {
@@ -52,7 +56,7 @@ public class PaymentMntDayWorkerDetailAjaxHandler implements CommandHandler {
         StringBuilder json = new StringBuilder();
         json.append("{");
 
-        // --- 일자별 지급내역 배열 ---
+        // --- 일자별 지급내역 배열 --- / --- 日別支給内訳配列 ---
         json.append("\"dailyList\": [");
         for (int i = 0; i < dailyList.size(); i++) {
             PaymentMntDayWorkerDailyVO d = dailyList.get(i);
@@ -67,7 +71,7 @@ public class PaymentMntDayWorkerDetailAjaxHandler implements CommandHandler {
         }
         json.append("],");
 
-        // --- 공제항목 객체 (DEDUCTION_ITEM_ID -> 금액) ---
+        // --- 공제항목 객체 (DEDUCTION_ITEM_ID -> 금액) --- / --- 控除項目オブジェクト（DEDUCTION_ITEM_ID -> 金額） ---
         json.append("\"deductionMode\":\"").append(deduction == null ? "" : nvl(deduction.getDeductionMode())).append("\",");
         json.append("\"deductionAmounts\": {");
         if (deduction != null) {

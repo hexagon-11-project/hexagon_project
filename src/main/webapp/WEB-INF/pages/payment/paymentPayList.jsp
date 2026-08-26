@@ -8,7 +8,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>사원별 급여내역 | HEXAGON PAY</title>
+<title>社員別給与内訳 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
 body { min-width: 1200px; background: #fff; }
@@ -41,68 +41,68 @@ body { min-width: 1200px; background: #fff; }
 
 	<main class="content-area">
 		<div class="page-header" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="사원별 급여내역">
+			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="社員別給与内訳">
 			<div>
-				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">사원별 급여내역</h2>
+				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">社員別給与内訳</h2>
 				<p class="text-muted" style="margin: 3px 0 0 0; font-size: 12px; color: #666;">
-					사원의 급여내역을 조회하여 한 눈에 확인할 수 있도록 제공되는 메뉴입니다. 조회기간 및 사원을 확인하세요!
+					社員の給与内訳を照会し、一目で確認できるように提供されるメニューです。照会期間および社員をご確認ください！
 				</p>
 			</div>
 		</div>
 
 		<form id="pplFilterForm" action="${pageContext.request.contextPath}/Payment/paymentPayList.do" method="GET" onsubmit="return pplCheckPeriod();">
 			<div class="ppl-filter-bar">
-				<strong>* 기간선택</strong>
+				<strong>* 期間選択</strong>
 				<select name="startYear">
 					<c:forEach var="year" begin="2005" end="2031">
-						<option value="${year}" <c:if test="${startYear eq year}">selected</c:if>>${year} 년</option>
+						<option value="${year}" <c:if test="${startYear eq year}">selected</c:if>>${year}年</option>
 					</c:forEach>
 				</select>
 				<select name="startMonth">
 					<c:forEach var="month" begin="1" end="12">
 						<fmt:formatNumber value="${month}" pattern="00" var="pplStartMonthFmt" />
-						<option value="${pplStartMonthFmt}" <c:if test="${startMonth eq pplStartMonthFmt}">selected</c:if>>${pplStartMonthFmt} 월</option>
+						<option value="${pplStartMonthFmt}" <c:if test="${startMonth eq pplStartMonthFmt}">selected</c:if>>${pplStartMonthFmt}月</option>
 					</c:forEach>
 				</select>
 				<span>~</span>
 				<select name="endYear">
 					<c:forEach var="year" begin="2005" end="2031">
-						<option value="${year}" <c:if test="${endYear eq year}">selected</c:if>>${year} 년</option>
+						<option value="${year}" <c:if test="${endYear eq year}">selected</c:if>>${year}年</option>
 					</c:forEach>
 				</select>
 				<select name="endMonth">
 					<c:forEach var="month" begin="1" end="12">
 						<fmt:formatNumber value="${month}" pattern="00" var="pplEndMonthFmt" />
-						<option value="${pplEndMonthFmt}" <c:if test="${endMonth eq pplEndMonthFmt}">selected</c:if>>${pplEndMonthFmt} 월</option>
+						<option value="${pplEndMonthFmt}" <c:if test="${endMonth eq pplEndMonthFmt}">selected</c:if>>${pplEndMonthFmt}月</option>
 					</c:forEach>
 				</select>
 
-				<strong>* 사원선택</strong>
-				<input type="text" id="pplEmployeeName" name="employeeName" placeholder="사원명 입력" value="${employeeName}" readonly style="cursor: pointer; background: #fff;" onclick="pplOpenEmployeeModal()">
+				<strong>* 社員選択</strong>
+				<input type="text" id="pplEmployeeName" name="employeeName" placeholder="社員名を入力" value="${employeeName}" readonly style="cursor: pointer; background: #fff;" onclick="pplOpenEmployeeModal()">
 				<button type="button" class="ppl-icon-btn" onclick="pplOpenEmployeeModal()">🔍</button>
 
-				<button type="submit" class="ppl-query-btn">📋 급여내역 조회</button>
+				<button type="submit" class="ppl-query-btn">📋 給与内訳照会</button>
 			</div>
 		</form>
 
 		<table class="ppl-table">
 			<thead>
 				<tr class="ppl-group-row">
-					<th colspan="5">월별 급여내역</th>
-					<th colspan="6" class="ppl-group-insurance">4대보험 및 갑근세 내역</th>
+					<th colspan="5">月別給与内訳</th>
+					<th colspan="6" class="ppl-group-insurance">4大保険および甲勤税内訳</th>
 				</tr>
 				<tr class="ppl-col-row">
-					<th class="ppl-month-col">급여월(차수)</th>
-					<th>보수월액</th>
-					<th>지급합계</th>
-					<th>공제합계</th>
-					<th>실지급액</th>
-					<th>국민연금</th>
-					<th>건강보험</th>
-					<th>노인장기요양보험</th>
-					<th>고용보험</th>
-					<th>소득세</th>
-					<th>주민세</th>
+					<th class="ppl-month-col">給与月（回）</th>
+					<th>報酬月額</th>
+					<th>支給合計</th>
+					<th>控除合計</th>
+					<th>実支給額</th>
+					<th>国民年金</th>
+					<th>健康保険</th>
+					<th>老人長期療養保険</th>
+					<th>雇用保険</th>
+					<th>所得税</th>
+					<th>住民税</th>
 				</tr>
 			</thead>
 			<tbody id="pplBody">
@@ -126,8 +126,8 @@ body { min-width: 1200px; background: #fff; }
 					<tr>
 						<td colspan="11" style="padding: 25px; color: #666;">
 							<c:choose>
-								<c:when test="${empty employeeName}">사원을 선택하고 조회해주세요.</c:when>
-								<c:otherwise>조회된 급여내역이 없습니다.</c:otherwise>
+								<c:when test="${empty employeeName}">社員を選択して照会してください。</c:when>
+								<c:otherwise>照会された給与内訳がありません。</c:otherwise>
 							</c:choose>
 						</td>
 					</tr>
@@ -135,7 +135,7 @@ body { min-width: 1200px; background: #fff; }
 			</tbody>
 			<tfoot>
 				<tr>
-					<td>합계</td>
+					<td>合計</td>
 					<td class="ppl-num"><fmt:formatNumber value="${result.totals.totalPayAmount}" pattern="#,###" /></td>
 					<td class="ppl-num"><fmt:formatNumber value="${result.totals.totalPayAmount}" pattern="#,###" /></td>
 					<td class="ppl-num"><fmt:formatNumber value="${result.totals.totalDeductionAmount}" pattern="#,###" /></td>
@@ -151,7 +151,7 @@ body { min-width: 1200px; background: #fff; }
 		</table>
 
 		<div class="ppl-back-wrap">
-			<a class="ppl-back-btn" href="${pageContext.request.contextPath}/Payment/paymentRegisterList.do">급여대장 목록</a>
+			<a class="ppl-back-btn" href="${pageContext.request.contextPath}/Payment/paymentRegisterList.do">給与台帳一覧</a>
 		</div>
 	</main>
 
@@ -164,10 +164,10 @@ body { min-width: 1200px; background: #fff; }
 	    window.open(popupUrl, "PplEmployeeSelectModal", "width=820,height=650,left=250,top=100,scrollbars=yes");
 	}
 
-	// 사원선택 팝업에서 호출 (window.opener.pplSetSelectedEmployee(...))
+	// 사원선택 팝업에서 호출 (window.opener.pplSetSelectedEmployee(...)) / 社員選択ポップアップから呼び出し（window.opener.pplSetSelectedEmployee(...)）
 	function pplSetSelectedEmployee(employeeName) {
 	    document.getElementById("pplEmployeeName").value = employeeName;
-	    // form.submit()으로 직접 제출하면 onsubmit 검증(pplCheckPeriod)이 건너뛰어지므로 여기서도 먼저 확인한다
+	    // form.submit()으로 직접 제출하면 onsubmit 검증(pplCheckPeriod)이 건너뛰어지므로 여기서도 먼저 확인한다 / form.submit()で直接送信するとonsubmit検証（pplCheckPeriod）が飛ばされるため、ここでも先に確認する
 	    if (pplCheckPeriod()) {
 	        document.getElementById("pplFilterForm").submit();
 	    }
@@ -182,7 +182,7 @@ body { min-width: 1200px; background: #fff; }
 
 	    var monthCount = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
 	    if (monthCount > 12) {
-	        alert("검색 기간은 최대 12개월[1년] 입니다.");
+	        alert("検索期間は最大12か月[1年]です。");
 	        return false;
 	    }
 	    return true;
