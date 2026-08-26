@@ -14,6 +14,8 @@ import payment.paymentRegisterList.dto.PaymentRegisterListDetailDTO;
 import payment.paymentRegisterList.dto.PaymentRegisterListDetailResult;
 import payment.paymentRegisterList.dto.PaymentRegisterListItemDTO;
 
+// 급여대장 상세화면의 비즈니스 로직을 처리하는 서비스 클래스
+// 給与台帳詳細画面のビジネスロジックを処理するサービスクラス
 public class PaymentRegisterListDetailService {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");

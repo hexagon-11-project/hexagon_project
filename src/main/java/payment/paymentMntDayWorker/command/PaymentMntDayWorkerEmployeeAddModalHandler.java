@@ -10,6 +10,7 @@ import payment.paymentMntDayWorker.dto.PaymentMntDayWorkerEmployeeDTO;
 import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // [신규추가] 버튼 클릭 시 뜨는 일용직 근로자 검색 모달
+// [新規追加]ボタンクリック時に表示される日雇い労働者検索モーダル
 public class PaymentMntDayWorkerEmployeeAddModalHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();

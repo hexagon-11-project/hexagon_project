@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>급여대장 | HEXAGON PAY</title>
+<title>給与台帳 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
 body { min-width: 1200px; background: #fff; }
@@ -50,11 +50,11 @@ body { min-width: 1200px; background: #fff; }
 
 	<main class="content-area">
 		<div class="page-header" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="급여대장">
+			<img src="https://img.payzon.co.kr/_commonImg/pay_tit_img.gif" width="50" height="45" alt="給与台帳">
 			<div>
-				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">급여대장</h2>
+				<h2 style="margin: 0; font-size: 20px; font-weight: bold;">給与台帳</h2>
 				<p class="text-muted" style="margin: 3px 0 0 0; font-size: 12px; color: #666;">
-					귀속연월별 급여총액과 사원별 급여지급 현황을 보실 수 있습니다. 결재란을 만들어 사용할 수 있습니다.
+					帰属年月別の給与総額と社員別の給与支給状況を確認できます。決裁欄を作成してご利用いただけます。
 				</p>
 			</div>
 		</div>
@@ -67,58 +67,58 @@ body { min-width: 1200px; background: #fff; }
 
 			<div class="prld-filter-bar">
 				<select name="empType" onchange="document.getElementById('detailSearchForm').submit()">
-					<option value="">전체</option>
-					<option value="정규직" <c:if test="${empType eq '정규직'}">selected</c:if>>정규직</option>
-					<option value="계약직" <c:if test="${empType eq '계약직'}">selected</c:if>>계약직</option>
-					<option value="임시직" <c:if test="${empType eq '임시직'}">selected</c:if>>임시직</option>
-					<option value="파견직" <c:if test="${empType eq '파견직'}">selected</c:if>>파견직</option>
-					<option value="위촉직" <c:if test="${empType eq '위촉직'}">selected</c:if>>위촉직</option>
-					<option value="일용직" <c:if test="${empType eq '일용직'}">selected</c:if>>일용직</option>
+					<option value="">全体</option>
+					<option value="정규직" <c:if test="${empType eq '정규직'}">selected</c:if>>正社員</option>
+					<option value="계약직" <c:if test="${empType eq '계약직'}">selected</c:if>>契約社員</option>
+					<option value="임시직" <c:if test="${empType eq '임시직'}">selected</c:if>>臨時職</option>
+					<option value="파견직" <c:if test="${empType eq '파견직'}">selected</c:if>>派遣職</option>
+					<option value="위촉직" <c:if test="${empType eq '위촉직'}">selected</c:if>>委嘱職</option>
+					<option value="일용직" <c:if test="${empType eq '일용직'}">selected</c:if>>日雇い</option>
 				</select>
 				<select name="department" onchange="document.getElementById('detailSearchForm').submit()">
-					<option value="">부서 선택</option>
+					<option value="">部署選択</option>
 					<c:forEach var="d" items="${result.departmentList}">
 						<option value="${d}" <c:if test="${department eq d}">selected</c:if>>${d}</option>
 					</c:forEach>
 				</select>
 				<select name="incomeType" onchange="document.getElementById('detailSearchForm').submit()">
-					<option value="">전체</option>
-					<option value="근로소득자" <c:if test="${incomeType eq '근로소득자'}">selected</c:if>>근로소득자</option>
-					<option value="사업소득자" <c:if test="${incomeType eq '사업소득자'}">selected</c:if>>사업소득자</option>
-					<option value="일용근로자" <c:if test="${incomeType eq '일용근로자'}">selected</c:if>>일용근로자</option>
+					<option value="">全体</option>
+					<option value="근로소득자" <c:if test="${incomeType eq '근로소득자'}">selected</c:if>>勤労所得者</option>
+					<option value="사업소득자" <c:if test="${incomeType eq '사업소득자'}">selected</c:if>>事業所得者</option>
+					<option value="일용근로자" <c:if test="${incomeType eq '일용근로자'}">selected</c:if>>日雇い労働者</option>
 				</select>
 			</div>
 
 			<div class="prld-info-bar">
-				<label><strong>＊ 귀속연도</strong> <span class="prld-static">${payYear}년 ${payMonth}월</span></label>
-				<label><strong>＊ 급여차수</strong> <span class="prld-static">급여-${paySeqPadded}차</span></label>
-				<label><strong>＊ 정산기간</strong> <span class="prld-static">${result.settlementStartDate}</span> ~ <span class="prld-static">${result.settlementEndDate}</span></label>
-				<label><strong>＊ 지급일</strong> <span class="prld-static">${result.paymentDate}</span></label>
+				<label><strong>＊ 帰属年度</strong> <span class="prld-static">${payYear}年 ${payMonth}月</span></label>
+				<label><strong>＊ 給与回</strong> <span class="prld-static">給与-${paySeqPadded}回</span></label>
+				<label><strong>＊ 精算期間</strong> <span class="prld-static">${result.settlementStartDate}</span> ~ <span class="prld-static">${result.settlementEndDate}</span></label>
+				<label><strong>＊ 支給日</strong> <span class="prld-static">${result.paymentDate}</span></label>
 				<label style="margin-left: auto;">
-					<strong>＊ 급여대장 양식</strong>
-					<label><input type="radio" name="prldLayout" value="long" checked onclick="prldSwitchLayout('long')"> 긴 가로형</label>
-					<label><input type="radio" name="prldLayout" value="short" onclick="prldSwitchLayout('short')"> 짧은 가로형</label>
+					<strong>＊ 給与台帳様式</strong>
+					<label><input type="radio" name="prldLayout" value="long" checked onclick="prldSwitchLayout('long')"> 長い横型</label>
+					<label><input type="radio" name="prldLayout" value="short" onclick="prldSwitchLayout('short')"> 短い横型</label>
 				</label>
 			</div>
 		</form>
 
 		<c:set var="emptyList" value="${empty result.employeeList}" />
 
-		<!-- ================= 긴 가로형 ================= -->
+		<!-- ================= 긴 가로형 / 長い横型 ================= -->
 		<div id="prldLongWrap" class="prld-table-wrap">
 			<table class="prld-table">
 				<thead>
 					<tr>
-						<th class="prld-sticky" style="left:0;">구분</th>
-						<th class="prld-sticky" style="left:60px;">성명</th>
-						<th class="prld-sticky" style="left:130px;">입사일</th>
-						<th class="prld-sticky" style="left:220px;">부서</th>
-						<th class="prld-sticky" style="left:300px;">직위</th>
+						<th class="prld-sticky" style="left:0;">区分</th>
+						<th class="prld-sticky" style="left:60px;">氏名</th>
+						<th class="prld-sticky" style="left:130px;">入社日</th>
+						<th class="prld-sticky" style="left:220px;">部署</th>
+						<th class="prld-sticky" style="left:300px;">職位</th>
 						<c:forEach var="item" items="${result.payItemList}"><th>${item.itemName}</th></c:forEach>
-						<th>지급총액</th>
+						<th>支給総額</th>
 						<c:forEach var="item" items="${result.deductionItemList}"><th>${item.itemName}</th></c:forEach>
-						<th>공제총액</th>
-						<th>실지급액</th>
+						<th>控除総額</th>
+						<th>実支給額</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -143,14 +143,14 @@ body { min-width: 1200px; background: #fff; }
 					<c:if test="${emptyList}">
 						<tr>
 							<td colspan="${8 + fn:length(result.payItemList) + fn:length(result.deductionItemList)}"
-								style="padding: 30px; color: #666;">등록된 사원 데이터가 없습니다.</td>
+								style="padding: 30px; color: #666;">登録された社員データがありません。</td>
 						</tr>
 					</c:if>
 				</tbody>
 				<c:if test="${!emptyList}">
 				<tfoot>
 					<tr>
-						<td class="prld-sticky" style="left:0;" colspan="5">합계</td>
+						<td class="prld-sticky" style="left:0;" colspan="5">合計</td>
 						<c:forEach var="item" items="${result.payItemList}">
 							<td class="prld-num"><fmt:formatNumber value="${result.totalRow.getPayAmount(item.itemId)}" pattern="#,###" /></td>
 						</c:forEach>
@@ -166,28 +166,28 @@ body { min-width: 1200px; background: #fff; }
 			</table>
 		</div>
 
-		<!-- ================= 짧은 가로형 ================= -->
+		<!-- ================= 짧은 가로형 / 短い横型 ================= -->
 		<div id="prldShortWrap" class="prld-table-wrap" style="display: none;">
 			<table class="prld-table">
 				<thead>
 					<tr>
 						<th>no.</th>
-						<th>성명</th>
+						<th>氏名</th>
 						<c:forEach var="item" items="${result.payItemList}"><th>${item.itemName}</th></c:forEach>
-						<th rowspan="3">지급총액</th>
+						<th rowspan="3">支給総額</th>
 						<c:forEach var="item" items="${result.deductionItemList}"><th>${item.itemName}</th></c:forEach>
-						<th rowspan="3">공제총액</th>
-						<th rowspan="3">실지급액</th>
+						<th rowspan="3">控除総額</th>
+						<th rowspan="3">実支給額</th>
 					</tr>
 					<tr>
-						<th>구분</th>
-						<th>입사일</th>
+						<th>区分</th>
+						<th>入社日</th>
 						<c:forEach var="item" items="${result.payItemList}"><th style="background:#fff;"></th></c:forEach>
 						<c:forEach var="item" items="${result.deductionItemList}"><th style="background:#fff;"></th></c:forEach>
 					</tr>
 					<tr>
-						<th>부서</th>
-						<th>직위</th>
+						<th>部署</th>
+						<th>職位</th>
 						<c:forEach var="item" items="${result.payItemList}"><th style="background:#fff;"></th></c:forEach>
 						<c:forEach var="item" items="${result.deductionItemList}"><th style="background:#fff;"></th></c:forEach>
 					</tr>
@@ -221,7 +221,7 @@ body { min-width: 1200px; background: #fff; }
 					<c:if test="${emptyList}">
 						<tr>
 							<td colspan="${6 + fn:length(result.payItemList) + fn:length(result.deductionItemList)}"
-								style="padding: 30px; color: #666;">등록된 사원 데이터가 없습니다.</td>
+								style="padding: 30px; color: #666;">登録された社員データがありません。</td>
 						</tr>
 					</c:if>
 				</tbody>
@@ -231,7 +231,7 @@ body { min-width: 1200px; background: #fff; }
 			<c:url var="prldListUrl" value="/Payment/paymentRegisterList.do">
 				<c:param name="payYear" value="${payYear}" />
 			</c:url>
-			<a href="${prldListUrl}" class="prld-back-btn">전체목록 보기</a>
+			<a href="${prldListUrl}" class="prld-back-btn">全体一覧を見る</a>
 		</div>
 	</main>
 

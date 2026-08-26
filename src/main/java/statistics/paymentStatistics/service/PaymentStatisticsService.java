@@ -12,6 +12,8 @@ import statistics.paymentStatistics.dto.PersonalAnnualStatistics;
 /**
  * 연도별 개인연봉 통계 Service.
  * 선택 연도 기준 과거 10년, 선택 사원 1인의 연도별 통계를 조회한다.
+ * 年度別個人年俸統計Service。
+ * 選択年度基準で過去10年、選択した社員1人の年度別統計を照会する。
  */
 public class PaymentStatisticsService {
 

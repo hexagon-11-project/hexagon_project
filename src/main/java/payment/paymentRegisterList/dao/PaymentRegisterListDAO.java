@@ -10,12 +10,17 @@ import java.util.List;
 import payment.paymentRegisterList.dto.PaymentRegisterListDTO;
 
 // 급여대장 - 귀속연도별 급여차수 목록 (PAYROLL 헤더 + PAYROLL_EMPLOYEE 집계)
+// 給与台帳 - 帰属年度別給与回一覧（PAYROLLヘッダー＋PAYROLL_EMPLOYEE集計）
 public class PaymentRegisterListDAO {
 
     /** 귀속연도(payYear)의 급여-01차 실적만 조회 (달력상 1~12월 채우기는 Service에서 처리).
      *  정산기간/지급일은 PAYROLL에 저장된 값이 아니라 화면에서 귀속연월 기준으로 항상 계산해서 보여주므로 조회하지 않는다.
      *  인원/금액은 "등록만 되고 저장은 안 한" 사원을 제외하기 위해, 실제 급여상세가 저장된 사원만 집계한다.
-     *  (일용직은 DAILY_WORK_RECORD, 그 외는 PAYROLL_PAY_DETAIL 존재 여부로 판단 - paymentMnt/paymentMntDayWorker와 동일한 기준) */
+     *  (일용직은 DAILY_WORK_RECORD, 그 외는 PAYROLL_PAY_DETAIL 존재 여부로 판단 - paymentMnt/paymentMntDayWorker와 동일한 기준)
+     *  帰属年度（payYear）の給与-01回実績のみ照会（カレンダー上の1～12月埋めはServiceで処理）。
+     *  精算期間・支給日はPAYROLLに保存された値ではなく画面で帰属年月基準に常に計算して表示するため照会しない。
+     *  人員・金額は「登録だけされて保存はしていない」社員を除外するため、実際に給与詳細が保存された社員のみ集計する。
+     *  （日雇いはDAILY_WORK_RECORD、それ以外はPAYROLL_PAY_DETAILの存在有無で判断 - paymentMnt/paymentMntDayWorkerと同一基準） */
     public List<PaymentRegisterListDTO> selectPayrollSummaryByYear(Connection conn, String payYear) throws SQLException {
         List<PaymentRegisterListDTO> list = new ArrayList<>();
         String sql = "SELECT p.PAYROLL_ID, p.PAY_YEAR_MONTH, "
@@ -55,7 +60,8 @@ public class PaymentRegisterListDAO {
         return list;
     }
 
-    /** 급여차수 삭제: 하위 일자별내역/공제상세/이체신청 내역까지 함께 삭제 후 PAYROLL 헤더 삭제 */
+    /** 급여차수 삭제: 하위 일자별내역/공제상세/이체신청 내역까지 함께 삭제 후 PAYROLL 헤더 삭제
+     *  給与回削除：下位の日別内訳・控除詳細・振込申請内訳まで一緒に削除した後、PAYROLLヘッダーを削除 */
     public void deletePayroll(Connection conn, Long payrollId) throws SQLException {
         String empSubSelect = "(SELECT PAYROLL_EMPLOYEE_ID FROM PAYROLL_EMPLOYEE WHERE PAYROLL_ID = ?)";
 
@@ -71,6 +77,8 @@ public class PaymentRegisterListDAO {
         }
         // ★ 지급 상세내역(PAYROLL_PAY_DETAIL)도 함께 삭제해야 한다 - 빠지면 PAYROLL_EMPLOYEE 삭제 시 FK 오류가
         //   나거나, 삭제되지 않은 상세행이 그대로 남아 "전부 삭제"가 아니게 된다.
+        // ★ 支給詳細内訳（PAYROLL_PAY_DETAIL）も一緒に削除しなければならない - 抜けるとPAYROLL_EMPLOYEE削除時にFKエラーが
+        //   出るか、削除されない詳細行がそのまま残り「全部削除」ではなくなる。
         try (PreparedStatement p3 = conn.prepareStatement(
                 "DELETE FROM PAYROLL_PAY_DETAIL WHERE PAYROLL_EMPLOYEE_ID IN " + empSubSelect)) {
             p3.setLong(1, payrollId);

@@ -11,6 +11,7 @@ import statistics.paymentStatistics.dto.PersonalAnnualStatistics;
 import statistics.paymentStatistics.service.PaymentStatisticsService;
 
 // 연도별 개인연봉 통계 화면 컨트롤러
+// 年度別個人年俸統計画面コントローラー
 public class PaymentStatisticsController implements CommandHandler {
 
     private PaymentStatisticsService service = new PaymentStatisticsService();
@@ -22,7 +23,7 @@ public class PaymentStatisticsController implements CommandHandler {
         String yearParam = request.getParameter("year");
         String employeeName = request.getParameter("employeeName");
 
-        // 파라미터 없이 처음 들어왔을 때(최초 진입)는 기본으로 강해린 사원의 화면을 보여준다.
+        // 파라미터 없이 처음 들어왔을 때(최초 진입)는 기본으로 강해린 사원의 화면을 보여준다. / パラメータなしで最初にアクセスした時（初回アクセス）は、初期値として강해린社員の画面を表示する。
         boolean firstVisit = request.getParameterMap().isEmpty();
         if (firstVisit && (employeeName == null || employeeName.trim().isEmpty())) {
             employeeName = "강해린";

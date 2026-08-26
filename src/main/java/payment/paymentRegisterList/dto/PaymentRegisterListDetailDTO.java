@@ -4,14 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 // 급여대장 상세화면의 사원 1행 (지급/공제 항목별 금액은 itemId를 key로 하는 Map으로 보관)
+// 給与台帳詳細画面の社員1行（支給・控除項目別金額はitemIdをキーとするMapで保持）
 public class PaymentRegisterListDetailDTO {
 
     private Long payrollEmployeeId;
-    private String employmentType;   // 구분
-    private String employeeName;     // 성명
-    private String hireDate;         // 입사일
-    private String department;       // 부서
-    private String position;         // 직위
+    private String employmentType;   // 구분 / 区分
+    private String employeeName;     // 성명 / 氏名
+    private String hireDate;         // 입사일 / 入社日
+    private String department;       // 부서 / 部署
+    private String position;         // 직위 / 職位
 
     private Map<Long, Long> payAmountByItemId = new HashMap<>();
     private long totalPayAmount;

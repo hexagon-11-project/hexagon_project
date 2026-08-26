@@ -60,18 +60,18 @@
 		<a
 			class="nav-item <%="payroll-manage".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentMnt.do"><span
-			class="nav-icon">□</span><span>급여입력/관리</span></a><a
+			class="nav-icon">□</span><span>給与入力・管理</span></a><a
 			class="nav-item <%="daily-payroll".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentMntDayWorker.do"><span
-			class="nav-icon">□</span><span>급여입력/관리(일용직)</span></a><a
+			class="nav-icon">□</span><span>給与入力・管理（日雇い）</span></a><a
 			class="nav-item <%="payroll-ledger".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentRegisterList.do"><span
-			class="nav-icon">□</span><span>급여대장</span></a><a
+			class="nav-icon">□</span><span>給与台帳</span></a><a
 			class="nav-item <%="pay-slip".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Payment/paymentPayslip.do"><span class="nav-icon">□</span><span>급여명세</span></a><a
+			href="<%=ctx%>/Payment/paymentPayslip.do"><span class="nav-icon">□</span><span>給与明細</span></a><a
 			class="nav-item <%="employee-pay-history".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymentPayList.do"><span
-			class="nav-icon">□</span><span>사원별 급여내역</span></a><a
+			class="nav-icon">□</span><span>社員別給与内訳</span></a><a
 			class="nav-item <%="transfer-request".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Payment/paymenttransfer.do"><span
 			class="nav-icon">□</span><span>給与振込申請</span></a><a
@@ -90,10 +90,10 @@
 		<a
 			class="nav-item <%="annual-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatistics.do"><span
-			class="nav-icon">□</span><span>연도별 개인연봉 통계</span></a><a
+			class="nav-icon">□</span><span>年度別個人年俸統計</span></a><a
 			class="nav-item <%="monthly-personal".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsMonth.do"><span
-			class="nav-icon">□</span><span>월별 개인급여 통계</span></a><a
+			class="nav-icon">□</span><span>月別個人給与統計</span></a><a
 			class="nav-item <%="paymentstatisticsall".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Statistics/paymentStatisticsAll.do"><span
 			class="nav-icon">□</span><span>年度別給与総額統計</span></a><a

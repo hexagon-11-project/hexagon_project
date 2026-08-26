@@ -1,6 +1,7 @@
 package payment.paymentRegisterList.model;
 
 // PAYROLL 테이블 1행에 대응하는 모델(VO). 급여대장의 급여차수 신규등록/수정 기능에서 사용 예정
+// PAYROLLテーブル1行に対応するモデル（VO）。給与台帳の給与回新規登録・修正機能で使用予定
 public class PaymentRegisterListVO {
 
     private Long payrollId;

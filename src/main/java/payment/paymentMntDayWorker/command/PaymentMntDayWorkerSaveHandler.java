@@ -15,6 +15,8 @@ import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // [저장] 버튼 - 일자별 지급내역(배열) + 공제항목을 한번에 저장
 // 화면에서 workDate[], rate[], payAmt[], incomeTax[], localTax[] 형태의 배열 파라미터로 전송
+// [保存]ボタン - 日別支給内訳（配列）＋控除項目を一度に保存
+// 画面からworkDate[], rate[], payAmt[], incomeTax[], localTax[]形式の配列パラメータで送信
 public class PaymentMntDayWorkerSaveHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();
@@ -30,7 +32,7 @@ public class PaymentMntDayWorkerSaveHandler implements CommandHandler {
         }
         Long payrollDayWorkerEmployeeId = Long.parseLong(empIdStr);
 
-        // 1. 일자별 지급내역 배열 파싱
+        // 1. 일자별 지급내역 배열 파싱 / 1. 日別支給内訳配列をパース
         String[] workDates = request.getParameterValues("workDate");
         String[] rates = request.getParameterValues("rate");
         String[] payAmts = request.getParameterValues("payAmt");
@@ -40,7 +42,7 @@ public class PaymentMntDayWorkerSaveHandler implements CommandHandler {
         List<PaymentMntDayWorkerDailyVO> dailyList = new ArrayList<>();
         if (workDates != null) {
             for (int i = 0; i < workDates.length; i++) {
-                if (workDates[i] == null || workDates[i].isEmpty()) continue; // 일자 없는 빈 행 제외
+                if (workDates[i] == null || workDates[i].isEmpty()) continue; // 일자 없는 빈 행 제외 / 日付のない空行を除外
                 PaymentMntDayWorkerDailyVO d = new PaymentMntDayWorkerDailyVO();
                 d.setWorkDate(workDates[i]);
                 d.setRate(parseBigDecimal(get(rates, i), BigDecimal.ONE));
@@ -51,7 +53,7 @@ public class PaymentMntDayWorkerSaveHandler implements CommandHandler {
             }
         }
 
-        // 2. 공제항목 파싱 (dedItemId[], dedAmount[] 배열 - 공제항목 패널이 DB 마스터 기준으로 동적 렌더링되므로 항목 수가 고정이 아님)
+        // 2. 공제항목 파싱 (dedItemId[], dedAmount[] 배열 - 공제항목 패널이 DB 마스터 기준으로 동적 렌더링되므로 항목 수가 고정이 아님) / 2. 控除項目をパース（dedItemId[], dedAmount[]配列 - 控除項目パネルはDBマスタ基準で動的レンダリングされるため項目数は固定でない）
         PaymentMntDayWorkerDeductionVO deduction = new PaymentMntDayWorkerDeductionVO();
         deduction.setDeductionMode(request.getParameter("deductionMode") != null ? request.getParameter("deductionMode") : "4대보험");
 
@@ -64,7 +66,7 @@ public class PaymentMntDayWorkerSaveHandler implements CommandHandler {
             }
         }
 
-        // 3. 저장 (Service에서 합계 계산 및 트랜잭션 처리)
+        // 3. 저장 (Service에서 합계 계산 및 트랜잭션 처리) / 3. 保存（Serviceで合計計算およびトランザクション処理）
         service.saveDetail(payrollDayWorkerEmployeeId, dailyList, deduction);
 
         writeResult(response, "SUCCESS");

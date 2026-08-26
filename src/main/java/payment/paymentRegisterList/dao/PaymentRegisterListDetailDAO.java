@@ -14,11 +14,15 @@ import payment.paymentRegisterList.dto.PaymentRegisterListDetailDTO;
 import payment.paymentRegisterList.dto.PaymentRegisterListItemDTO;
 
 // 급여대장 상세화면(사원별 지급/공제 내역) 조회용 DAO
+// 給与台帳詳細画面（社員別支給・控除内訳）照会用DAO
 public class PaymentRegisterListDetailDAO {
 
     // 사원등록 화면은 EMPLOYMENT_TYPE을 한글로만 저장하지만, 일부 기존 데이터는 영문 코드(REGULAR/CONTRACT/DAILY 등)로
     // 들어가 있어(paymentMnt/paymentRegisterList의 '일용직','DAILY' 동시 처리와 동일한 이유) 구분 필터가 한글 값과만
     // 비교하면 그 사원들이 걸러지지 않는다. 알려진 영문 코드가 있는 구분은 함께 매칭해준다.
+    // 社員登録画面はEMPLOYMENT_TYPEをハングルのみで保存するが、一部の既存データは英字コード（REGULAR/CONTRACT/DAILYなど）で
+    // 入っており（paymentMnt/paymentRegisterListの'일용직','DAILY'同時処理と同じ理由）区分フィルターがハングル値とだけ
+    // 比較すると、その社員が絞り込まれない。既知の英字コードがある区分は一緒にマッチングする。
     private static final Map<String, String[]> EMP_TYPE_ALIASES = new HashMap<>();
     static {
         EMP_TYPE_ALIASES.put("정규직", new String[] { "정규직", "REGULAR" });
@@ -41,7 +45,8 @@ public class PaymentRegisterListDetailDAO {
         return sb.toString();
     }
 
-    /** 귀속연월+급여차수에 해당하는 PAYROLL_ID 조회 (등록된 급여가 없으면 null) */
+    /** 귀속연월+급여차수에 해당하는 PAYROLL_ID 조회 (등록된 급여가 없으면 null)
+     *  帰属年月＋給与回に該当するPAYROLL_IDを照会（登録された給与がなければnull） */
     public Long selectPayrollId(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         String sql = "SELECT PAYROLL_ID FROM PAYROLL WHERE PAY_YEAR_MONTH = ? AND PAY_SEQUENCE = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -85,7 +90,8 @@ public class PaymentRegisterListDetailDAO {
         return list;
     }
 
-    /** 급여차수에 속한 사원 목록 (구분/부서/소득유형 필터 적용). 지급/공제 상세는 별도 조회 후 Service에서 합쳐준다. */
+    /** 급여차수에 속한 사원 목록 (구분/부서/소득유형 필터 적용). 지급/공제 상세는 별도 조회 후 Service에서 합쳐준다.
+     *  給与回に属する社員一覧（区分・部署・所得類型フィルター適用）。支給・控除詳細は別途照会後、Serviceで合わせる。 */
     public List<PaymentRegisterListDetailDTO> selectEmployeeList(Connection conn, Long payrollId,
             String empType, String department, String incomeType) throws SQLException {
         List<PaymentRegisterListDetailDTO> list = new ArrayList<>();
@@ -142,7 +148,8 @@ public class PaymentRegisterListDetailDAO {
         return list;
     }
 
-    /** payrollId에 속한 모든 사원의 지급상세를 한 번에 조회: key = PAYROLL_EMPLOYEE_ID, value = (PAY_ITEM_ID -> AMOUNT) */
+    /** payrollId에 속한 모든 사원의 지급상세를 한 번에 조회: key = PAYROLL_EMPLOYEE_ID, value = (PAY_ITEM_ID -> AMOUNT)
+     *  payrollIdに属するすべての社員の支給詳細を一度に照会：key = PAYROLL_EMPLOYEE_ID、value = (PAY_ITEM_ID -> AMOUNT) */
     public Map<Long, Map<Long, Long>> selectPayDetailsByPayroll(Connection conn, Long payrollId) throws SQLException {
         Map<Long, Map<Long, Long>> result = new HashMap<>();
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, d.PAY_ITEM_ID, d.AMOUNT "
@@ -161,7 +168,8 @@ public class PaymentRegisterListDetailDAO {
         return result;
     }
 
-    /** payrollId에 속한 모든 사원의 공제상세를 한 번에 조회: key = PAYROLL_EMPLOYEE_ID, value = (DEDUCTION_ITEM_ID -> AMOUNT) */
+    /** payrollId에 속한 모든 사원의 공제상세를 한 번에 조회: key = PAYROLL_EMPLOYEE_ID, value = (DEDUCTION_ITEM_ID -> AMOUNT)
+     *  payrollIdに属するすべての社員の控除詳細を一度に照会：key = PAYROLL_EMPLOYEE_ID、value = (DEDUCTION_ITEM_ID -> AMOUNT) */
     public Map<Long, Map<Long, Long>> selectDeductionDetailsByPayroll(Connection conn, Long payrollId) throws SQLException {
         Map<Long, Map<Long, Long>> result = new HashMap<>();
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, d.DEDUCTION_ITEM_ID, d.AMOUNT "

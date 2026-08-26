@@ -4,15 +4,15 @@ import java.util.Date;
 
 public class PaymentMntPayDetailDTO {
     
-    private Long payrollPayDetailId;   // 급여지급상세아이디
-    private Long payrollEmployeeId;    // 사원별급여아이디
-    private Long payItemId;            // 지급항목아이디
-    private String itemName;           // 지급항목명 (화면 표시용으로 PAY_ITEM 테이블과 JOIN해서 가져올 값)
-    private Long amount;               // 실제지급금액
-    private String regId;              // 등록자 아이디
-    private String modId;              // 수정자 아이디
-    private Date createdAt;            // 생성일시
-    private Date updatedAt;            // 수정일시
+    private Long payrollPayDetailId;   // 급여지급상세아이디 / 給与支給詳細ID
+    private Long payrollEmployeeId;    // 사원별급여아이디 / 社員別給与ID
+    private Long payItemId;            // 지급항목아이디 / 支給項目ID
+    private String itemName;           // 지급항목명 (화면 표시용으로 PAY_ITEM 테이블과 JOIN해서 가져올 값) / 支給項目名（画面表示用にPAY_ITEMテーブルとJOINして取得する値）
+    private Long amount;               // 실제지급금액 / 実際の支給金額
+    private String regId;              // 등록자 아이디 / 登録者ID
+    private String modId;              // 수정자 아이디 / 修正者ID
+    private Date createdAt;            // 생성일시 / 作成日時
+    private Date updatedAt;            // 수정일시 / 修正日時
 
     // Getter / Setter
     public Long getPayrollPayDetailId() {

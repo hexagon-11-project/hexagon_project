@@ -13,7 +13,9 @@ import payment.paymentPayList.dto.PaymentPayListRowDTO;
 public class PaymentPayListDAO {
 
     /** 사원명(정확히 일치)과 조회기간(YYYYMM)에 해당하는 월별 급여내역 + 4대보험/갑근세 공제액을 조회한다.
-     *  4대보험 항목명은 payment.fourinsureList(4대보험 공제내역) 화면과 동일한 DEDUCTION_ITEM_NAME을 사용한다. */
+     *  4대보험 항목명은 payment.fourinsureList(4대보험 공제내역) 화면과 동일한 DEDUCTION_ITEM_NAME을 사용한다.
+     *  社員名（完全一致）と照会期間（YYYYMM）に該当する月別給与内訳＋4大保険・甲勤税控除額を照会する。
+     *  4大保険項目名はpayment.fourinsureList（4大保険控除内訳）画面と同一のDEDUCTION_ITEM_NAMEを使用する。 */
     public List<PaymentPayListRowDTO> selectPayList(Connection conn, String employeeName,
             String startYearMonth, String endYearMonth) throws SQLException {
         List<PaymentPayListRowDTO> list = new ArrayList<>();

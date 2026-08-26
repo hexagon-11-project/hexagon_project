@@ -3,6 +3,7 @@ package payment.paymentPayslip.dto;
 import java.util.List;
 
 // 급여명세서 화면 조회 결과 (필터 헤더 정보 + 사원 목록, 항목 내역은 각 사원 DTO 안에 포함)
+// 給与明細書画面照会結果（フィルターヘッダー情報＋社員一覧、項目内訳は各社員DTOの中に含む）
 public class PaymentPayslipResult {
 
     private String payYearMonth;

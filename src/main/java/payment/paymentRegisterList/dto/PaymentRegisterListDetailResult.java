@@ -3,6 +3,7 @@ package payment.paymentRegisterList.dto;
 import java.util.List;
 
 // 급여대장 상세화면 조회 결과 (헤더 정보 + 항목 컬럼 + 사원 목록 + 합계행)
+// 給与台帳詳細画面照会結果（ヘッダー情報＋項目カラム＋社員一覧＋合計行）
 public class PaymentRegisterListDetailResult {
 
     private String payYearMonth;

@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 // 급여명세서 사원 1인 정보 - 좌측 목록(구분/성명)과 우측 미리보기(인적사항 + 지급/공제 내역)에 함께 쓰인다
+// 給与明細書社員1人分の情報 - 左側一覧（区分/氏名）と右側プレビュー（人的事項＋支給・控除内訳）に共に使われる
 public class PaymentPayslipDetailDTO {
 
     private Long payrollEmployeeId;
-    private String employmentType; // 구분
-    private String employeeName;   // 성명
-    private String residentRegNo;  // 생년월일(주민등록번호)
-    private String department;     // 부서
-    private String position;       // 직급
-    private String hireDate;       // 입사일
+    private String employmentType; // 구분 / 区分
+    private String employeeName;   // 성명 / 氏名
+    private String residentRegNo;  // 생년월일(주민등록번호) / 生年月日（住民登録番号）
+    private String department;     // 부서 / 部署
+    private String position;       // 직급 / 職級
+    private String hireDate;       // 입사일 / 入社日
 
     private List<PaymentPayslipItemDTO> payItems = new ArrayList<>();
     private long totalPayAmount;

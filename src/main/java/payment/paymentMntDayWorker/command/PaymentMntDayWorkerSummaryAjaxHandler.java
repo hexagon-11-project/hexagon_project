@@ -10,6 +10,7 @@ import command.CommandHandler;
 import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // 하단 [급여 종합정보] 갱신용 - 공제항목 수정 등으로 금액이 바뀔 때마다 페이지 새로고침 없이 최신 합계를 JSON으로 반환
+// 下部[給与総合情報]更新用 - 控除項目修正などで金額が変わるたびにページ再読み込みなしで最新合計をJSONで返す
 public class PaymentMntDayWorkerSummaryAjaxHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();

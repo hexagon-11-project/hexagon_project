@@ -10,6 +10,7 @@ import payment.paymentPayslip.dto.PaymentPayslipResult;
 import payment.paymentPayslip.service.PaymentPayslipService;
 
 // 급여명세서 화면 초기 진입 컨트롤러
+// 給与明細書画面の初期アクセスコントローラー
 public class PaymentPayslipController implements CommandHandler {
 
     private PaymentPayslipService service = new PaymentPayslipService();
@@ -22,7 +23,7 @@ public class PaymentPayslipController implements CommandHandler {
         String payMonth = request.getParameter("payMonth");
         String paySequenceParam = request.getParameter("paySequence");
 
-        // 파라미터가 없으면(최초 진입) 기본값으로 '전월'을 사용한다 (paymentMnt.jsp와 동일한 기본값 규칙)
+        // 파라미터가 없으면(최초 진입) 기본값으로 '전월'을 사용한다 (paymentMnt.jsp와 동일한 기본값 규칙) / パラメータがなければ（初回アクセス）初期値として「前月」を使用する（paymentMnt.jspと同一の初期値ルール）
         LocalDate defaultMonth = LocalDate.now().minusMonths(1);
         if (payYear == null || payYear.trim().isEmpty()) { payYear = String.valueOf(defaultMonth.getYear()); }
         if (payMonth == null || payMonth.trim().isEmpty()) { payMonth = String.format("%02d", defaultMonth.getMonthValue()); }

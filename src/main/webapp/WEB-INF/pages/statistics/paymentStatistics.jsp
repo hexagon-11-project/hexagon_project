@@ -4,9 +4,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
-request.setAttribute("pageTitle", "연도별 개인연봉 통계");
-request.setAttribute("pageSection", "급여통계");
-request.setAttribute("pageDescription", "귀속년도와 사원을 검색하시면 해당사원의 최근 10개년도 급여현황을 확인하실 수 있습니다.");
+request.setAttribute("pageTitle", "年度別個人年俸統計");
+request.setAttribute("pageSection", "給与統計");
+request.setAttribute("pageDescription", "帰属年度と社員を検索すると、該当社員の直近10年間の給与状況を確認できます。");
 request.setAttribute("activeKey", "annual-personal");
 request.setAttribute("pageCss", "statistics.css");
 request.setAttribute("pageJs", null);
@@ -36,7 +36,7 @@ for (int i = 0; i < annualList.size(); i++) {
 		deductionValuesJson.append(',');
 		netValuesJson.append(',');
 	}
-	labelsJson.append('"').append(row.getYear()).append("년\"");
+	labelsJson.append('"').append(row.getYear()).append("年\"");
 	deductionValuesJson.append(row.getTotalDeductionAmount() / 1000L);
 	netValuesJson.append(row.getNetPayAmount() / 1000L);
 }
@@ -62,21 +62,21 @@ netValuesJson.append(']');
 <form id="pstFilterForm" action="<%=ctx%>/Statistics/paymentStatistics.do" method="get">
 	<section class="filter-bar">
 		<div class="field">
-			<label>* 귀속년도를 선택해 주세요.</label>
+			<label>* 帰属年度を選択してください。</label>
 			<select class="select" name="year" onchange="document.getElementById('pstFilterForm').submit()">
 <%
 for (int y = currentYear + 1; y >= 2005; y--) {
 %>
-				<option value="<%=y%>" <%=y == selectedYear ? "selected" : ""%>><%=y%>년</option>
+				<option value="<%=y%>" <%=y == selectedYear ? "selected" : ""%>><%=y%>年</option>
 <%
 }
 %>
 			</select>
 		</div>
 		<div class="field">
-			<label>대상자를 선택해 주세요.</label>
+			<label>対象者を選択してください。</label>
 			<input type="text" class="input" id="employeeNameInput" name="employeeName"
-				value="<%=employeeNameValue%>" placeholder="사원명을 입력하세요" readonly
+				value="<%=employeeNameValue%>" placeholder="社員名を入力してください" readonly
 				style="cursor: pointer;" onclick="pstOpenEmployeeModal()">
 		</div>
 		<div class="actions">
@@ -92,7 +92,7 @@ function pstOpenEmployeeModal() {
 	window.open(popupUrl, "PstEmployeeSelectModal", "width=820,height=650,left=250,top=100,scrollbars=yes");
 }
 
-// 사원선택 팝업에서 호출 (window.opener.pstSetSelectedEmployee(...))
+// 사원선택 팝업에서 호출 (window.opener.pstSetSelectedEmployee(...)) / 社員選択ポップアップから呼び出し（window.opener.pstSetSelectedEmployee(...)）
 function pstSetSelectedEmployee(employeeName) {
 	document.getElementById("employeeNameInput").value = employeeName;
 	document.getElementById("pstFilterForm").submit();
@@ -104,7 +104,7 @@ if (!hasResult) {
 %>
 <section class="card">
 	<div class="card-body">
-		<p class="empty-state"><%=employeeNameValue.isEmpty() ? "사원명을 입력하고 검색해주세요." : "조회된 급여 내역이 없습니다."%></p>
+		<p class="empty-state"><%=employeeNameValue.isEmpty() ? "社員名を入力して検索してください。" : "照会された給与内訳がありません。"%></p>
 	</div>
 </section>
 <%
@@ -115,8 +115,8 @@ if (!hasResult) {
 		<script>
 			window.paymentStatisticsChartData = {
 				labels: <%=labelsJson.toString()%>,
-				deduction: { name: "공제금액 (천원)", values: <%=deductionValuesJson.toString()%> },
-				net: { name: "실지급액 (천원)", values: <%=netValuesJson.toString()%> }
+				deduction: { name: "控除金額（千円）", values: <%=deductionValuesJson.toString()%> },
+				net: { name: "実支給額（千円）", values: <%=netValuesJson.toString()%> }
 			};
 		</script>
 		<div class="chart-canvas-wrap">
@@ -161,8 +161,8 @@ if (!hasResult) {
 						activeIndex = found;
 						tip.innerHTML =
 							'<div class="chart-tooltip-title">' + item.label + '</div>' +
-							'<div class="chart-tooltip-row"><span class="dot" style="background:#8ea9db"></span>실지급액 (천원) : <strong>' + fmt(item.net) + '</strong></div>' +
-							'<div class="chart-tooltip-row"><span class="dot" style="background:#f4b183"></span>공제금액 (천원) : <strong>' + fmt(item.deduction) + '</strong></div>';
+							'<div class="chart-tooltip-row"><span class="dot" style="background:#8ea9db"></span>実支給額（千円）：<strong>' + fmt(item.net) + '</strong></div>' +
+							'<div class="chart-tooltip-row"><span class="dot" style="background:#f4b183"></span>控除金額（千円）：<strong>' + fmt(item.deduction) + '</strong></div>';
 					}
 					tip.hidden = false;
 					var tipW = tip.offsetWidth || 160;
@@ -196,8 +196,8 @@ if (!hasResult) {
 				var labels = data.labels || [];
 				var deductionValues = (data.deduction && data.deduction.values) || [];
 				var netValues = (data.net && data.net.values) || [];
-				var deductionName = (data.deduction && data.deduction.name) || '공제금액 (천원)';
-				var netName = (data.net && data.net.name) || '실지급액 (천원)';
+				var deductionName = (data.deduction && data.deduction.name) || '控除金額（千円）';
+				var netName = (data.net && data.net.name) || '実支給額（千円）';
 				var DEDUCTION_COLOR = '#f4b183';
 				var NET_COLOR = '#8ea9db';
 
@@ -260,7 +260,7 @@ if (!hasResult) {
 				ctx.textAlign = 'center';
 				ctx.fillStyle = '#44505c';
 				ctx.font = '12px sans-serif';
-				ctx.fillText('공제금액 실지급액 (천원)', 0, 0);
+				ctx.fillText('控除金額 実支給額（千円）', 0, 0);
 				ctx.restore();
 
 				for (var b = 0; b < labels.length; b++) {
@@ -336,21 +336,21 @@ if (!hasResult) {
 			<table class="data-table stats-matrix">
 				<thead>
 					<tr>
-						<th class="col-label">구분</th>
+						<th class="col-label">区分</th>
 						<c:forEach var="row" items="${annualList}">
-							<th>${row.year}년</th>
+							<th>${row.year}年</th>
 						</c:forEach>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<th class="col-label">연봉액 (천원)</th>
+						<th class="col-label">年俸額（千円）</th>
 						<c:forEach var="row" items="${annualList}">
 							<td><fmt:formatNumber value="${row.totalPayAmount / 1000}" pattern="#,###"/></td>
 						</c:forEach>
 					</tr>
 					<tr>
-						<th class="col-label sub-label">└ 증가율</th>
+						<th class="col-label sub-label">└ 増加率</th>
 						<c:forEach var="row" items="${annualList}">
 							<td>
 								<c:choose>
@@ -369,13 +369,13 @@ if (!hasResult) {
 						</c:forEach>
 					</tr>
 					<tr>
-						<th class="col-label">공제금액 (천원)</th>
+						<th class="col-label">控除金額（千円）</th>
 						<c:forEach var="row" items="${annualList}">
 							<td><fmt:formatNumber value="${row.totalDeductionAmount / 1000}" pattern="#,###"/></td>
 						</c:forEach>
 					</tr>
 					<tr>
-						<th class="col-label">실지급액 (천원)</th>
+						<th class="col-label">実支給額（千円）</th>
 						<c:forEach var="row" items="${annualList}">
 							<td><fmt:formatNumber value="${row.netPayAmount / 1000}" pattern="#,###"/></td>
 						</c:forEach>
@@ -384,7 +384,7 @@ if (!hasResult) {
 			</table>
 		</div>
 		<div class="chart-print-note">
-			※ 통계차트는 별도의 인쇄화면을 제공하지 않습니다. 회원님께서 윈도우즈에서 제공하는 스크린샷(ScreenShot) 기능을 이용하여 인쇄(Ctrl + P)하여 주시길 바랍니다.
+			※ 統計チャートは別途の印刷画面を提供しておりません。Windowsが提供するスクリーンショット機能をご利用の上、印刷（Ctrl + P）してください。
 		</div>
 	</div>
 </section>

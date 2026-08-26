@@ -13,6 +13,8 @@ import payment.paymentMntDayWorker.service.PaymentMntDayWorkerService;
 
 // 모달에서 선택한 사원들을 메인 화면(급여차수)에 추가
 // 전체 새로고침 없이 방금 등록한 사원 행만 화면에 붙일 수 있도록, 등록된 사원들의 표시정보를 JSON으로 반환
+// モーダルで選択した社員をメイン画面（給与回）に追加
+// 全体再読み込みなしで今登録した社員行だけを画面に追加できるよう、登録された社員の表示情報をJSONで返す
 public class PaymentMntDayWorkerEmployeeInsertHandler implements CommandHandler {
 
     private PaymentMntDayWorkerService service = new PaymentMntDayWorkerService();

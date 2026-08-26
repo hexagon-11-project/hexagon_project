@@ -12,11 +12,14 @@ import payment.paymentMntDayWorker.dto.PaymentMntDayWorkerEmployeeDTO;
 import payment.paymentMntDayWorker.model.PaymentMntDayWorkerDailyVO;
 import payment.paymentMntDayWorker.model.PaymentMntDayWorkerDeductionVO;
 
+// 급여입력/관리(일용직) 화면의 비즈니스 로직을 처리하는 서비스 클래스
+// 給与入力・管理（日雇い）画面のビジネスロジックを処理するサービスクラス
 public class PaymentMntDayWorkerService {
 
     private PaymentMntDayWorkerDAO dao = new PaymentMntDayWorkerDAO();
 
-    /** 귀속연월+차수 헤더 조회/생성 후 PAYROLL_DAYWORKER_ID 반환 */
+    /** 귀속연월+차수 헤더 조회/생성 후 PAYROLL_DAYWORKER_ID 반환
+     *  帰属年月＋回のヘッダーを照会・生成後、PAYROLL_DAYWORKER_IDを返す */
     public Long getOrCreateHeader(String payYearMonth, int paySequence) {
         Connection conn = null;
         try {
@@ -29,7 +32,8 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    /** 공제항목 마스터 목록 (화면 공제항목 패널을 DB 기준으로 동적 렌더링) */
+    /** 공제항목 마스터 목록 (화면 공제항목 패널을 DB 기준으로 동적 렌더링)
+     *  控除項目マスタ一覧（画面の控除項目パネルをDB基準で動的レンダリング） */
     public List<PaymentMntDayWorkerDeductionItemDTO> getDeductionItemList() {
         Connection conn = null;
         try {
@@ -90,7 +94,8 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    /** 신규추가 후, 방금 등록한 사원들의 화면 표시용 정보를 반환 (전체 새로고침 없이 해당 행만 추가하기 위함) */
+    /** 신규추가 후, 방금 등록한 사원들의 화면 표시용 정보를 반환 (전체 새로고침 없이 해당 행만 추가하기 위함)
+     *  新規追加後、今登録した社員の画面表示用情報を返す（全体再読み込みなしで該当行だけ追加するため） */
     public List<PaymentMntDayWorkerEmployeeDTO> insertEmployees(Long payrollDayWorkerId, List<String> empIds) {
         Connection conn = null;
         try {
@@ -138,7 +143,8 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    /** 근로자 클릭 시 우측 상세(일자별 내역 + 공제항목) 조회 */
+    /** 근로자 클릭 시 우측 상세(일자별 내역 + 공제항목) 조회
+     *  労働者クリック時に右側詳細（日別内訳＋控除項目）を照会 */
     public List<PaymentMntDayWorkerDailyVO> getDailyList(Long payrollDayWorkerEmployeeId) {
         Connection conn = null;
         try {
@@ -163,7 +169,8 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null) */
+    /** 공제항목 마스터에서 이름으로 DEDUCTION_ITEM_ID 조회 (없으면 null)
+     *  控除項目マスタから名前でDEDUCTION_ITEM_IDを照会（なければnull） */
     public Long getDeductionItemIdByName(String deductionItemName) {
         Connection conn = null;
         try {
@@ -176,7 +183,8 @@ public class PaymentMntDayWorkerService {
         }
     }
 
-    /** 저장: 일자별 내역 + 공제항목을 한번에 저장, 합계도 갱신 */
+    /** 저장: 일자별 내역 + 공제항목을 한번에 저장, 합계도 갱신
+     *  保存：日別内訳＋控除項目を一度に保存し、合計も更新 */
     public void saveDetail(Long payrollDayWorkerEmployeeId, List<PaymentMntDayWorkerDailyVO> dailyList,
                             PaymentMntDayWorkerDeductionVO deduction) {
         Connection conn = null;

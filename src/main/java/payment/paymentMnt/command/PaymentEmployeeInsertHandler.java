@@ -12,13 +12,14 @@ import payment.paymentMnt.dto.PaymentMntEmployeeDTO;
 import payment.paymentMnt.service.PaymentMntService;
 
 // 전체 새로고침 없이 방금 등록한 사원 행만 화면에 붙일 수 있도록, 등록된 사원들의 표시정보를 JSON으로 반환
+// 全体再読み込みをせず、今登録した社員行だけを画面に追加できるよう、登録された社員の表示情報をJSONで返す
 public class PaymentEmployeeInsertHandler implements CommandHandler {
 
     private PaymentMntService paymentMntService = new PaymentMntService();
 
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 1. 파라미터 받기
+        // 1. 파라미터 받기 / 1. パラメータを受け取る
         String payrollIdStr = request.getParameter("payrollId");
         String employeeIdsStr = request.getParameter("employeeIds");
 
@@ -27,7 +28,7 @@ public class PaymentEmployeeInsertHandler implements CommandHandler {
             Long payrollId = Long.parseLong(payrollIdStr);
             List<String> empIds = Arrays.asList(employeeIdsStr.split(","));
 
-            // 2. 서비스 호출하여 DB에 INSERT 실행하고, 방금 추가된 사원들의 표시정보를 돌려받음
+            // 2. 서비스 호출하여 DB에 INSERT 실행하고, 방금 추가된 사원들의 표시정보를 돌려받음 / 2. サービスを呼び出してDBにINSERTを実行し、今追加した社員の表示情報を受け取る
             inserted = paymentMntService.insertEmployees(payrollId, empIds);
         }
 

@@ -14,7 +14,8 @@ import payment.paymentPayslip.dto.PaymentPayslipItemDTO;
 
 public class PaymentPayslipDAO {
 
-    /** 귀속연월+급여차수에 해당하는 PAYROLL_ID 조회 (등록된 급여가 없으면 null) */
+    /** 귀속연월+급여차수에 해당하는 PAYROLL_ID 조회 (등록된 급여가 없으면 null)
+     *  帰属年月＋給与回に該当するPAYROLL_IDを照会（登録された給与がなければnull） */
     public Long selectPayrollId(Connection conn, String payYearMonth, int paySequence) throws SQLException {
         String sql = "SELECT PAYROLL_ID FROM PAYROLL WHERE PAY_YEAR_MONTH = ? AND PAY_SEQUENCE = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -26,12 +27,16 @@ public class PaymentPayslipDAO {
         }
     }
 
-    /** 급여차수에 속한 사원 목록 + 인적사항 + 지급/공제 합계 (지급/공제 상세는 별도 배치 조회 후 Service에서 합쳐준다) */
+    /** 급여차수에 속한 사원 목록 + 인적사항 + 지급/공제 합계 (지급/공제 상세는 별도 배치 조회 후 Service에서 합쳐준다)
+     *  給与回に属する社員一覧＋人的事項＋支給・控除合計（支給・控除詳細は別途バッチ照会後、Serviceで合わせる） */
     public List<PaymentPayslipDetailDTO> selectEmployeeList(Connection conn, Long payrollId) throws SQLException {
         List<PaymentPayslipDetailDTO> list = new ArrayList<>();
         // 일용직/DAILY 사원은 이 급여차수에 실제 근무기록(DAILY_WORK_RECORD)이 있을 때만 노출한다.
         // (근무기록 없이 지급/공제 내역이 전부 0인 유령 PAYROLL_EMPLOYEE 행 - 예: 예전 "지난급여 불러오기"가
         //  직군 구분 없이 복사하던 시절의 잔존 데이터 - 는 명세서 대상에서 제외)
+        // 日雇い/DAILY社員はこの給与回に実際の勤務記録（DAILY_WORK_RECORD）がある時のみ表示する。
+        // （勤務記録なしで支給・控除内訳がすべて0の幽霊PAYROLL_EMPLOYEE行 - 例：以前の「前回給与の読み込み」が
+        //  職種区分なしにコピーしていた頃の残存データ - は明細書の対象から除外）
         String sql = "SELECT pe.PAYROLL_EMPLOYEE_ID, e.EMPLOYMENT_TYPE, e.EMPLOYEE_NAME, e.RESIDENT_REG_NO, "
                    + "e.DEPARTMENT, e.POSITION, e.HIRE_DATE, "
                    + "pe.TOTAL_PAY_AMOUNT, pe.TOTAL_DEDUCTION_AMOUNT, pe.NET_PAY_AMOUNT "
@@ -62,7 +67,8 @@ public class PaymentPayslipDAO {
         return list;
     }
 
-    /** payrollId에 속한 모든 사원의 지급항목 내역을 한 번에 조회 (0원 항목은 명세서에 표시하지 않는다) */
+    /** payrollId에 속한 모든 사원의 지급항목 내역을 한 번에 조회 (0원 항목은 명세서에 표시하지 않는다)
+     *  payrollIdに属するすべての社員の支給項目内訳を一度に照会（0円項目は明細書に表示しない） */
     public Map<Long, List<PaymentPayslipItemDTO>> selectPayItemsByPayroll(Connection conn, Long payrollId) throws SQLException {
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, pi.PAY_ITEM_NAME AS ITEM_NAME, pi.CALCULATION_METHOD, d.AMOUNT "
                    + "FROM PAYROLL_PAY_DETAIL d "
@@ -73,7 +79,8 @@ public class PaymentPayslipDAO {
         return selectItemsByPayroll(conn, sql, payrollId);
     }
 
-    /** payrollId에 속한 모든 사원의 공제항목 내역을 한 번에 조회 (0원 항목은 명세서에 표시하지 않는다) */
+    /** payrollId에 속한 모든 사원의 공제항목 내역을 한 번에 조회 (0원 항목은 명세서에 표시하지 않는다)
+     *  payrollIdに属するすべての社員の控除項目内訳を一度に照会（0円項目は明細書に表示しない） */
     public Map<Long, List<PaymentPayslipItemDTO>> selectDeductionItemsByPayroll(Connection conn, Long payrollId) throws SQLException {
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, di.DEDUCTION_ITEM_NAME AS ITEM_NAME, di.CALCULATION_METHOD, d.AMOUNT "
                    + "FROM PAYROLL_DEDUCTION_DETAIL d "
@@ -84,7 +91,8 @@ public class PaymentPayslipDAO {
         return selectItemsByPayroll(conn, sql, payrollId);
     }
 
-    /** 일용직 사원의 지급내역: 일자별로 DAILY_WORK_RECORD에 저장되므로 PAYROLL_PAY_DETAIL이 아닌 여기서 합산해 한 줄로 만들어준다. */
+    /** 일용직 사원의 지급내역: 일자별로 DAILY_WORK_RECORD에 저장되므로 PAYROLL_PAY_DETAIL이 아닌 여기서 합산해 한 줄로 만들어준다.
+     *  日雇い社員の支給内訳：日別にDAILY_WORK_RECORDに保存されるためPAYROLL_PAY_DETAILではなくここで合算して1行にまとめる。 */
     public Map<Long, PaymentPayslipItemDTO> selectDailyPayByPayroll(Connection conn, Long payrollId) throws SQLException {
         Map<Long, PaymentPayslipItemDTO> result = new HashMap<>();
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, COUNT(*) AS WORK_DAYS, SUM(d.PAY_AMOUNT) AS TOTAL_PAY "
@@ -105,7 +113,8 @@ public class PaymentPayslipDAO {
         return result;
     }
 
-    /** 일용직 사원의 원천징수 세액(소득세/지방소득세): PAYROLL_DEDUCTION_DETAIL이 아닌 DAILY_WORK_RECORD에 일자별로 저장된다. */
+    /** 일용직 사원의 원천징수 세액(소득세/지방소득세): PAYROLL_DEDUCTION_DETAIL이 아닌 DAILY_WORK_RECORD에 일자별로 저장된다.
+     *  日雇い社員の源泉徴収税額（所得税・地方所得税）：PAYROLL_DEDUCTION_DETAILではなくDAILY_WORK_RECORDに日別で保存される。 */
     public Map<Long, List<PaymentPayslipItemDTO>> selectDailyTaxDeductionsByPayroll(Connection conn, Long payrollId) throws SQLException {
         Map<Long, List<PaymentPayslipItemDTO>> result = new HashMap<>();
         String sql = "SELECT d.PAYROLL_EMPLOYEE_ID, SUM(d.INCOME_TAX_AMOUNT) AS INCOME_TAX, "
