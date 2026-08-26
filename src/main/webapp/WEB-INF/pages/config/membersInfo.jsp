@@ -308,3 +308,27 @@ request.setAttribute("pageJs", null);
         }
     });
 </script>
+
+<script>
+// 저장 시 팝업 창
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            if (!confirm('저장하시겠습니까?')) {
+                event.preventDefault();
+            }
+        });
+
+       
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.get('save') === 'success') {
+            alert('저장되었습니다.');
+            
+            const companyId = urlParams.get('id') || '1001';
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?id=" + companyId;
+            window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+        }
+    });
+</script>

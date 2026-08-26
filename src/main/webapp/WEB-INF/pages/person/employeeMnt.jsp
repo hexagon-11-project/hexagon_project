@@ -137,5 +137,41 @@ request.setAttribute("pageJs", null);
 		onclick="location.href='${pageContext.request.contextPath}/Config/employeeIns1.do'">신규사원등록</button>
 	<button type="submit" form="deleteForm" class="btn">선택 삭제</button>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. "삭제 하시겠습니까?" 확인 창 로직
+        const deleteForm = document.getElementById('deleteForm');
+        
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function(event) {
+                // 체크된 사원이 있는지 먼저 검사합니다.
+                const checkedBoxes = deleteForm.querySelectorAll('input[name="empId"]:checked');
+                
+                if (checkedBoxes.length === 0) {
+                    alert('삭제할 사원을 먼저 선택해주세요.');
+                    event.preventDefault(); // 폼 전송 중단
+                    return;
+                }
 
+                // 사용자가 '취소'를 누르면 폼 전송을 중단합니다.
+                if (!confirm('삭제 하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        // 2. "삭제 되었습니다." 알림창 로직
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL에 delete=success가 있으면 알림창 생성
+        if (urlParams.get('delete') === 'success') {
+            alert('삭제 되었습니다.');
+            
+            // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL에서 파라미터 삭제.
+            const url = new URL(window.location);
+            url.searchParams.delete('delete');
+            window.history.replaceState({}, document.title, url);
+        }
+    });
+</script>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>

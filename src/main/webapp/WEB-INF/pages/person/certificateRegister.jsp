@@ -36,7 +36,6 @@ request.setAttribute("pageJs", null);
 		</div>
 		<div class="actions">
 			<button type="submit" class="btn btn-primary">조회</button>
-			<button type="button" class="btn ">인쇄</button>
 		</div>
 	</section>
 </form>
@@ -48,13 +47,12 @@ request.setAttribute("pageJs", null);
 	<div class="card-body">
 		
 		
-		<form action="${pageContext.request.contextPath}/Person/certificateRegisterUpdate.do" method="POST" onsubmit="return confirm('선택한 증명서를 정말 취소 처리하시겠습니까?');">
+		<form id="deleteForm" action="${pageContext.request.contextPath}/Person/certificateRegisterUpdate.do" method="POST">
 			<div class="table-toolbar">
 				
 				<span class="table-count">총 ${certList.size()}건</span>
 				<div class="actions">
 					<button type="submit" class="btn btn-danger">선택 삭제</button>
-					<button type="button" class="btn btn-danger">전체 삭제</button>
 				</div>
 			</div>
 			
@@ -102,4 +100,41 @@ request.setAttribute("pageJs", null);
 		
 	</div>
 </section>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. "삭제 하시겠습니까?" 확인 창 로직
+        const deleteForm = document.getElementById('deleteForm');
+        
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function(event) {
+                // 체크된 항목이 있는지 검사
+                const checkedBoxes = deleteForm.querySelectorAll('input[name="issueNo"]:checked');
+                
+                if (checkedBoxes.length === 0) {
+                    alert('삭제(취소)할 증명서를 먼저 선택해주세요.');
+                    event.preventDefault(); 
+                    return;
+                }
+
+                // 사용자가 '취소'를 누르면 폼 전송을 중단
+                if (!confirm('삭제 하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        // 2. "삭제 되었습니다." 알림창 로직
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL에 delete=success 파라미터가 있으면 알림창을 띄웁니다.
+        if (urlParams.get('delete') === 'success') {
+            alert('삭제 되었습니다.');
+            
+            // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL 파라미터 정리
+            const url = new URL(window.location);
+            url.searchParams.delete('delete');
+            window.history.replaceState({}, document.title, url);
+        }
+    });
+</script>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>

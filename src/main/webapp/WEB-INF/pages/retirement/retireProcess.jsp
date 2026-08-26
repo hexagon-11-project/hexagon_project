@@ -160,5 +160,31 @@ request.setAttribute("pageJs", null);
         document.getElementById("modalOverlay").style.display = "none";
     }
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // "저장하시겠습니까?" 확인 창 로직
+        const retireForm = document.querySelector('#retireModal form');
+        
+        if (retireForm) {
+            retireForm.addEventListener('submit', function(event) {
+                if (!confirm('저장하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        // "저장되었습니다." 알림창 로직
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL에 save=success 파라미터가 있으면 알림창을 띄웁니다.
+        if (urlParams.get('save') === 'success') {
+            alert('저장되었습니다.');
+            
+            const url = new URL(window.location);
+            url.searchParams.delete('save');
+            window.history.replaceState({}, document.title, url);
+        }
+    });
+</script>
 
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>

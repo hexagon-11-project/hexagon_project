@@ -199,5 +199,40 @@ request.setAttribute("pageJs", null);
 		<!--  form 태그 닫기 -->
 	</section>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // "저장하시겠습니까?" 확인 창 로직
+       
+        const insertForm = document.querySelector('form[action$="certificatePrintWorkingInsert.do"]');
+        
+        if (insertForm) {
+            insertForm.addEventListener('submit', function(event) {
+                // '발급용도'가 선택되지 않았으면 폼 전송을 막고 안내를 띄웁니다.
+                const purpose = insertForm.querySelector('select[name="purpose"]').value;
+                if (!purpose) {
+                    alert('발급용도를 선택해주세요.');
+                    event.preventDefault(); 
+                    return;
+                }
 
+                if (!confirm('저장하시겠습니까?')) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        //  "저장되었습니다." 알림창 로직
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL에 save=success 파라미터가 있으면 알림창을 띄웁니다.
+        if (urlParams.get('save') === 'success') {
+            alert('저장되었습니다.');
+            
+            // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL에서 파라미터를 정리합니다.
+            const url = new URL(window.location);
+            url.searchParams.delete('save');
+            window.history.replaceState({}, document.title, url);
+        }
+    });
+</script>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>
