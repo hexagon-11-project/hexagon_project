@@ -15,6 +15,7 @@ public class RetirementProcessReadHandler implements CommandHandler {
     public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
         
         //  페이지 번호 받기 (기본값 1)
+    	// // ページ番号を受け取る (デフォルト値 1)
         String pageVal = req.getParameter("page");
         int pageNum = 1;
         if (pageVal != null && !pageVal.isEmpty()) {
@@ -30,6 +31,7 @@ public class RetirementProcessReadHandler implements CommandHandler {
         }
 
         //  30개씩 분할된 데이터를 가진 Page 객체 호출
+        // // 30件ずつ分割されたデータを持つPageオブジェクトを呼び出す
         RetirementProcessPage retirementPage = retirementService.getRetirementProcessPage(pageNum, searchName, status);
         
        

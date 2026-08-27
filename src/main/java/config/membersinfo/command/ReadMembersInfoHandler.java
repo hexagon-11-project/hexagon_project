@@ -17,6 +17,7 @@ public class ReadMembersInfoHandler implements CommandHandler {
 
 		try {
 			// 로그인 기능 없으므로 ID 1001로 고정
+			//ログイン機能がないため、IDは1001に固定します。
 			CompanyInfo companyInfo = readService.getCompanyInfo(1001);
 
 			req.setAttribute("companyInfo", companyInfo);
@@ -25,6 +26,7 @@ public class ReadMembersInfoHandler implements CommandHandler {
 
 		} catch (CompanyNotFoundException e) {
 			// 잘못된 회사 ID의 회사 정보가 없을 경우 404 Not Found 에러 응답
+			//指定された会社IDに該当する会社情報がない場合、404 Not Foundエラーを返します。
 			req.getServletContext().log("no company info", e);
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;

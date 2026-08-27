@@ -1,8 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-request.setAttribute("pageTitle", "사용자 정보");
-request.setAttribute("pageSection", "기본환경");
-request.setAttribute("pageDescription", "회사·담당자·급여 지급정보와 로고·직인을 관리합니다.");
+request.setAttribute("pageTitle", "ユーザー情報");
+request.setAttribute("pageSection", "基本設定");
+request.setAttribute("pageDescription", "会社・担当者・給与支払情報、ロゴ・社印を管理します。");
 request.setAttribute("activeKey", "user-info");
 request.setAttribute("pageCss", "environment.css");
 request.setAttribute("pageJs", null);
@@ -20,46 +20,46 @@ request.setAttribute("pageJs", null);
 	<div class="user-info-layout">
 		<div class="user-info-left">
 			<section class="source-section">
-				<div class="source-section-title">회사정보</div>
+				<div class="source-section-title">会社情報</div>
 				<table class="source-form-table">
 					<tbody>
 						<tr>
-							<th>상호</th>
+							<th>商号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="companyName" value="${companyInfo.companyName}"></td>
-							<th>대표자명</th>
+							<th>代表者名</th>
 							<td class="span-1"><input type="text" class="input"
 								name="ceoName" value="${companyInfo.ceoName}"></td>
 						</tr>
 						<tr>
-							<th>사업자번호</th>
+							<th>事業者番号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="businessNo" value="${companyInfo.businessNo}"></td>
-							<th>법인등록번호</th>
+							<th>法人登録番号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="corpNo" value="${companyInfo.corpNo}"></td>
 						</tr>
 						<tr>
-							<th>설립일</th>
+							<th>設立日</th>
 							<td class="span-1"><input type="date" class="input"
 								name="estDate" value="${companyInfo.estDate}"></td>
-							<th>홈페이지</th>
+							<th>ホームページ</th>
 							<td class="span-1"><input type="text" class="input"
 								name="webSite" value="${companyInfo.webSite}"></td>
 						
 						<tr>
-							<th>전화번호</th>
+							<th>電話番号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="telNo" value="${companyInfo.telNo}"></td>
-							<th>팩스번호</th>
+							<th>FAX番号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="faxNo" value="${companyInfo.faxNo}"></td>
 						</tr>
 						<tr>
-							<th>업태</th>
+							<th>業態</th>
 							<td class="span-1"><input type="text" class="input"
 								name="businessType" value="${companyInfo.businessType}"></td>
-							<th>종목</th>
+							<th>業種</th>
 							<td class="span-1"><input type="text" class="input"
 								name="businessItem" value="${companyInfo.businessItem}"></td>
 						</tr>
@@ -67,13 +67,13 @@ request.setAttribute("pageJs", null);
 				</table>
 			</section>
 			<section class="source-section">
-				<div class="source-section-title">급여지급정보</div>
+				<div class="source-section-title">給与支払情報</div>
 				<table class="source-form-table">
 					<tbody>
 						<tr>
-							<th>급여 산정기간</th>
+							<th>給与計算期間</th>
 							<td class="span-1"><div class="date-rule">
-									당월 <select class="select" name="payPeriodStartDay">
+									当月 <select class="select" name="payPeriodStartDay">
 										<option value="1" ${companyInfo.payDay == 1 ? 'selected' : ''}>01일</option>
 										<option value="2" ${companyInfo.payDay == 2 ? 'selected' : ''}>02일</option>
 										<option value="3" ${companyInfo.payDay == 3 ? 'selected' : ''}>03일</option>
@@ -105,7 +105,7 @@ request.setAttribute("pageJs", null);
 										<option value="29"${companyInfo.payDay == 29 ? 'selected' : ''}>29일</option>
 										<option value="30"${companyInfo.payDay == 30 ? 'selected' : ''}>30일</option>
 										<option value="31"${companyInfo.payDay == 31 ? 'selected' : ''}>31일</option>
-									</select> ~ 당월 <select class="select" name="payPeriodEndDay">
+									</select> ~ 当月 <select class="select" name="payPeriodEndDay">
 										<option value="1" ${companyInfo.payDay == 1 ? 'selected' : ''}>01일</option>
 										<option value="2" ${companyInfo.payDay == 2 ? 'selected' : ''}>02일</option>
 										<option value="3" ${companyInfo.payDay == 3 ? 'selected' : ''}>03일</option>
@@ -139,9 +139,9 @@ request.setAttribute("pageJs", null);
 										<option value="31"${companyInfo.payDay == 31 ? 'selected' : ''}>31일</option>
 									</select>
 								</div></td>
-							<th>급여지급일</th>
+							<th>給与支給日</th>
 							<td class="span-1"><div class="date-rule">
-									익월 <select class="select" name="payDay">
+									翌月 <select class="select" name="payDay">
 										<option value="1" ${companyInfo.payDay == 1 ? 'selected' : ''}>01일</option>
 										<option value="2" ${companyInfo.payDay == 2 ? 'selected' : ''}>02일</option>
 										<option value="3" ${companyInfo.payDay == 3 ? 'selected' : ''}>03일</option>
@@ -178,45 +178,44 @@ request.setAttribute("pageJs", null);
 								</div></td>
 						</tr>
 						<tr>
-							<th>금융기관</th>
+							<th>金融機関</th>
 							<td class="span-1"><select class="select" name="bankName">
-									<option value="국민은행"
-										${companyInfo.bankName == '국민은행' ? 'selected' : ''}>국민은행</option>
-									<option value="신한은행"
-										${companyInfo.bankName == '신한은행' ? 'selected' : ''}>신한은행</option>
-									<option value="우리은행"
-										${companyInfo.bankName == '우리은행' ? 'selected' : ''}>우리은행</option>
+									<option value="KB国民銀行"
+										${companyInfo.bankName == 'KB国民銀行' ? 'selected' : ''}>KB国民銀行</option>
+									<option value="新韓銀行"
+										${companyInfo.bankName == '新韓銀行' ? 'selected' : ''}>新韓銀行</option>
+									<option value="ウリィ銀行"
+										${companyInfo.bankName == 'ウリィ銀行' ? 'selected' : ''}>ウリィ銀行</option>
 							</select></td>
-							<th>계좌번호</th>
+							<th>口座番号</th>
 							<td class="span-1"><input type="text" class="input"
 								name="bankAccount" value="${companyInfo.bankAccount}"></td>
 						</tr>
 						<tr>
-							<th>급여이체뱅킹</th>
-							<td class="span-3"><span class="muted">외부 은행 이체 기능은
-									프로젝트 범위에서 제외</span></td>
+							<th>給与振込バンキング</th>
+							<td class="span-3"><span class="muted">外部銀行への振込機能はプロジェクトの対象範囲外とします。</span></td>
 						</tr>
 					</tbody>
 				</table>
 			</section>
 			<section class="source-section">
-				<div class="source-section-title">회사로고 / 회사도장</div>
+				<div class="source-section-title">会社ロゴ / 会社印</div>
 				<div class="brand-assets">
 					<div class="brand-asset">
-						<div class="brand-title">회사로고</div>
+						<div class="brand-title">会社ロゴ</div>
 						<div class="brand-preview">
 									<img src="${pageContext.request.contextPath}/assets/images/Logo.png" alt="회사로고" style="max-height: 80px; max-width: 100%;">
 
-									회사 로고
+									会社ロゴ
 						</div>
 						<div class="mini-actions">
 						</div>
 					</div>
 					<div class="brand-asset">
-						<div class="brand-title">회사도장</div>
+						<div class="brand-title">会社印</div>
 						<div class="brand-preview seal-preview">
 									<img src="${pageContext.request.contextPath}/assets/images/Seal.png" alt="직인" style="max-height: 80px; max-width: 100%;">
-									직인
+									社印
 						</div>
 						<div class="mini-actions">
 						</div>
@@ -226,56 +225,55 @@ request.setAttribute("pageJs", null);
 		</div>
 		<div class="user-info-right">
 			<section class="source-section">
-				<div class="source-section-title">담당자정보</div>
+				<div class="source-section-title">担当者情報</div>
 				<table class="source-form-table">
 					<tbody>
-						<!--  2. 담당자 정보(조인해온 데이터)를 value 속성에 연결하고 name을 명확히 지정합니다. -->
 						<tr>
-							<th>성명</th>
+							<th>氏名</th>
 							<td class="span-3"><input type="text" class="input"
 								name="managerName" value="${companyInfo.managerName}"></td>
 						</tr>
 						<tr>
 							<th>부서</th>
 							<td class="span-3"><div class="inline-control">
-									<select class="select"><option selected>선택</option>
-										<option>사장실</option>
-										<option>개발팀</option>
-										<option>콘텐츠팀</option>
-										<option>업무지원팀</option>
-										<option>디자인팀</option>
-										<option>관리팀</option>
-										<option>기획전략팀</option></select>
+									<select class="select"><option selected>選択</option>
+										<option>社長室</option>
+										<option>開発チーム</option>
+										<option>コンテンツチーム</option>
+										<option>業務支援チーム</option>
+										<option>デザインチーム</option>
+										<option>管理チーム</option>
+										<option>企画戦略チーム</option></select>
 									<!-- 	<button type="button" class="btn btn-sm">관리</button> -->
 								</div></td>
 						</tr>
 						<tr>
-							<th>직위</th>
+							<th>役職</th>
 							<td class="span-3"><div class="inline-control">
-									<select class="select"><option selected>선택</option>
-										<option>이사</option>
-										<option>차장</option>
-										<option>사장</option>
-										<option>부장</option>
-										<option>과장</option>
-										<option>대리</option>
-										<option>주임</option>
-										<option>사원</option>
-										<option>실장</option></select>
+									<select class="select"><option selected>選択</option>
+										<option>取締役</option>
+										<option>次長</option>
+										<option>社長</option>
+										<option>部長</option>
+										<option>課長</option>
+										<option>代理</option>
+										<option>主任</option>
+										<option>社員</option>
+										<option>室長</option></select>
 								</div></td>
 						</tr>
 						<tr>
-							<th>전화번호</th>
+							<th>電話番号</th>
 							<td class="span-3"><input type="text" class="input"
 								name="managerTel" value="${companyInfo.managerTel}"></td>
 						</tr>
 						<tr>
-							<th>휴대전화</th>
+							<th>携帯電話番号</th>
 							<td class="span-3"><input type="text" class="input"
 								name="managerMobile" value="${companyInfo.managerMobile}"></td>
 						</tr>
 						<tr>
-							<th>이메일</th>
+							<th>メールアドレス</th>
 							<td class="span-3"><input type="email" class="input"
 								name="managerEmail" value="${companyInfo.managerEmail}"></td>
 						</tr>
@@ -285,8 +283,7 @@ request.setAttribute("pageJs", null);
 		</div>
 	</div>
 	<div class="source-bottom-actions">
-		<button type="submit" class="btn btn-primary">저장</button>
-		<button type="reset" class="btn">취소</button>
+		<button type="submit" class="btn btn-primary">保存</button>
 	</div>
 </form>
 
@@ -294,14 +291,15 @@ request.setAttribute("pageJs", null);
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // URL 파라미터를 읽어옵니다.
         const urlParams = new URLSearchParams(window.location.search);
         
         // save 파라미터 값이 'success'이면 알림창을 띄웁니다.
+        //saveパラメータの値が「success」の場合、アラートを表示します。
         if (urlParams.get('save') === 'success') {
-            alert('저장되었습니다.');
+            alert('保存しました。');
             
             // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL에서 파라미터를 정리합니다.
+            //アラート表示後、再読み込み時に再度表示されないよう、URLからパラメータを削除します。
             const companyId = urlParams.get('id') || '1001';
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?id=" + companyId;
             window.history.replaceState({path: cleanUrl}, '', cleanUrl);
@@ -310,12 +308,12 @@ request.setAttribute("pageJs", null);
 </script>
 
 <script>
-// 저장 시 팝업 창
+// 保存時にポップアップを表示
     document.addEventListener("DOMContentLoaded", function() {
         
         const form = document.querySelector('form');
         form.addEventListener('submit', function(event) {
-            if (!confirm('저장하시겠습니까?')) {
+            if (!confirm('保存しますか？')) {
                 event.preventDefault();
             }
         });
@@ -324,7 +322,7 @@ request.setAttribute("pageJs", null);
         const urlParams = new URLSearchParams(window.location.search);
         
         if (urlParams.get('save') === 'success') {
-            alert('저장되었습니다.');
+            alert('保存しました。');
             
             const companyId = urlParams.get('id') || '1001';
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?id=" + companyId;

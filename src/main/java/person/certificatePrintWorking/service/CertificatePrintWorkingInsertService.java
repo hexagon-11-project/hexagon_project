@@ -23,24 +23,24 @@ public class CertificatePrintWorkingInsertService {
             CompanyInfo companyInfo = companyDao.selectById(conn, 1001); 
             
             if (companyInfo != null && companyInfo.getManagerName() != null) {
-                model.setRegId(companyInfo.getManagerName()); // '김민수'가 쏙 들어갑니다!
+                model.setRegId(companyInfo.getManagerName()); 
             } else {
-                model.setRegId("시스템"); // 혹시 데이터가 없을 때를 대비한 기본값
-            }
+                model.setRegId("system"); // 혹시 데이터가 없을 때를 대비한 기본값
+            }							  // もしデータがない場合に備えたデフォルト値
             
             int result = dao.insertCertificatePrintWorking(conn, model);
             
             if (result > 0) {
                 conn.commit();
-                return true; // 저장 성공
+                return true; 
             } else {
                 conn.rollback();
-                return false; // 저장 실패 (INSERT 된 행이 없음)
+                return false; 
             }
             
         } catch (SQLException e) {
-            JdbcUtil.rollback(conn); // 예외 발생 시 롤백
-            throw new RuntimeException("증명서 발급 저장 중 오류 발생: " + e.getMessage(), e);
+            JdbcUtil.rollback(conn); 
+            throw new RuntimeException("証明書発行の保存中にエラーが発生： " + e.getMessage(), e);
         } finally {
             JdbcUtil.close(conn); 
         }

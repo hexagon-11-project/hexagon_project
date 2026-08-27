@@ -32,11 +32,13 @@ public class RetirementProcessReadDao {
                        + "WHERE 1=1 ";
 
             // 검색어 조건 추가
+            // 検索ワード条件を追加
             if (searchName != null && !searchName.trim().isEmpty()) {
                 sql += "AND e.employee_name LIKE ? ";
             }
             
             // 상태별 검색 조건 추가 (전체가 아닐 경우)
+            // ステータス別検索条件を追加 (全体ではない場合)
             if (status != null && !status.equals("전체보기") && !status.trim().isEmpty()) {
                 sql += "AND e.retirement_yn = ? ";
             }
@@ -46,6 +48,7 @@ public class RetirementProcessReadDao {
             pstmt = conn.prepareStatement(sql);
 
             // 파라미터 세팅
+            // パラメータセッティング
             int paramIndex = 1;
             if (searchName != null && !searchName.trim().isEmpty()) {
                 pstmt.setString(paramIndex++, "%" + searchName.trim() + "%");
@@ -82,6 +85,7 @@ public class RetirementProcessReadDao {
     
     
  // 검색 조건에 맞는 전체 데이터 갯수 카운트 
+ // 検索条件に合う全体のデータ件数をカウント
     public int getRetirementCount(Connection conn, String searchName, String status) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -115,7 +119,8 @@ public class RetirementProcessReadDao {
         }
     }
 
-    // // 30명씩 자른 퇴직자 데이터와 하단 페이지 번호 계산
+    // 30명씩 자른 퇴직자 데이터와 하단 페이지 번호 계산
+    // 30명씩 자른 퇴직자 데이터와 하단 페이지 번호 계산
     public List<RetirementProcessModel> getRetirementListByPaging(Connection conn, String searchName, String status, int firstRow, int endRow) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -188,6 +193,7 @@ public class RetirementProcessReadDao {
 
                 try {
                     // 사원이 이미 존재하므로 UPDATE 쿼리 사용
+                	// 社員がすでに存在するためUPDATEクエリを使用
                     String sql = "UPDATE employee SET "
                                + "retirement_yn = 'Y', "                     // 상태를 퇴직으로 변경
                                + "retirement_type_code = ?, "                // 퇴직구분

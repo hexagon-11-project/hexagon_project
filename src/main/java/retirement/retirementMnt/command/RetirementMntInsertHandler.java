@@ -31,10 +31,11 @@ public class RetirementMntInsertHandler implements CommandHandler {
             return null; 
         }else if(result == 0) {
         	// [중복] 이미 해당 사원의 데이터가 존재하는 경우 (DB에서 INSERT를 수행하지 않음)
+        	// [重複] すでに該当社員のデータが存在する場合 (DBでINSERTを実行しない)
             res.sendRedirect(req.getContextPath() + "/Retire/retirementMnt.do?error=dup");
             return null;
         }else {
-            req.setAttribute("errorMsg", "저장에 실패했습니다.");
+            req.setAttribute("errorMsg", "保存に失敗しました。");
             return "/WEB-INF/pages/common/error.jsp";
         }
     }

@@ -16,17 +16,20 @@ public class EmployeeMntReadHandler implements CommandHandler {
       
         
         // 사용자가 클릭한 페이지 번호 가져오기 (없으면 1페이지)
+    	// ユーザーがクリックしたページ番号を取得 (なければ1ページ)
         String pageVal = req.getParameter("page");
         int pageNum = 1;
         if (pageVal != null && !pageVal.isEmpty()) {
             pageNum = Integer.parseInt(pageVal);
         }
-        // 검색 파라미터 추줄 
+        // 검색 파라미터
+        // 検索パラメータ
         String searchType = req.getParameter("searchType");
         String keyword = req.getParameter("keyword");
         
         try {
-            //  30개씩 잘린 데이터 상자 가져오기 (페이징 정보 포함)
+            // 30개씩 페이징
+        	// 30件ずつページング
         	EmployeePage employeePage = employeeService.getEmployeePage(pageNum, searchType, keyword);
             
             java.util.Map<String, Integer> countMap = employeeService.getEmployeeCounts();
@@ -37,9 +40,8 @@ public class EmployeeMntReadHandler implements CommandHandler {
             return "/WEB-INF/pages/person/employeeMnt.jsp";
             
         } catch (Exception e) {
-            System.out.println(" [Handler 에러 발생!] " + e.getMessage());
             e.printStackTrace();
-            req.getServletContext().log("사원 목록 조회 실패", e);
+            req.getServletContext().log("社員一覧の照会失敗", e);
             res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;
         }

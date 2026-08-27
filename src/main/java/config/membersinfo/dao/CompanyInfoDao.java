@@ -19,6 +19,7 @@ public class CompanyInfoDao {
 		ResultSet rs = null;
 		try {
 			// 회사 정보 조회
+			//会社情報の取得
 			String sql = "SELECT company_info.*, " +
 
 					"employee.employee_name, employee.phone, employee.mobile, employee.email " +
@@ -55,6 +56,7 @@ public class CompanyInfoDao {
 	}
 
 	// 회사 정보와 회사의 메인 담당자 정보 동시 업데이트
+	//会社情報と会社のメイン担当者情報を同時に更新
 	public int update(Connection conn, CompanyInfo info) throws SQLException {
 
 		String sql1 = "UPDATE company_info SET " + "company_name=?, business_no=?, ceo_name=?, corp_no=?, "
@@ -90,7 +92,8 @@ public class CompanyInfoDao {
 			pstmt1.setInt(19, info.getCompanyId()); 
 			int result1 = pstmt1.executeUpdate();
 
-			// 모델의 필드명에 맞춘 getter를 사용하여 담당자 정보 업데이트
+			//  담당자 정보 업데이트
+			//担当者情報の更新
 			pstmt2.setString(1, info.getManagerName()); 
 			pstmt2.setString(2, info.getManagerTel()); 
 			pstmt2.setString(3, info.getManagerMobile()); 
@@ -103,6 +106,7 @@ public class CompanyInfoDao {
 	}
 	
 //날짜 문자열을 데이터베이스 저장용 날짜 객체로 변환
+//日付文字列をデータベース保存用の日付オブジェクトに変換
 	private Date toDate(String date) {
 		if (date == null || date.trim().isEmpty()) {
 			return null; 

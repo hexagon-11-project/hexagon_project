@@ -22,7 +22,7 @@ public class CertificateRegisterService {
 			return certificateRegisterDao.getAllCertificateList(conn, startDate, endDate, certType, empName);
 			
 		} catch (SQLException e) {
-			throw new RuntimeException("증명서 목록 조회 중 DB 에러 발생", e);
+			throw new RuntimeException("証明書一覧の照会中にDBエラーが発生", e);
 		} finally {
 			JdbcUtil.close(conn);
 		}

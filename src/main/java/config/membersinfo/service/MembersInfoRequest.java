@@ -5,11 +5,8 @@ import java.sql.Date;
 public class MembersInfoRequest {
 	
 	private int companyId;
-	//USER_ACOUNT PK
     private int userId;
-    //COMPANY_INFO PK
     
- // 1. COMPANY_INFO 
     private String companyName;
     private String ceoName;
     private String businessNo;
@@ -29,11 +26,10 @@ public class MembersInfoRequest {
     private String logoPath;
     private String sealPath;
 
-    // 2. USER_ACCOUNT (성명, 전화번호, 휴대전화, 이메일)
-    private String managerName;   // 담당자명
-    private String managerTel;    // 담당자 전화번호
-    private String managerMobile; // 담당자 휴대폰번호
-    private String managerEmail;  // 담당자 이메일
+    private String managerName;   
+    private String managerTel;    
+    private String managerMobile; 
+    private String managerEmail;  
 	
     
     

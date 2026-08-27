@@ -15,14 +15,14 @@ public class UpdateMembersInfoService {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
-            conn.setAutoCommit(false); // 트랜잭션 시작
+            conn.setAutoCommit(false); 
 
           
             companyInfoDao.update(conn, info);
 
-            conn.commit(); // 성공 시 커밋
+            conn.commit(); 
         } catch (SQLException e) {
-            JdbcUtil.rollback(conn); // 실패 시 롤백
+            JdbcUtil.rollback(conn); 
             throw new RuntimeException(e);
         } finally {
             JdbcUtil.close(conn);

@@ -7,7 +7,7 @@ public class RetirementProcessPage {
     private int total;
     private int currentPage;
     private List<RetirementProcessModel> content; // 30개 분량 데이터
-    private int totalPages;
+    private int totalPages;						  // 30個分のデータ
     private int startPage;
     private int endPage;
 

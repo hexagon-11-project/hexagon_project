@@ -20,23 +20,26 @@ public class CertificatePrintWorkingReadHandler implements CommandHandler {
         String employeeNo = req.getParameter("employeeNo");
         String certType = req.getParameter("certType");
         String searchName = req.getParameter("searchName"); // 검색어 파라미터
-        if (certType == null || certType.trim().isEmpty()) {
-            certType = "재직증명서"; 
+        if (certType == null || certType.trim().isEmpty()) {// 検索キーワードパラメータ
+            certType = "在職証明書"; 
         }
 
         // 좌측 리스트 세팅
+        // 左側リストセッティング
         List<Employee> empList = certService.getEmployeeList(searchName);
         req.setAttribute("empList", empList);
 
         // 우측 상세 데이터 세팅
+        // 右側詳細データセッティング
         if (employeeNo != null && !employeeNo.isEmpty()) {
             Employee empDetail = certService.getEmployeeDetail(employeeNo);
             
             if (empDetail != null) {
                 // 퇴직증명서 예외 처리
-                if ("퇴직증명서".equals(certType) && "N".equals(empDetail.getRetirementYn())) {
-                    req.setAttribute("alertMessage", "해당 사원은 퇴직 처리되지 않아 퇴직증명서를 발급할 수 없습니다.");
-                    certType = "재직증명서"; 
+            	// 退職証明書の例外処理
+                if ("退職証明書".equals(certType) && "N".equals(empDetail.getRetirementYn())) {
+                    req.setAttribute("alertMessage", "該当社員は退職処理されていないため、退職証明書を発行できません。");
+                    certType = "在職証明書"; 
                 }
                 
                 req.setAttribute("empDetail", empDetail);
@@ -46,6 +49,7 @@ public class CertificatePrintWorkingReadHandler implements CommandHandler {
         }
 
         // 화면 상태 유지용 세팅
+        // 画面状態維持用セッティング
         req.setAttribute("selectedEmpNo", employeeNo);
         req.setAttribute("selectedCertType", certType);
         req.setAttribute("today", LocalDate.now().toString());

@@ -8,13 +8,13 @@ import person.employeeMnt.service.EmployeeMntDeleteService;
 
 public class EmployeeMntDeleteHandler implements CommandHandler {
 
-    // 1번에서 만든 삭제 전용 서비스 연결
     private EmployeeMntDeleteService deleteService = new EmployeeMntDeleteService();
 
     @Override
     public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
         
-        // 오직 POST 요청(폼 전송)일 때만 삭제 처리!
+        //  POST일 때만 삭제 처리
+    	//  POSTの時のみ削除処理
         if (req.getMethod().equalsIgnoreCase("POST")) {
             
             String[] empIds = req.getParameterValues("empId");
@@ -23,12 +23,14 @@ public class EmployeeMntDeleteHandler implements CommandHandler {
                 deleteService.deleteEmployees(empIds);
             }
             
-            // 삭제 완료 후 조회 페이지로 이동(삭제가 성공했다는 신호)
+            // 삭제 완료 후 조회 페이지로 이동
+            // 削除完了後、照会ページへ移動
             res.sendRedirect(req.getContextPath() + "/Person/employeeMnt.do?delete=success");
             return null;
             
         } else {
-            // GET 방식 등으로 잘못 접근하면 "허용되지 않은 메서드(405)" 에러 뱉기
+            // GET 방식 등으로 잘못 접근시 405 에러
+        	// GETメソッド等による不正アクセス時は405エラー
             res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return null;
         }

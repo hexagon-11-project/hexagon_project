@@ -14,8 +14,10 @@ import retirement.retireProcess.dao.RetirementProcessReadDao;
 public class RetirementProcessReadService {
     private RetirementProcessReadDao retirementDao = new RetirementProcessReadDao();
     private int size = 30; // 30개 고정 출력
+    					   // 30個固定出力
 
  // 전체 목록 조회 기능 (페이징 안 함)
+ // 全体リスト照会機能 (ページングなし)   
     public List<RetirementProcessModel> getRetirementEmployeeList(String searchName, String status) {
         try (Connection conn = ConnectionProvider.getConnection()) {
             List<RetirementProcessModel> list = retirementDao.getRetirementList(conn, searchName, status);
@@ -23,11 +25,12 @@ public class RetirementProcessReadService {
             return list;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("DB 조회 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("DB照会中にエラーが発生しました。", e);
         }
     }
 
     // 30개 단위 페이징 처리된 페이지 객체 가져오기
+    // 30件単位でページング処理されたページオブジェクトを取得
     public RetirementProcessPage getRetirementProcessPage(int pageNum, String searchName, String status) {
         try (Connection conn = ConnectionProvider.getConnection()) {
             int total = retirementDao.getRetirementCount(conn, searchName, status);
@@ -38,15 +41,16 @@ public class RetirementProcessReadService {
                 int endRow = firstRow + size - 1;
                 list = retirementDao.getRetirementListByPaging(conn, searchName, status, firstRow, endRow);
                 applyWorkYearsLogic(list); // 근속연수 포맷팅 적용
-            }
+            }							   // 勤続年数のフォーマットを適用
             return new RetirementProcessPage(total, pageNum, size, list);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("DB 페이징 조회 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("DBページング照会中にエラーが発生しました", e);
         }
     }
 
     // 근속연수 계산 공통 로직
+    // 勤続年数計算の共通ロジック
     private void applyWorkYearsLogic(List<RetirementProcessModel> list) {
         if (list == null) return;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

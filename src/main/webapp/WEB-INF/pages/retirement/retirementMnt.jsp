@@ -1,9 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
-request.setAttribute("pageTitle", "퇴직급여 입력/관리");
-request.setAttribute("pageSection", "퇴직관리");
-request.setAttribute("pageDescription", "퇴직자의 최근 3개월 급여를 불러와 평균임금과 퇴직급여를 계산·저장합니다.");
+request.setAttribute("pageTitle", "退職給与入力/管理");
+request.setAttribute("pageSection", "退職管理");
+request.setAttribute("pageDescription", "退職者の直近3ヶ月の給与を読み込み、平均賃金と退職給与を計算・保存します。");
 request.setAttribute("activeKey", "retirement-pay");
 request.setAttribute("pageCss", "retirement.css");
 request.setAttribute("pageJs", null);
@@ -12,12 +12,13 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/app-start.jspf"%>
 
 <!-- 상단 검색 영역 (Filter Bar) -->
+<!-- 上段検索領域 (Filter Bar) -->
 <section class="filter-bar">
 	<form action="" method="get" id="searchForm" style="display: contents;">
 		<div class="field ">
-			<label>퇴직연도</label> <select class="select" name="retirementYear"
+			<label>退職年度</label> <select class="select" name="retirementYear"
 				onchange="this.form.submit()">
-				<option value="">전체</option>
+				<option value="">全体</option>
 				<c:set var="currentYear"
 					value="<%=java.time.Year.now().getValue()%>" />
 				<c:forEach var="i" begin="0" end="4">
@@ -28,9 +29,9 @@ request.setAttribute("pageJs", null);
 			</select>
 		</div>
 		<div class="field ">
-			<label>사원</label> <select class="select" name="employeeId"
+			<label>社員</label> <select class="select" name="employeeId"
 				onchange="this.form.submit()">
-				<option value="">전체보기</option>
+				<option value="">全件表示</option>
 				<c:forEach var="emp" items="${retiredEmpList}">
 					<option value="${emp.employeeId}"
 						<c:if test="${emp.employeeId eq employeeId}">selected</c:if>>
@@ -39,26 +40,27 @@ request.setAttribute("pageJs", null);
 			</select>
 		</div>
 		<div class="actions">
-			<button type="button" class="btn " onclick="location.href='?'">초기화</button>
+			<button type="button" class="btn " onclick="location.href='?'">初期化</button>
 		</div>
 	</form>
 </section>
 
 <div class="page-grid two">
 	<!--  퇴직급여 대상 목록 -->
+	<!-- 退職給与対象リスト -->
 	<section class="card ">
 		<div class="card-header">
-			<h2 class="section-title">퇴직급여 대상 목록</h2>
+			<h2 class="section-title">退職給与対象リスト</h2>
 		</div>
 		<div class="card-body">
 			<div class="table-wrap">
 				<table class="data-table list-table">
 					<thead>
 						<tr>
-							<th>성명</th>
-							<th>입사일</th>
-							<th>퇴직일</th>
-							<th>상태</th>
+							<th>氏名</th>
+							<th>入社日</th>
+							<th>退職日</th>
+							<th>ステータス</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -70,17 +72,17 @@ request.setAttribute("pageJs", null);
 								<td>${pay.resignDate}</td>
 								<td><c:choose>
 										<c:when test="${pay.retirementSettlementYn eq 'Y'}">
-                                            확정
+                                            確定
                                         </c:when>
 										<c:otherwise>
-                                            작성 전
+                                            作成前
                                         </c:otherwise>
 									</c:choose></td>
 							</tr>
 						</c:forEach>
 						<c:if test="${empty payList}">
 							<tr>
-								<td colspan="4" style="text-align: center;">조회된 대상자가 없습니다.</td>
+								<td colspan="4" style="text-align: center;">照会された対象者がいません。</td>
 							</tr>
 						</c:if>
 					</tbody>
@@ -90,9 +92,10 @@ request.setAttribute("pageJs", null);
 	</section>
 
 	<!-- 퇴직급여 계산 -->
+	<!-- 退職給与計算 -->
 	<section class="card ">
 		<div class="card-header">
-			<h2 class="section-title">퇴직급여 계산</h2>
+			<h2 class="section-title">退職給与計算</h2>
 		</div>
 		<div class="card-body">
 			<form action="${pageContext.request.contextPath}/Retire/retirementMntInsert.do" method="post" id="calcForm">
@@ -105,12 +108,13 @@ request.setAttribute("pageJs", null);
 
 				<div class="form-grid cols-2">
 					<div class="field ">
-						<label>입사일</label> 
+						<label>入社日</label> 
 						<!-- [수정] name="hireDate" 추가 -->
+						<!-- [修正] name="hireDate" 追加 -->
 						<input type="date" class="input" id="calcHireDate" name="hireDate" readonly>
 					</div>
 					<div class="field ">
-						<label>퇴직일</label> 
+						<label>退職日</label> 
 						<input type="date" class="input" id="calcResignDate" name="resignDate" readonly>
 					</div>
 				</div>
@@ -119,15 +123,14 @@ request.setAttribute("pageJs", null);
 					<table class="data-table ">
 						<thead>
 							<tr>
-								<th>최근 3개월</th>
-								<th>지급총액</th>
-								<th>일수</th>
+								<th>直近3ヶ月</th>
+								<th>支給総額</th>
+								<th>日数</th>
 							</tr>
 						</thead>
 						<tbody id="wageTableBody">
 							<tr>
-								<td colspan="3" style="text-align: center; color: #999;">좌측
-									목록에서 사원을 선택해 주세요.</td>
+								<td colspan="3" style="text-align: center; color: #999;">左側のリストから社員を選択してください。</td>
 							</tr>
 						</tbody>
 					</table>
@@ -135,21 +138,20 @@ request.setAttribute("pageJs", null);
 
 				<div class="calc-box">
 					<div class="calc-line">
-						<span>3개월 임금총액</span><strong id="displayTotalWage">0원</strong>
+						<span>3ヶ月賃金総額</span><strong id="displayTotalWage">0ウォン</strong>
 					</div>
 					<div class="calc-line">
-						<span>1일 평균임금</span><strong id="displayAvgWage">0원</strong>
+						<span>1日平均賃金</span><strong id="displayAvgWage">0ウォン</strong>
 					</div>
 					<div class="calc-line total">
-						<span>퇴직급여</span><strong id="displayRetirementPay">0원</strong>
+						<span>退職給与</span><strong id="displayRetirementPay">0ウォン</strong>
 					</div>
 				</div>
 
 				<div class="button-row right">
-					<button type="button" class="btn " onclick="fetchRecent3Months()">최근
-						3개월 급여 불러오기</button>
+					<button type="button" class="btn " onclick="fetchRecent3Months()">直近3ヶ月の給与を読み込む</button>
 					<button type="submit" class="btn btn-primary"
-						onclick="return validateForm()">저장</button>
+						onclick="return validateForm()">保存</button>
 				</div>
 			</form>
 		</div>
@@ -164,7 +166,7 @@ request.setAttribute("pageJs", null);
 		document.getElementById('calcHireDate').value = hireDate;
 		document.getElementById('calcResignDate').value = resignDate;
 
-		document.getElementById('wageTableBody').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">[최근 3개월 급여 불러오기]를 클릭하세요.</td></tr>';
+		document.getElementById('wageTableBody').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">[直近3ヶ月の給与を読み込む]をクリックしてください。</td></tr>';
 		resetCalcValues();
 	}
 
@@ -174,9 +176,9 @@ request.setAttribute("pageJs", null);
 		document.getElementById('averageDailyWage').value = "0";
 		document.getElementById('retirementPayAmount').value = "0";
 
-		document.getElementById('displayTotalWage').innerText = "0원";
-		document.getElementById('displayAvgWage').innerText = "0원";
-		document.getElementById('displayRetirementPay').innerText = "0원";
+		document.getElementById('displayTotalWage').innerText = "0ウォン";
+		document.getElementById('displayAvgWage').innerText = "0ウォン";
+		document.getElementById('displayRetirementPay').innerText = "0ウォン";
 	}
 
 	function fetchRecent3Months() {
@@ -184,7 +186,7 @@ request.setAttribute("pageJs", null);
 		var resignDate = document.getElementById('calcResignDate').value;
 
 		if (!empId) {
-			alert("먼저 좌측 목록에서 사원을 선택해주세요.");
+			alert("先に左側のリストから社員を選択してください。");
 			return;
 		}
 
@@ -200,7 +202,7 @@ request.setAttribute("pageJs", null);
 				var responseText = xhr.responseText.trim();
 
 				if (responseText === "") {
-					alert("최근 3개월 급여 내역이 존재하지 않습니다.");
+					alert("直近3ヶ月の給与履歴が存在しません。");
 					return;
 				}
 
@@ -250,9 +252,9 @@ request.setAttribute("pageJs", null);
 
 				var retirementPay = Math.floor(avgWage * 30 * (serviceDays / 365));
 
-				document.getElementById('displayTotalWage').innerText = totalWage.toLocaleString() + "원";
-				document.getElementById('displayAvgWage').innerText = avgWage.toLocaleString() + "원";
-				document.getElementById('displayRetirementPay').innerText = retirementPay.toLocaleString() + "원";
+				document.getElementById('displayTotalWage').innerText = totalWage.toLocaleString() + "ウォン";
+				document.getElementById('displayAvgWage').innerText = avgWage.toLocaleString() + "ウォン";
+				document.getElementById('displayRetirementPay').innerText = retirementPay.toLocaleString() + "ウォン";
 
 				document.getElementById('serviceDays').value = serviceDays;
 				document.getElementById('totalWageAmount').value = totalWage;
@@ -266,29 +268,31 @@ request.setAttribute("pageJs", null);
 
 	function validateForm() {
 		if (!document.getElementById('selectedEmployeeId').value) {
-			alert("사원을 선택하고 급여를 불러온 뒤 저장해주세요.");
+			alert("社員を選択し、給与を読み込んでから保存してください。");
 			return false;
 		}
 		if (document.getElementById('totalWageAmount').value === "0") {
-			alert("급여 불러오기를 완료해야 저장할 수 있습니다.");
+			alert("給与の読み込みを完了しないと保存できません。");
 			return false;
 		}
-		return confirm("해당 퇴직급여 내역을 저장하시겠습니까?");
+		return confirm("該当の退職給与履歴を保存しますか？");
 	}
 	window.onload = function() {
 	    var urlParams = new URLSearchParams(window.location.search);
 	    
 	    // 저장 성공 시 알림창 띄우기
+	    // 保存成功時にアラートウィンドウを表示
 	    if (urlParams.get('save') === 'success') {
-	        alert("저장되었습니다.");
+	        alert("保存されました。");
 	        
 	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
 	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
 	    }
 	    
 	    // error 값이 'dup'인지 확인 (중복 저장 방지)
+	    // error値が'dup'か確認 (重複保存防止)
 	    if (urlParams.get('error') === 'dup') {
-	        alert("이미 저장된 내역입니다.");
+	        alert("すでに保存されている履歴です。");
 	        
 	        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
 	        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
