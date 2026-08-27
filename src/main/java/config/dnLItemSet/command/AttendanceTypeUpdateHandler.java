@@ -7,6 +7,8 @@ import command.CommandHandler;
 import config.model.AttendanceType;
 import config.dnLItemSet.service.AttendanceTypeUpdateService;
 
+// 근태항목 수정 저장
+// / 勤怠項目修正保存
 public class AttendanceTypeUpdateHandler implements CommandHandler {
 
 	private AttendanceTypeUpdateService updateService = new AttendanceTypeUpdateService();

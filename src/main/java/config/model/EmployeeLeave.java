@@ -4,21 +4,24 @@ import java.sql.Date;
 
 // EMPLOYEE_LEAVE 테이블 매핑 (사원별 휴가부과)
 // 목록 화면에 같이 뿌려야 하는 사원 기본정보(이름/부서 등)도 조회 시 join해서 같이 담아둔다.
+// EMPLOYEE_LEAVE テーブルマッピング（社員別休暇付与）
+// 一覧画面に一緒に表示すべき社員基本情報（名前／部署など）も、照会時にJOINして一緒に保持する。
 public class EmployeeLeave {
 
 	private Integer employeeLeaveId;
 	private Integer employeeId;
 	private Integer leaveTypeId;
-	private java.math.BigDecimal grantedDays;
+	private java.math.BigDecimal grantedDays; // 부과일수 (付与日数)
 
 	// 화면 표시용 (EMPLOYEE 테이블 join 결과)
+	// 画面表示用（EMPLOYEEテーブルJOIN結果）
 	private String employmentType;
-	private String employmentStatus; // 재직/퇴직
+	private String employmentStatus; // 재직/퇴직 (在職／退職)
 	private String employeeNo;
 	private String employeeName;
 	private String department;
 	private String position;
-	private Date hireDate;
+	private Date hireDate; // 입사일 (入社日)
 
 	public Integer getEmployeeLeaveId() {
 		return employeeLeaveId;
@@ -109,7 +112,10 @@ public class EmployeeLeave {
 	}
 
 	// ===== 화면 표시용 헬퍼 =====
+	// ===== 画面表示用ヘルパー =====
 
+	// 부과일수를 소수점 아래 불필요한 0을 정리하여 깔끔한 문자열로 반환 (값이 없으면 "0")
+	// 付与日数を小数点以下の不要なゼロを整理してすっきりした文字列として返却（値がなければ"0"）
 	public String getGrantedDaysValue() {
 		return grantedDays == null ? "0" : grantedDays.stripTrailingZeros().toPlainString();
 	}

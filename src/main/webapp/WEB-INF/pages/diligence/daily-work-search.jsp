@@ -2,6 +2,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="config.model.DailyWorkRecord"%>
 <%
+// ページ表示に必要なデータをrequestから取得 / 화면 표시에 필요한 데이터 취득
 List<DailyWorkRecord> recordList = (List<DailyWorkRecord>) request.getAttribute("recordList");
 String[] workSiteOptions = (String[]) request.getAttribute("workSiteOptions");
 String searchMonth = (String) request.getAttribute("searchMonth");
@@ -11,9 +12,9 @@ String payAmountTotal = (String) request.getAttribute("payAmountTotal");
 String netPayTotal = (String) request.getAttribute("netPayTotal");
 %>
 <%
-request.setAttribute("pageTitle", "일용직 근무 조회");
-request.setAttribute("pageSection", "근태관리");
-request.setAttribute("pageDescription", "기간·현장·사원 조건으로 일용직 근무기록과 지급 합계를 조회합니다.");
+request.setAttribute("pageTitle", "日雇労働者 勤務照会");
+request.setAttribute("pageSection", "勤怠管理");
+request.setAttribute("pageDescription", "期間・現場・社員条件で日雇労働者の勤務記録と支給合計を照会します。");
 request.setAttribute("activeKey", "daily-work-search");
 request.setAttribute("pageCss", "attendance.css");
 request.setAttribute("pageJs", null);
@@ -21,21 +22,22 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
 
+<!-- 検索条件フォーム / 검색 조건 폼 -->
 <form id="searchForm" method="post" action="<%=ctx%>/Diligence/dayWorkerSearchMonth.do">
 	<section class="filter-bar">
-		<div class="field ">
-			<label>조회구분</label>
-			<div class="input" style="display: flex; align-items: center;">월별 조회</div>
+		<div class="field">
+			<label>照会区分</label>
+			<div class="input" style="display: flex; align-items: center;">月別照会</div>
 			<input type="hidden" name="searchType" value="월별 조회">
 		</div>
-		<div class="field ">
-			<label>조회월</label> <input type="month" class="input"
-				name="searchMonth" value="<%=searchMonth%>">
+		<div class="field">
+			<label>照会月</label>
+			<input type="month" class="input" name="searchMonth" value="<%=searchMonth%>">
 		</div>
-		<div class="field ">
-			<label>현장</label>
+		<div class="field">
+			<label>現場</label>
 			<select class="select" name="workSiteName">
-				<option value="" <%=selectedWorkSiteName == null || selectedWorkSiteName.isBlank() ? "selected" : ""%>>전체</option>
+				<option value="" <%=selectedWorkSiteName == null || selectedWorkSiteName.isBlank() ? "selected" : ""%>>全件</option>
 				<%
 				if (workSiteOptions != null) {
 					for (String site : workSiteOptions) {
@@ -47,33 +49,36 @@ request.setAttribute("pageJs", null);
 				%>
 			</select>
 		</div>
-		<div class="field ">
-			<label>사원명</label> <input type="text" class="input" name="employeeName"
+		<div class="field">
+			<label>社員名</label>
+			<input type="text" class="input" name="employeeName" placeholder="社員名を入力"
 				value="<%=employeeNameKeyword == null ? "" : employeeNameKeyword%>">
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<!-- 照会ボタン / 조회 버튼 -->
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 
-<section class="card ">
+<!-- 照会結果テーブル / 조회 결과 테이블 -->
+<section class="card">
 	<div class="card-header">
-		<h2 class="section-title">일용직 근무 조회 결과</h2>
+		<h2 class="section-title">日雇労働者 勤務照会 結果</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
-			<table class="data-table ">
+			<table class="data-table">
 				<thead>
 					<tr>
-						<th>성명</th>
-						<th>근무일</th>
-						<th>현장</th>
-						<th>일당</th>
-						<th>지급률</th>
-						<th>지급액</th>
-						<th>세금</th>
-						<th>실지급액</th>
+						<th>氏名</th>
+						<th>勤務日</th>
+						<th>現場</th>
+						<th>日当</th>
+						<th>支給率</th>
+						<th>支給額</th>
+						<th>税金</th>
+						<th>実支給額</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -96,7 +101,7 @@ request.setAttribute("pageJs", null);
 					} else {
 					%>
 					<tr>
-						<td colspan="8">조회된 근무기록이 없습니다.</td>
+						<td colspan="8">照会された勤務記録がありません。</td>
 					</tr>
 					<%
 					}
@@ -104,8 +109,9 @@ request.setAttribute("pageJs", null);
 				</tbody>
 			</table>
 		</div>
+		<!-- 支給額合計・実支給額合計 / 지급액 합계·실지급액 합계 -->
 		<div class="tfoot-summary">
-			<span>지급액 합계 <%=payAmountTotal%>원</span> <span>실지급액 합계 <%=netPayTotal%>원</span>
+			<span>支給額合計 <%=payAmountTotal%>円</span> <span>実支給額合計 <%=netPayTotal%>円</span>
 		</div>
 	</div>
 </section>

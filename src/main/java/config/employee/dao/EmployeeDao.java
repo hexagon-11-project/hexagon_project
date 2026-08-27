@@ -9,12 +9,16 @@ import java.sql.Statement;
 import config.employee.model.Employee;
 import jdbc.JdbcUtil;
 
+// 사원 기본 정보(마스터 테이블)를 찌르고 업데이트하는 핵심 DAO
+// 社員の基本情報（マスターテーブル）を叩いてアップデートする中核となる DAO
 public class EmployeeDao {
 
     // 1. 현재 저장된 사원번호 중 가장 큰 값을 조회한다 (없으면 null).
     // 주의: 여기서는 순수하게 "현재 최댓값"만 리턴한다. 다음 번호 계산(+1)은
     // Service의 calcNextEmpNo()에서 한 곳에서만 처리한다 (여기서 미리 +1까지 해버리면
     // Service에서 또 +1이 되어 번호가 두 개씩 건너뛰는 문제가 생긴다).
+    // DB에서 가장 큰 사원번호만 딱 가져옴 (여기서 +1 계산까지 해버리면 서비스단이랑 로직 꼬임 방지)
+    // DBから一番大きい社員番号だけを取得（ここで+1の計算までやってしまうとサービス側のロジックとバッティングするため防止）
     public String selectMaxEmpNo(Connection conn) throws SQLException {
         Statement stmt = null;
         ResultSet rs = null;
@@ -37,6 +41,8 @@ public class EmployeeDao {
     }
 
     // 2. 1페이지 사원 기본 정보 INSERT (REG_ID 필수값 포함 완벽 반영)
+    // 사원 기본정보 인서트 치고, 방금 딴 PK(시퀀스)를 다시 긁어오는 게 핵심 포인트 (하위 테이블들 FK로 써야 하니까)
+    // 社員の基本情報をインサートし、今採番したPK（シーケンス）を再取得するのがポイント（子テーブルのFKとして使うため）
     public void insert(Connection conn, Employee emp) throws SQLException {
         PreparedStatement pstmt = null;
         Statement stmt = null;
@@ -98,11 +104,15 @@ public class EmployeeDao {
     }
 
     // 3. 사원번호로 1명의 사원 정보를 SELECT (2페이지 진입 시 데이터 불러오기용)
+    // 사번으로 사원 정보 단건 조회
+    // 社員番号で社員情報を単件照会
     public Employee selectEmployee(Connection conn, String employeeNo) throws SQLException {
         return selectEmployeeByCondition(conn, "EMPLOYEE_NO", employeeNo);
     }
 
     // 3-1. employeeId로 1명의 사원 정보를 SELECT (사원현황에서 이름 클릭 시 사원등록1 폼 불러오기용)
+    // PK(ID)로 사원 정보 단건 조회
+    // PK(ID)で社員情報を単件照会
     public Employee selectEmployeeById(Connection conn, int employeeId) throws SQLException {
         return selectEmployeeByCondition(conn, "EMPLOYEE_ID", String.valueOf(employeeId));
     }
@@ -154,6 +164,8 @@ public class EmployeeDao {
     }
 
     // 4. 사원등록 취소 - 사원번호로 해당 사원 레코드 삭제
+    // 해당 사원 정보 DB에서 완전히 날림
+    // 該当する社員情報をDBから完全に飛ばす（削除する）
     public void deleteByEmployeeNo(Connection conn, String employeeNo) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -166,6 +178,8 @@ public class EmployeeDao {
     }
 
     // 4-1. 사원현황에서 불러온 기존 사원 정보 수정 (1페이지 기본정보 UPDATE)
+    // 기존 사원 정보 엎어치기 (업데이트)
+    // 既存の社員情報を上書き（アップデート）
     public void update(Connection conn, Employee emp) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -223,6 +237,8 @@ public class EmployeeDao {
     }
 
     // 5. 2페이지의 퇴직 섹션 저장용 - 퇴직일자는 1페이지의 RESIGN_DATE 컬럼을 그대로 같이 갱신한다
+    // 퇴직 관련 정보만 따로 떼서 업데이트 치는 로직
+    // 退職関連の情報だけを別途アップデートにかけるロジック
     public int updateRetirementInfo(Connection conn, int employeeId, String typeCode, java.sql.Date resignDate,
             String reason, String phone) throws SQLException {
         PreparedStatement pstmt = null;

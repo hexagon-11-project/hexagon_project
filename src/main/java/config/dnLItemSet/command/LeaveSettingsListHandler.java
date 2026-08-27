@@ -7,7 +7,8 @@ import command.CommandHandler;
 import config.dnLItemSet.service.AttendanceTypeListService;
 import config.dnLItemSet.service.LeaveTypeListService;
 
-// 휴가/근태설정 화면 진입점 (GET) - 휴가항목/근태항목 목록을 같이 보여줌
+// 휴가/근태설정 화면 진입 - 휴가항목/근태항목 목록 표시
+// / 休暇・勤怠設定画面の進入 - 休暇項目/勤怠項目一覧表示// 휴가/근태설정 화면 진입점 (GET) - 휴가항목/근태항목 목록을 같이 보여줌
 public class LeaveSettingsListHandler implements CommandHandler {
 
 	private LeaveTypeListService leaveTypeListService = new LeaveTypeListService();

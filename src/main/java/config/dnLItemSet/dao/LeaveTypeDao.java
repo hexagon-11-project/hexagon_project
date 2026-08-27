@@ -10,8 +10,12 @@ import java.util.List;
 import config.model.LeaveType;
 import jdbc.JdbcUtil;
 
+// 회사별 휴가 항목(연차, 반차 등)을 관리하는 DAO
+// 会社別の休暇項目（有休、半休など）を管理する DAO
 public class LeaveTypeDao {
 
+	// 특정 회사의 전체 휴가 항목 목록을 가져옴 (화면 표시 순서대로 정렬)
+	// 特定の会社の全休暇項目リストを取得（画面の表示順にソート）
 	public List<LeaveType> selectByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -39,6 +43,8 @@ public class LeaveTypeDao {
 		}
 	}
 
+	// ID로 휴가 항목 딱 하나만 조회 (단건 조회)
+	// IDで休暇項目を1件だけ照会（単件照会）
 	public LeaveType selectById(Connection conn, int leaveTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -64,6 +70,8 @@ public class LeaveTypeDao {
 		}
 	}
 
+	// 휴가 항목 신규 등록
+	// 休暇項目の新規登録
 	public void insert(Connection conn, LeaveType item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -92,6 +100,8 @@ public class LeaveTypeDao {
 		}
 	}
 
+	// 기존 휴가 항목 내용 수정
+	// 既存の休暇項目の内容を修正
 	public void update(Connection conn, LeaveType item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -117,6 +127,8 @@ public class LeaveTypeDao {
 		}
 	}
 
+	// 휴가 항목 완전 삭제 (DB에서 날림)
+	// 休暇項目の完全削除（DBから物理削除）
 	public void delete(Connection conn, int leaveTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;

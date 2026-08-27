@@ -11,10 +11,14 @@ import config.model.EmployeeLeaveStatus;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
+// 사원별 휴가(연차 등) 부여/삭제 등 현황을 관리하는 서비스
+// 社員別の休暇（有休など）の付与・削除など、状況を管理するサービス
 public class EmployeeLeaveManageService {
 
 	private EmployeeLeaveDao employeeLeaveDao = new EmployeeLeaveDao();
 
+	// 특정 휴가 항목(예: 연차) 기준으로 사원들 목록이랑 각자 부여받은 일수 쫙 뽑아옴
+	// 特定の休暇項目（例：有休）を基準に、社員リストとそれぞれ付与された日数をざっと抽出する
 	public List<EmployeeLeave> getList(int leaveTypeId, int companyId) {
 
 		Connection conn = null;
@@ -29,7 +33,8 @@ public class EmployeeLeaveManageService {
 		}
 	}
 
-	// [휴가일수 현황] 팝업용 - 근태기록/관리 화면에서 사원을 선택했을 때 호출
+	// [휴가일수 현황] 팝업용 - 근태 화면에서 사원 클릭했을 때 띄워줄 부여/사용 내역
+	// [休暇日数現況] ポップアップ用 - 勤怠画面で社員をクリックした時に表示する付与・使用履歴
 	public List<EmployeeLeaveStatus> getStatusByEmployeeId(int employeeId) {
 
 		Connection conn = null;
@@ -44,7 +49,10 @@ public class EmployeeLeaveManageService {
 		}
 	}
 
-	// 체크된 사원들의 휴가일수를 한 번에 저장 - 이미 부과기록이 있으면 수정, 없으면 새로 추가
+	// 체크한 사원들 휴가 일수 일괄 저장 처리 (트랜잭션 태움)
+	// 이미 부여된 내역이 있으면 업데이트 치고, 없으면 새로 인서트 쳐줌 (Upsert 느낌)
+	// チェックした社員の休暇日数を一括保存処理（トランザクションに乗せる）
+	// 既に付与履歴があればアップデートをかけ、なければ新規でインサートする（Upsertのイメージ）
 	public void saveGrantedDays(int leaveTypeId, int[] employeeIds, BigDecimal[] grantedDaysList) {
 
 		Connection conn = null;
@@ -58,6 +66,8 @@ public class EmployeeLeaveManageService {
 				int employeeId = employeeIds[i];
 				BigDecimal grantedDays = grantedDaysList[i];
 
+				// 데이터 있는지 먼저 찔러봄
+				// データがあるか先にチェックする
 				Integer employeeLeaveId = employeeLeaveDao.selectEmployeeLeaveId(conn, employeeId, leaveTypeId);
 
 				if (employeeLeaveId == null) {
@@ -76,7 +86,8 @@ public class EmployeeLeaveManageService {
 		}
 	}
 
-	// 체크된 사원들의 휴가부과 기록을 통째로 삭제 (0일로 만드는 게 아니라 기록 자체를 지움)
+	// 체크한 사원들의 휴가 부여 기록 자체를 완전 날려버림 (0일로 바꾸는 게 아니라 DB에서 아예 지움)
+	// チェックした社員の休暇付与履歴自体を完全に飛ばす（0日に変更するのではなくDBから完全に削除）
 	public void deleteGrantedDays(int leaveTypeId, int[] employeeIds) {
 
 		Connection conn = null;

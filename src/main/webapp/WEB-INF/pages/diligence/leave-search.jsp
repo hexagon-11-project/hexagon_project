@@ -5,6 +5,7 @@
 <%@ page import="config.model.LeaveType"%>
 <%@ page import="diligence.holidayssearchresult.dao.LeaveSearchDao"%>
 <%
+// ページ表示に必要なデータをrequestから取得 / 화면 표시에 필요한 데이터 취득
 List<LeaveType> leaveTypeList = (List<LeaveType>) request.getAttribute("leaveTypeList");
 List<EmployeeLeaveStatus> statusList = (List<EmployeeLeaveStatus>) request.getAttribute("statusList");
 List<AttendanceRecord> usageList = (List<AttendanceRecord>) request.getAttribute("usageList");
@@ -15,9 +16,9 @@ Integer selectedEmployeeId = (Integer) request.getAttribute("selectedEmployeeId"
 EmployeeLeaveStatus selectedStatus = (EmployeeLeaveStatus) request.getAttribute("selectedStatus");
 %>
 <%
-request.setAttribute("pageTitle", "휴가조회");
-request.setAttribute("pageSection", "근태관리");
-request.setAttribute("pageDescription", "휴가항목별 부여·사용·잔여일수와 선택 사원의 사용내역을 조회합니다.");
+request.setAttribute("pageTitle", "休暇照会");
+request.setAttribute("pageSection", "勤怠管理");
+request.setAttribute("pageDescription", "休暇項目別の付与・使用・残余日数と選択社員の使用内訳を照会します。");
 request.setAttribute("activeKey", "leave-search");
 request.setAttribute("pageCss", "attendance.css");
 request.setAttribute("pageJs", null);
@@ -25,13 +26,15 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
 
+<!-- 検索条件フォーム / 검색 조건 폼 -->
 <form id="searchForm" method="post"
 	action="<%=ctx%>/Diligence/holidaysSearchResult.do">
 	<input type="hidden" id="selectedEmployeeIdInput"
 		name="selectedEmployeeId" value="">
 	<section class="filter-bar">
-		<div class="field ">
-			<label>휴가항목</label> <select class="select" name="leaveTypeId">
+		<div class="field">
+			<label>休暇項目</label>
+			<select class="select" name="leaveTypeId">
 				<%
 				if (leaveTypeList != null) {
 					for (LeaveType type : leaveTypeList) {
@@ -39,55 +42,56 @@ request.setAttribute("pageJs", null);
 				<option value="<%=type.getLeaveTypeId()%>"
 					<%=type.getLeaveTypeId().equals(selectedLeaveTypeId) ? "selected" : ""%>><%=type.getLeaveName()%></option>
 				<%
-				}
+					}
 				}
 				%>
 			</select>
 		</div>
-		<div class="field ">
-			<label>기준연도</label> <select class="select" name="year">
+		<div class="field">
+			<label>基準年度</label>
+			<select class="select" name="year">
 				<%
 				int currentYear = java.time.Year.now().getValue();
 				for (int y = currentYear; y >= currentYear - 4; y--) {
 				%>
 				<option value="<%=y%>"
-					<%=year != null && year == y ? "selected" : ""%>><%=y%></option>
+					<%=year != null && year == y ? "selected" : ""%>><%=y%>年</option>
 				<%
 				}
 				%>
 			</select>
 		</div>
-		<div class="field ">
-			<label>정렬</label> <select class="select" name="sortKey">
-				<option value="<%=LeaveSearchDao.SORT_NAME%>"
-					<%=LeaveSearchDao.SORT_NAME.equals(sortKey) ? "selected" : ""%>><%=LeaveSearchDao.SORT_NAME%></option>
-				<option value="<%=LeaveSearchDao.SORT_DEPARTMENT%>"
-					<%=LeaveSearchDao.SORT_DEPARTMENT.equals(sortKey) ? "selected" : ""%>><%=LeaveSearchDao.SORT_DEPARTMENT%></option>
-				<option value="<%=LeaveSearchDao.SORT_REMAINING%>"
-					<%=LeaveSearchDao.SORT_REMAINING.equals(sortKey) ? "selected" : ""%>><%=LeaveSearchDao.SORT_REMAINING%></option>
+		<div class="field">
+			<!-- 並び替えは直接ハードコード（DAO定数が日本語未対応のため） / 정렬 드롭다운 하드코딩 -->
+			<label>並び替え</label>
+			<select class="select" name="sortKey">
+				<option value="氏名順" <%="氏名順".equals(sortKey) ? "selected" : ""%>>氏名順</option>
+				<option value="部署順" <%="部署順".equals(sortKey) ? "selected" : ""%>>部署順</option>
+				<option value="残余順" <%="残余順".equals(sortKey) ? "selected" : ""%>>残余順</option>
 			</select>
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 
-<section class="card ">
+<!-- 休暇現況テーブル / 휴가 현황 테이블 -->
+<section class="card">
 	<div class="card-header">
-		<h2 class="section-title">휴가 현황</h2>
+		<h2 class="section-title">休暇現況</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
 			<table class="data-table list-table" id="leaveTable">
 				<thead>
 					<tr>
-						<th>성명</th>
-						<th>부서</th>
-						<th>휴가항목</th>
-						<th>부여일수</th>
-						<th>사용일수</th>
-						<th>잔여일수</th>
+						<th>氏名</th>
+						<th>部署</th>
+						<th>休暇項目</th>
+						<th>付与日数</th>
+						<th>使用日数</th>
+						<th>残余日数</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -96,6 +100,7 @@ request.setAttribute("pageJs", null);
 						for (EmployeeLeaveStatus status : statusList) {
 							boolean isSelectedRow = selectedEmployeeId != null && selectedEmployeeId.equals(status.getEmployeeId());
 					%>
+					<!-- 行クリックで該当社員の使用内訳を表示 / 행 클릭 시 해당 사원 사용내역 표시 -->
 					<tr class="clickable-row <%=isSelectedRow ? "selected" : ""%>"
 						onclick="document.getElementById('selectedEmployeeIdInput').value='<%=status.getEmployeeId()%>'; document.getElementById('searchForm').submit();">
 						<td><%=status.getEmployeeName()%></td>
@@ -110,7 +115,7 @@ request.setAttribute("pageJs", null);
 					} else {
 					%>
 					<tr>
-						<td colspan="6">조회된 휴가 현황이 없습니다.</td>
+						<td colspan="6">照会された休暇現況がありません。</td>
 					</tr>
 					<%
 					}
@@ -121,20 +126,21 @@ request.setAttribute("pageJs", null);
 	</div>
 </section>
 
-<section class="card ">
+<!-- 選択社員の休暇使用内訳テーブル / 선택 사원 휴가 사용내역 테이블 -->
+<section class="card">
 	<div class="card-header">
 		<h2 class="section-title">
-			선택 사원 휴가 사용내역<%=selectedStatus != null ? " - " + selectedStatus.getEmployeeName() : ""%></h2>
+			選択社員 休暇使用内訳<%=selectedStatus != null ? " - " + selectedStatus.getEmployeeName() : ""%></h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
-			<table class="data-table ">
+			<table class="data-table">
 				<thead>
 					<tr>
-						<th>사용일</th>
-						<th>휴가항목</th>
-						<th>사용일수</th>
-						<th>메모</th>
+						<th>使用日</th>
+						<th>休暇項目</th>
+						<th>使用日数</th>
+						<th>摘要</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -142,7 +148,7 @@ request.setAttribute("pageJs", null);
 					if (selectedStatus == null) {
 					%>
 					<tr>
-						<td colspan="4">위 목록에서 사원을 선택하면 사용내역이 표시됩니다.</td>
+						<td colspan="4">上の一覧から社員を選択すると使用内訳が表示されます。</td>
 					</tr>
 					<%
 					} else if (usageList != null && !usageList.isEmpty()) {
@@ -159,7 +165,7 @@ request.setAttribute("pageJs", null);
 					} else {
 					%>
 					<tr>
-						<td colspan="4">사용내역이 없습니다.</td>
+						<td colspan="4">使用内訳がありません。</td>
 					</tr>
 					<%
 					}
@@ -171,16 +177,8 @@ request.setAttribute("pageJs", null);
 </section>
 
 <style>
-.clickable-row {
-	cursor: pointer;
-}
-
-.clickable-row:hover {
-	background: var(- -row-hover, #f5f7fa);
-}
-
-.clickable-row.selected {
-	background: var(- -row-selected, #eef3ff);
-}
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background: var(--row-hover, #f5f7fa); }
+.clickable-row.selected { background: var(--row-selected, #eef3ff); }
 </style>
 <%@ include file="/WEB-INF/jspf/app-end.jspf"%>

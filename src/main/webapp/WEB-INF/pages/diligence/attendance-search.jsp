@@ -4,6 +4,7 @@
 <%@ page import="config.model.AttendanceType"%>
 <%@ page import="diligence.searchmonth.dao.AttendanceSearchDao"%>
 <%
+// ページ表示に必要なデータをrequestから取得 / 화면 표시에 필요한 데이터 취득
 List<AttendanceRecord> recordList = (List<AttendanceRecord>) request.getAttribute("recordList");
 List<AttendanceType> attendanceTypeList = (List<AttendanceType>) request.getAttribute("attendanceTypeList");
 String searchMonth = (String) request.getAttribute("searchMonth");
@@ -11,9 +12,9 @@ Integer selectedAttendanceTypeId = (Integer) request.getAttribute("selectedAtten
 String sortKey = (String) request.getAttribute("sortKey");
 %>
 <%
-request.setAttribute("pageTitle", "근태조회");
-request.setAttribute("pageSection", "근태관리");
-request.setAttribute("pageDescription", "월별 조건으로 사원별 근태기록을 조회합니다.");
+request.setAttribute("pageTitle", "勤怠照会");
+request.setAttribute("pageSection", "勤怠管理");
+request.setAttribute("pageDescription", "月別条件で社員別の勤怠記録を照会します。");
 request.setAttribute("activeKey", "attendance-search");
 request.setAttribute("pageCss", "attendance.css");
 request.setAttribute("pageJs", null);
@@ -21,21 +22,22 @@ request.setAttribute("pageJs", null);
 <%@ include file="/WEB-INF/jspf/head.jspf"%><%@ include
 	file="/WEB-INF/jspf/app-start.jspf"%>
 
+<!-- 検索条件フォーム / 검색 조건 폼 -->
 <form id="searchForm" method="post" action="<%=ctx%>/Diligence/diligenceSearchMonth.do">
 	<section class="filter-bar">
-		<div class="field ">
-			<label>조회구분</label>
-			<div class="input" style="display: flex; align-items: center;">월별 조회</div>
+		<div class="field">
+			<label>照会区分</label>
+			<div class="input" style="display: flex; align-items: center;">月別照会</div>
 			<input type="hidden" name="searchType" value="월별 조회">
 		</div>
-		<div class="field ">
-			<label>조회월</label> <input type="month" class="input"
-				name="searchMonth" value="<%=searchMonth%>">
+		<div class="field">
+			<label>照会月</label>
+			<input type="month" class="input" name="searchMonth" value="<%=searchMonth%>">
 		</div>
-		<div class="field ">
-			<label>근태항목</label>
+		<div class="field">
+			<label>勤怠項目</label>
 			<select class="select" name="attendanceTypeId">
-				<option value="" <%=selectedAttendanceTypeId == null ? "selected" : ""%>>전체</option>
+				<option value="" <%=selectedAttendanceTypeId == null ? "selected" : ""%>>全件</option>
 				<%
 				if (attendanceTypeList != null) {
 					for (AttendanceType type : attendanceTypeList) {
@@ -48,39 +50,38 @@ request.setAttribute("pageJs", null);
 				%>
 			</select>
 		</div>
-		<div class="field ">
-			<label>정렬</label>
+		<div class="field">
+			<label>並び替え</label>
 			<select class="select" name="sortKey">
-				<option value="<%=AttendanceSearchDao.SORT_NAME%>"
-					<%=AttendanceSearchDao.SORT_NAME.equals(sortKey) ? "selected" : ""%>><%=AttendanceSearchDao.SORT_NAME%></option>
-				<option value="<%=AttendanceSearchDao.SORT_DEPARTMENT%>"
-					<%=AttendanceSearchDao.SORT_DEPARTMENT.equals(sortKey) ? "selected" : ""%>><%=AttendanceSearchDao.SORT_DEPARTMENT%></option>
-				<option value="<%=AttendanceSearchDao.SORT_DATE%>"
-					<%=AttendanceSearchDao.SORT_DATE.equals(sortKey) ? "selected" : ""%>><%=AttendanceSearchDao.SORT_DATE%></option>
+				<option value="氏名順" <%="氏名順".equals(sortKey) ? "selected" : ""%>>氏名順</option>
+				<option value="部署順" <%="部署順".equals(sortKey) ? "selected" : ""%>>部署順</option>
+				<option value="日付順" <%="日付順".equals(sortKey) ? "selected" : ""%>>日付順</option>
 			</select>
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<!-- 照会ボタン / 조회 버튼 -->
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 
-<section class="card ">
+<!-- 勤怠照会結果テーブル / 근태조회 결과 테이블 -->
+<section class="card">
 	<div class="card-header">
-		<h2 class="section-title">근태 조회 결과</h2>
+		<h2 class="section-title">勤怠照会 結果</h2>
 	</div>
 	<div class="card-body">
 		<div class="table-wrap">
-			<table class="data-table ">
+			<table class="data-table">
 				<thead>
 					<tr>
-						<th>성명</th>
-						<th>부서</th>
-						<th>근태항목</th>
-						<th>일자</th>
-						<th>일수/시간</th>
-						<th>수당</th>
-						<th>메모</th>
+						<th>氏名</th>
+						<th>部署</th>
+						<th>勤怠項目</th>
+						<th>日付</th>
+						<th>日数／時間</th>
+						<th>手当</th>
+						<th>摘要</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -102,7 +103,7 @@ request.setAttribute("pageJs", null);
 					} else {
 					%>
 					<tr>
-						<td colspan="7">조회된 근태기록이 없습니다.</td>
+						<td colspan="7">照会された勤怠記録がありません。</td>
 					</tr>
 					<%
 					}

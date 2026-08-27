@@ -9,7 +9,8 @@ import config.dnLItemSet.service.EmployeeLeaveManageService;
 import config.dnLItemSet.service.LeaveTypeListService;
 import config.dnLItemSet.service.LeaveTypeSelectService;
 
-// 휴가항목 목록의 [관리] 버튼 - 사원별 휴가일수 모달을 연 상태로 같은 화면을 다시 보여줌
+// 휴가항목 목록의 [관리] 버튼 - 사원별 휴가일수 팝업 열어서 표시
+// / 休暇項目一覧の[管理]ボタン - 社員別休暇日数ダイアログを開いて表示// 휴가항목 목록의 [관리] 버튼 - 사원별 휴가일수 모달을 연 상태로 같은 화면을 다시 보여줌
 public class EmployeeLeaveManageHandler implements CommandHandler {
 
 	private LeaveTypeListService leaveTypeListService = new LeaveTypeListService();

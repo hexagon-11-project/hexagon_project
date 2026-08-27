@@ -8,7 +8,8 @@ import config.dnLItemSet.service.AttendanceTypeListService;
 import config.dnLItemSet.service.LeaveTypeListService;
 import config.dnLItemSet.service.LeaveTypeSelectService;
 
-// 목록에서 휴가항목 한 줄을 클릭했을 때 - 오른쪽 편집폼에 그 데이터를 채워서 다시 보여줌
+// 휴가항목 목록에서 한 줄 클릭 - 오른쪽 편집폼에 데이터 채워서 표시
+// / 休暇項目一覧で行クリック - 右の編集フォームにデータを表示// 목록에서 휴가항목 한 줄을 클릭했을 때 - 오른쪽 편집폼에 그 데이터를 채워서 다시 보여줌
 public class LeaveTypeSelectHandler implements CommandHandler {
 
 	private LeaveTypeListService leaveTypeListService = new LeaveTypeListService();

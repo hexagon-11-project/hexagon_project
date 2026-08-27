@@ -3,6 +3,8 @@ package config.model;
 import java.math.BigDecimal;
 import java.sql.Date;
 
+// 사원 근태 기록(휴가, 출장, 연장근무, 수당 등) 데이터를 담는 모델(DTO/VO) 클래스
+// 社員の勤怠記録（休暇、出張、残業、手当など）データを保持するモデル（DTO/VO）クラス
 public class AttendanceRecord {
 
 	private Integer attendanceId;
@@ -22,8 +24,8 @@ public class AttendanceRecord {
 	private String attendanceName;
 	private String unitCode;
 	private Integer leaveTypeId;
-	private String employeeName; // 근태조회 화면용
-	private String department;   // 근태조회 화면용
+	private String employeeName; // 근태조회 화면용 (勤怠照会画面用)
+	private String department;   // 근태조회 화면용 (勤怠照会画面用)
 
 	public String getEmployeeName() {
 		return employeeName;
@@ -162,9 +164,10 @@ public class AttendanceRecord {
 	}
 
 	// ===== 화면 표시용 헬퍼 =====
+	// ===== 画面表示用ヘルパー =====
 
-	// 근태조회 화면 "일수/시간" 컬럼 - 단위(unitCode)에 맞는 값 + 단위 라벨을 붙여서 반환
-	// 근태조회/근태기록 화면 "금액(수당)" 컬럼 - 천단위 콤마, 값 없으면 "-"
+	// 근태조회 화면 "금액(수당)" 컬럼 - 천단위 콤마, 값 없으면 "-"
+	// 勤怠照会画面の「金額（手当）」カラム - 千単位カンマ、値がなければ"-"
 	public String getAllowanceAmountValue() {
 		if (allowanceAmount == null) {
 			return "-";
@@ -172,6 +175,8 @@ public class AttendanceRecord {
 		return String.format("%,d", allowanceAmount.longValue());
 	}
 
+	// 근태조회 화면 "일수/시간" 컬럼 - 단위(unitCode)에 맞는 값 + 단위 라벨을 붙여서 반환
+	// 勤怠照会画面の「日数／時間」カラム - 単位（unitCode）に合った値 ＋ 単位ラベルをつけて返却
 	public String getCountDisplayValue() {
 		BigDecimal count = "HOUR".equalsIgnoreCase(unitCode) ? hourCount : dayCount;
 		if (count == null) {

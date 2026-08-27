@@ -10,8 +10,12 @@ import java.util.List;
 import config.employee.model.EmployeeCareer;
 import jdbc.JdbcUtil;
 
+// 사원 경력(이전 직장 등) 정보를 처리하는 DAO
+// 社員の経歴（前職など）情報を処理する DAO
 public class CareerDao {
 
+    // 경력 테이블에 한 줄씩 인서트 치는 메서드
+    // 経歴テーブルに1行ずつインサートをかけるメソッド
     public void insert(Connection conn, int employeeId, EmployeeCareer v) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -35,6 +39,10 @@ public class CareerDao {
         }
     }
 
+    // 특정 사원의 경력 데이터를 싹 다 날림 
+    // (보통 수정 화면에서 기존 데이터 싹 비우고 다시 넣으려고 할 때 씀)
+    // 特定社員の経歴データを全消しする
+    // （通常、修正画面で既存データを一旦全て空にして入れ直す時に使う）
     public void deleteByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -46,6 +54,8 @@ public class CareerDao {
         }
     }
 
+    // 특정 사원의 전체 경력 내역을 쫙 긁어옴 (화면 표에 뿌려줄 때 씀)
+    // 特定社員の全経歴履歴をざっとかき集める（画面の表に描画する時に使う）
     public List<EmployeeCareer> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;

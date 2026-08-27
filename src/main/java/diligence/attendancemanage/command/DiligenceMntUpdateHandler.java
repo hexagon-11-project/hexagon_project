@@ -14,8 +14,8 @@ import config.model.AttendanceType;
 import config.model.LeaveType;
 import diligence.attendancemanage.service.AttendanceRecordManageService;
 
-// [수정] - 팝업에서 [수정] 눌러서 입력폼에 채워진 내용을 [저장]했을 때 처리 (attendanceId가 있으면 이쪽으로 옴)
-// 드롭다운에서 휴가항목을 직접 선택한 경우("leave-{leaveTypeId}") 매핑되는 근태항목을 자동으로 찾거나 만들어서 그걸로 저장
+// 근태기록 수정 저장 - attendanceId 있을 때 이쪽으로 옴
+// / 勤怠記録の修正保存 - attendanceIdがある場合にここへ
 public class DiligenceMntUpdateHandler implements CommandHandler {
 
 	private static final String LEAVE_PREFIX = "leave-";
@@ -59,6 +59,7 @@ public class DiligenceMntUpdateHandler implements CommandHandler {
 
 		BigDecimal count = parseOrNull(countParam);
 
+		// 시간 단위면 HOUR_COUNT, 그 외엔 DAY_COUNT / 時間単位ならHOUR_COUNT、それ以外はDAY_COUNT
 		if (type != null && "HOUR".equalsIgnoreCase(type.getUnitCode())) {
 			item.setHourCount(count);
 		} else {
@@ -72,7 +73,8 @@ public class DiligenceMntUpdateHandler implements CommandHandler {
 		return null;
 	}
 
-	// 드롭다운 값이 "leave-{leaveTypeId}"면 휴가항목을 직접 선택한 것 - 매핑되는 근태항목을 찾거나 자동 생성
+	// "leave-{id}" 형태면 휴가항목 - 매핑되는 근태항목 찾거나 새로 만들기
+	// / "leave-{id}"形式なら休暇項目 - 対応する勤怠項目を検索または新規作成
 	private int resolveAttendanceTypeId(String attendanceTypeIdParam) {
 
 		if (!attendanceTypeIdParam.startsWith(LEAVE_PREFIX)) {

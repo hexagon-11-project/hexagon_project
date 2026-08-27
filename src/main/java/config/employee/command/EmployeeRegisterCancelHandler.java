@@ -11,8 +11,8 @@ import config.employee.dao.EmployeeDao;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
-// [취소하기] - 2페이지에서 취소 시 이미 저장된 사원 1페이지 데이터를 DB에서 삭제하고
-// 사원등록1 초기화면으로 돌아간다.
+// 사원등록 2페이지에서 취소 - 이미 저장된 1페이지 데이터를 DB에서 지우고 1페이지 초기화면으로 이동
+// / 社員登録2ページでキャンセル - 保存済みの1ページデータをDBから削除して1ページ初期画面へ
 public class EmployeeRegisterCancelHandler implements CommandHandler {
 
     private EmployeeDao employeeDao = new EmployeeDao();

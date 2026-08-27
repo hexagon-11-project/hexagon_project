@@ -9,7 +9,8 @@ import command.CommandHandler;
 import config.model.EmployeeLeave;
 import diligence.dailyworkrecord.service.DailyWorkRecordService;
 
-// 왼쪽 목록에서 [관리] 클릭 - 그 사원을 오른쪽 입력폼 대상으로 잡고 일용직 근무기록 이력을 보여줌
+// [관리] 클릭 시 해당 사원을 입력폼 대상으로 잡고 일용직 근무기록 팝업 표시
+// / [管理]クリックで対象社員をセットし、勤務記録ダイアログを表示
 public class DayWorkerMntSelectHandler implements CommandHandler {
 
 	private DailyWorkRecordService dailyWorkRecordService = new DailyWorkRecordService();
@@ -39,15 +40,15 @@ public class DayWorkerMntSelectHandler implements CommandHandler {
 
 		if (editIdParam != null && !editIdParam.isBlank()) {
 			req.setAttribute("editRecord", dailyWorkRecordService.getById(Integer.parseInt(editIdParam)));
-			req.setAttribute("showRecordDialog", false); // [수정] 클릭 - 팝업 닫고 입력폼에서 편집
+			req.setAttribute("showRecordDialog", false); // 수정 클릭 - 팝업 닫고 입력폼에서 편집 / 修正クリックでダイアログ閉じて編集
 		} else if (silent) {
-			req.setAttribute("showRecordDialog", false); // 왼쪽 목록 체크박스로 선택만 한 경우 - 팝업 열지 않음
+			req.setAttribute("showRecordDialog", false); // 체크박스 선택만 한 경우 - 팝업 안 열음 / チェックのみの場合はダイアログ非表示
 		} else {
-			req.setAttribute("showRecordDialog", true); // [관리] 클릭 - 팝업 보여줌
+			req.setAttribute("showRecordDialog", true); // [관리] 클릭 - 팝업 열기 / [管理]クリックでダイアログ表示
 		}
 
 		if ("1".equals(req.getParameter("saved"))) {
-			req.setAttribute("saveMessage", "저장되었습니다."); // [저장] 후 복귀 - 팝업 대신 알림만
+			req.setAttribute("saveMessage", "保存しました。"); // 저장 후 알림 / 保存後のアラート
 		}
 
 		return "/WEB-INF/pages/diligence/daily-work-manage.jsp";
