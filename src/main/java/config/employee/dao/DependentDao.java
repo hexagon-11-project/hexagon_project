@@ -10,8 +10,12 @@ import java.util.List;
 import config.employee.model.EmployeeDependent;
 import jdbc.JdbcUtil;
 
+// 사원 부양가족(가족수당, 연말정산 등) 정보를 처리하는 DAO
+// 社員の扶養家族（家族手当、年末調整など）情報を処理する DAO
 public class DependentDao {
 
+    // 부양가족 데이터를 한 줄씩 인서트 쳐주는 메서드
+    // 扶養家族データを1行ずつインサートするメソッド
     public void insert(Connection conn, int employeeId, EmployeeDependent v) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -38,7 +42,10 @@ public class DependentDao {
         }
     }
 
-    // 사원 한 명의 부양가족을 통째로 지운다 (저장할 때마다 전체 재입력 방식으로 처리하기 위함)
+    // 사원 한 명의 부양가족을 통째로 날림 
+    // (화면에서 수정 버튼 눌렀을 때 부분 업데이트 안 하고, 싹 지운 다음 다시 엎어치기(재입력) 하려는 용도)
+    // 社員1名分の扶養家族データを丸ごと飛ばす
+    // （保存のたびに全削除して新しく入れ直す「洗い替え」方式で処理するため）
     public void deleteByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -50,6 +57,8 @@ public class DependentDao {
         }
     }
 
+    // 특정 사원의 부양가족 목록을 쫙 긁어옴 (화면 표에 뿌려주거나 공제 계산할 때 씀)
+    // 特定社員の扶養家族リストをざっと取得する（画面の表に描画したり、控除計算する時に使う）
     public List<EmployeeDependent> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;

@@ -2,6 +2,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%
+// ★ 공통 상단(app-start.jspf)이 pageSection/pageTitle/pageDescription을 그대로 출력하는데,
+//   이 값들을 안 채워두면 화면 위쪽에 "null"이 그대로 보이므로 미리 채워둔다.
+// ★共通ヘッダー（app-start.jspf）がpageSection/pageTitle/pageDescriptionをそのまま出力するため、
+//   これらの値を埋めておかないと画面上部に「null」がそのまま表示されるため、あらかじめ設定しておく。
+request.setAttribute("pageSection", "給与管理");
+request.setAttribute("pageTitle", "給与台帳");
+request.setAttribute("pageDescription", "帰属年月別の給与総額と社員別の給与支給状況を確認できます。決裁欄を作成してご利用いただけます。");
+%>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -10,6 +19,10 @@
 <title>給与台帳 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
+/* ★ 공통 상단(app-start.jspf)의 제목 영역은 이 화면 자체의 아이콘 제목과 중복되므로 숨긴다 / ★共通ヘッダー（app-start.jspf）のタイトル領域はこの画面自体のアイコン付きタイトルと重複するため非表示にする */
+.page-heading {
+	display: none;
+}
 body { min-width: 1200px; background: #fff; }
 .content-area { background: #fff; }
 

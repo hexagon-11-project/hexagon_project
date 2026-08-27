@@ -11,7 +11,8 @@ import config.dnLItemSet.service.EmployeeLeaveManageService;
 import config.dnLItemSet.service.LeaveTypeListService;
 import config.dnLItemSet.service.LeaveTypeSelectService;
 
-// [휴가일수 저장] - 체크된 사원들만 골라서 입력된 일수로 일괄 저장
+// 체크된 사원만 골라서 입력된 휴가일수로 일괄 저장
+// / チェックした社員のみ、入力した休暇日数で一括保存
 public class EmployeeLeaveSaveHandler implements CommandHandler {
 
 	private EmployeeLeaveManageService employeeLeaveManageService = new EmployeeLeaveManageService();
@@ -53,7 +54,8 @@ public class EmployeeLeaveSaveHandler implements CommandHandler {
 			justSaved = true;
 		}
 
-		// 저장 후 목록으로 이동하지 않고, 같은 모달을 최신 데이터로 다시 보여준다 (alert 띄우기 위해 forward 사용)
+		// 저장 후 목록 이동 안 하고 같은 팝업을 최신 데이터로 다시 표시 (alert용 forward)
+		// / 保存後はリストに戻らず同じダイアログを最新データで再表示（alert用にforward）
 		int leaveTypeId = Integer.parseInt(leaveTypeIdParam);
 
 		req.setAttribute("leaveTypeList", leaveTypeListService.getList(companyId));

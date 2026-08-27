@@ -8,6 +8,8 @@ import config.dnLItemSet.service.AttendanceTypeListService;
 import config.dnLItemSet.service.AttendanceTypeSelectService;
 import config.dnLItemSet.service.LeaveTypeListService;
 
+// 근태항목 목록에서 한 줄 클릭 - 오른쪽 편집폼에 데이터 채워서 표시
+// / 勤怠項目一覧で行クリック - 右の編集フォームにデータを表示
 public class AttendanceTypeSelectHandler implements CommandHandler {
 
 	private LeaveTypeListService leaveTypeListService = new LeaveTypeListService();

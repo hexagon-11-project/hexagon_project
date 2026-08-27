@@ -17,8 +17,8 @@ import config.model.EmployeeLeaveStatus;
 import diligence.attendancemanage.service.AttendanceRecordListService;
 import diligence.attendancemanage.service.AttendanceRecordManageService;
 
-// [휴가일수 현황] 버튼 - 저장하지 않고, 왼쪽 목록에서 체크한 사원(1명 이상)이
-// 부여받은 휴가항목별로 전체/사용/잔여 일수를 모달 팝업 표로 보여준다.
+// [휴가일수 현황] 버튼 - 체크한 사원의 휴가항목별 전체/사용/잔여 일수를 팝업으로 표시
+// / [休暇日数現況]ボタン - チェックした社員の休暇項目別日数をダイアログで表示
 public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 
 	private AttendanceRecordListService attendanceRecordListService = new AttendanceRecordListService();
@@ -41,7 +41,7 @@ public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 		List<Integer> employeeIds = parseEmployeeIds(req);
 
 		if (employeeIds.isEmpty()) {
-			// 사원을 먼저 선택하지 않고 버튼을 누른 경우 - 조회 없이 목록만 다시 보여준다.
+			// 사원 선택 없이 버튼 누른 경우 - 목록만 다시 표시 / 社員未選択でボタンが押された場合
 			List<AttendanceType> attendanceTypeList = attendanceTypeListService.getListForEntryForm(companyId);
 			req.setAttribute("employeeList", employeeList);
 			req.setAttribute("attendanceTypeList", attendanceTypeList);
@@ -60,7 +60,7 @@ public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 			}
 		}
 
-		// 체크된 사원 전원의 휴가일수 현황을 순서대로 이어붙임
+		// 체크된 사원 전원 현황 이어붙이기 / チェックした全員分の現況を結合
 		List<EmployeeLeaveStatus> leaveStatusList = new ArrayList<>();
 		for (int employeeId : employeeIds) {
 			leaveStatusList.addAll(employeeLeaveManageService.getStatusByEmployeeId(employeeId));
@@ -75,12 +75,13 @@ public class DiligenceMntLeaveStatusHandler implements CommandHandler {
 		req.setAttribute("recordList", attendanceRecordManageService.getListByEmployeeId(primaryEmployeeId));
 		req.setAttribute("leaveStatusList", leaveStatusList);
 		req.setAttribute("showLeaveStatusDialog", true);
-		req.setAttribute("showRecordDialog", false); // 입력폼에서 누른 거라 근태기록 팝업은 그대로 닫혀있어야 함
+		req.setAttribute("showRecordDialog", false); // 근태기록 팝업은 닫아둠 / 勤怠記録ダイアログは閉じておく
 
 		return "/WEB-INF/pages/diligence/attendance-manage.jsp";
 	}
 
-	// employeeIds(콤마 구분, 체크박스 다중 선택)가 있으면 그걸 쓰고, 없으면 employeeId(단일) 하나만 사용
+	// employeeIds(콤마 구분) 있으면 다중, 없으면 employeeId 단일 사용
+	// / employeeIds(カンマ区切り)があれば複数、なければemployeeIdを単一使用
 	private List<Integer> parseEmployeeIds(HttpServletRequest req) {
 
 		Set<Integer> ids = new LinkedHashSet<>();

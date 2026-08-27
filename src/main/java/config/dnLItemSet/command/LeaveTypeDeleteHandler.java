@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import config.dnLItemSet.service.LeaveTypeDeleteService;
 
+// 휴가항목 삭제
+// / 休暇項目削除
 public class LeaveTypeDeleteHandler implements CommandHandler {
 
 	private LeaveTypeDeleteService deleteService = new LeaveTypeDeleteService();

@@ -11,14 +11,18 @@ import config.model.AttendanceRecord;
 import config.model.EmployeeLeaveStatus;
 import jdbc.JdbcUtil;
 
+// 휴가 조회 및 상세 사용 내역을 다루기 위해 오라클 DB와 통신하는 DAO 클래스
+// 休暇照会および詳細使用履歴を処理するためにOracle DBと通信する DAO クラス
 public class LeaveSearchDao {
 
 	// 정렬 파라미터는 화이트리스트로만 SQL에 반영 (SQL 인젝션 방지)
-	public static final String SORT_NAME = "성명순";
-	public static final String SORT_DEPARTMENT = "부서순";
-	public static final String SORT_REMAINING = "잔여일수순";
+	// 並び替えパラメータはホワイトリストでのみSQLに反映（SQLインジェクション防止）
+	public static final String SORT_NAME = "氏名順";
+	public static final String SORT_DEPARTMENT = "部署順";
+	public static final String SORT_REMAINING = "残余順";
 
 	// [휴가 현황] 표 - 선택된 휴가항목을 부여받은 사원 전원의 전체/사용(선택 연도)/잔여 일수
+	// [休暇現状] テーブル - 選択された休暇項目を付与された全社員の全体／使用（選択年度）／残余日数
 	public List<EmployeeLeaveStatus> selectStatusByLeaveType(Connection conn, int companyId, int leaveTypeId,
 			int year, String sortKey) throws SQLException {
 
@@ -28,6 +32,8 @@ public class LeaveSearchDao {
 		try {
 			// EMPLOYEE_LEAVE(부여 기록)가 아니라 EMPLOYEE에서 시작 - 부여를 안 받았어도
 			// 실제 사용 기록(ATTENDANCE_RECORD)이 있으면 목록에 나와야 하기 때문
+			// EMPLOYEE_LEAVE（付与記録）ではなくEMPLOYEEから開始 - 付与されていなくても
+			// 実際の使用記録（ATTENDANCE_RECORD）があればリストに表示されなければならないため
 			String sql = "SELECT e.EMPLOYEE_ID, e.EMPLOYMENT_TYPE, e.EMPLOYEE_NAME, e.DEPARTMENT, e.POSITION, "
 					+ "lt.LEAVE_NAME, NVL(el.GRANTED_DAYS, 0) AS GRANTED_DAYS, "
 					+ "NVL((SELECT SUM(ar.DAY_COUNT) FROM ATTENDANCE_RECORD ar "
@@ -85,6 +91,7 @@ public class LeaveSearchDao {
 	}
 
 	// [선택 사원 휴가 사용내역] 표 - 특정 사원이 그 휴가항목으로, 선택 연도에 실제 사용한 근태기록 목록
+	// [選択社員の休暇使用履歴] テーブル - 特定の社員がその休暇項目で、選択年度に実際に使用した勤怠記録リスト
 	public List<AttendanceRecord> selectUsageDetail(Connection conn, int employeeId, int leaveTypeId, int year)
 			throws SQLException {
 
@@ -125,6 +132,8 @@ public class LeaveSearchDao {
 		}
 	}
 
+	// 정렬 조건 문자열을 안전한 오라클 ORDER BY 절로 변환해 주는 화이트리스트 헬퍼
+	// 並び替え条件文字列を安全なOracleのORDER BY句に変換してくれるホワイトリストヘルパー
 	private String resolveOrderBy(String sortKey) {
 		if (SORT_DEPARTMENT.equals(sortKey)) {
 			return "e.DEPARTMENT, e.EMPLOYEE_NAME";
@@ -132,6 +141,6 @@ public class LeaveSearchDao {
 		if (SORT_REMAINING.equals(sortKey)) {
 			return "REMAINING_DAYS DESC";
 		}
-		return "e.EMPLOYEE_NAME"; // 기본값: 성명순
+		return "e.EMPLOYEE_NAME"; // 기본값: 성명순 (デフォルト値: 氏名順)
 	}
 }

@@ -16,8 +16,10 @@ import config.dnLItemSet.service.LeaveTypeSelectService;
 import config.model.EmployeeLeave;
 import config.model.LeaveType;
 
-// [휴가일수 자동계산] - 체크된 사원들만 계산해서 화면 입력칸에 미리 채워준다.
-// 여기서는 DB에 저장하지 않고, [휴가일수 저장]을 따로 눌러야 실제로 반영된다.
+// 체크된 사원만 연차 자동계산해서 화면 입력칸에 미리 채워줌
+// DB 저장은 안 함 - [휴가일수 저장] 따로 눌러야 반영
+// / チェックした社員の年次を自動計算して画面に表示
+// / DB保存なし - [休暇日数保存]で別途反映
 public class EmployeeLeaveAutoCalcHandler implements CommandHandler {
 
 	private LeaveTypeListService leaveTypeListService = new LeaveTypeListService();
@@ -35,7 +37,7 @@ public class EmployeeLeaveAutoCalcHandler implements CommandHandler {
 
 		int companyId = 1001;
 		int leaveTypeId = Integer.parseInt(req.getParameter("leaveTypeId"));
-		String workTimeType = "40"; // 화면에서 근무시간제 선택칸을 없애서 40시간제 기준으로 고정
+		String workTimeType = "40"; // 근무시간제 선택 없애고 40시간제 고정 / 勤務時間制は40時間固定
 		String[] checkedEmployeeIds = req.getParameterValues("checkedEmployeeId");
 
 		LeaveType manageLeaveType = leaveTypeSelectService.getById(leaveTypeId);
@@ -43,7 +45,7 @@ public class EmployeeLeaveAutoCalcHandler implements CommandHandler {
 
 		if (manageLeaveType != null && checkedEmployeeIds != null && checkedEmployeeIds.length > 0) {
 
-			Date refDate = manageLeaveType.getEffectiveStartDate(); // 적용기간 시작일 기준으로 계산
+			Date refDate = manageLeaveType.getEffectiveStartDate(); // 적용기간 시작일 기준으로 계산 / 適用期間開始日を基準に計算
 
 			java.util.Set<Integer> checkedSet = new java.util.HashSet<>();
 			for (String idStr : checkedEmployeeIds) {
@@ -53,7 +55,7 @@ public class EmployeeLeaveAutoCalcHandler implements CommandHandler {
 			for (EmployeeLeave row : employeeLeaveList) {
 				if (checkedSet.contains(row.getEmployeeId())) {
 					BigDecimal calculated = AnnualLeaveCalculator.calculate(row.getHireDate(), refDate, workTimeType);
-					row.setGrantedDays(calculated); // 화면 표시용으로만 덮어씀 (DB 저장 아님)
+					row.setGrantedDays(calculated); // 화면 표시용만, DB 반영 안 함 / 画面表示のみ、DB未反映
 				}
 			}
 		}

@@ -7,6 +7,8 @@ import command.CommandHandler;
 import config.model.LeaveType;
 import config.dnLItemSet.service.LeaveTypeUpdateService;
 
+// 휴가항목 수정 저장
+// / 休暇項目修正保存
 public class LeaveTypeUpdateHandler implements CommandHandler {
 
 	private LeaveTypeUpdateService updateService = new LeaveTypeUpdateService();

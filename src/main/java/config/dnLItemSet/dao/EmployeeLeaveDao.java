@@ -11,9 +11,12 @@ import config.model.EmployeeLeave;
 import config.model.EmployeeLeaveStatus;
 import jdbc.JdbcUtil;
 
+// 사원별 휴가(부여일수 등) 데이터를 처리하는 DAO
+// 社員別の休暇（付与日数など）データを処理する DAO
 public class EmployeeLeaveDao {
 
-	// 특정 휴가항목 기준으로 회사 전체 사원 + 그 사원의 부과일수(없으면 0)를 같이 조회
+	// 특정 휴가항목 기준으로 전체 사원 목록이랑 부여된 일수를 싹 다 가져옴 (부여 안됐으면 null/0 처리)
+	// 特定の休暇項目を基準に、全社員リストと付与日数を全て取得（付与されていなければnull/0扱い）
 	public List<EmployeeLeave> selectByLeaveTypeId(Connection conn, int leaveTypeId, int companyId)
 			throws SQLException {
 
@@ -65,7 +68,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
-	// 근태기록 화면의 [휴가일수 현황] 버튼용 - 없으면 null (아직 부여 안 됨)
+	// 특정 사원의 특정 휴가항목 부여일수만 가져옴 (근태기록 화면의 휴가일수 현황 버튼용)
+	// 特定社員の特定休暇項目の付与日数のみ取得（勤怠記録画面の休暇日数現況ボタン用）
 	public java.math.BigDecimal selectGrantedDays(Connection conn, int employeeId, int leaveTypeId)
 			throws SQLException {
 
@@ -91,8 +95,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
-	// [휴가일수 현황] 팝업용 - 이 사원이 부여받은 휴가항목별로 전체(부여일수)와
-	// 사용(그 휴가항목에 연결된 근태기록 DAY_COUNT 합계)을 같이 조회
+	// [휴가일수 현황] 팝업용 - 이 사원이 부여받은 휴가별로 총 부여일수랑 사용일수(근태기록 합계)를 같이 가져옴
+	// [休暇日数現況] ポップアップ用 - この社員が付与された休暇ごとに、総付与日数と使用日数（勤怠記録の合計）を合わせて取得
 	public List<EmployeeLeaveStatus> selectStatusByEmployeeId(Connection conn, int employeeId)
 			throws SQLException {
 
@@ -135,6 +139,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
+	// 특정 사원과 휴가항목에 매핑된 ID 조회 (데이터 이미 있는지 체크할 때 씀)
+	// 特定社員と休暇項目にマッピングされたIDを取得（データが既に存在するかチェックする時に使用）
 	public Integer selectEmployeeLeaveId(Connection conn, int employeeId, int leaveTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -160,6 +166,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
+	// 사원한테 휴가일수 신규 부여 (등록)
+	// 社員に休暇日数を新規付与（登録）
 	public void insert(Connection conn, int employeeId, int leaveTypeId, java.math.BigDecimal grantedDays)
 			throws SQLException {
 
@@ -185,6 +193,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
+	// 이미 부여된 휴가일수 수정
+	// 既に付与された休暇日数を修正
 	public void update(Connection conn, int employeeLeaveId, java.math.BigDecimal grantedDays) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -206,6 +216,8 @@ public class EmployeeLeaveDao {
 		}
 	}
 
+	// 특정 사원의 특정 휴가 부여 내역 삭제
+	// 特定社員の特定休暇の付与履歴を削除
 	public void deleteByEmployeeAndLeaveType(Connection conn, int employeeId, int leaveTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;

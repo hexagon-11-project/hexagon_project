@@ -10,8 +10,12 @@ import java.util.List;
 import config.employee.model.EmployeeEducation;
 import jdbc.JdbcUtil;
 
+// 사원 학력(학교명, 전공, 졸업상태 등) 정보를 처리하는 DAO
+// 社員の学歴（学校名、専攻、卒業状態など）情報を処理する DAO
 public class EducationDao {
 
+    // 학력 데이터를 한 줄씩 DB에 밀어 넣는(인서트) 메서드
+    // 学歴データを1行ずつDBに押し込む（インサートする）メソッド
     public void insert(Connection conn, int employeeId, EmployeeEducation v) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -32,6 +36,10 @@ public class EducationDao {
         }
     }
 
+    // 특정 사원의 학력 데이터를 통째로 날림
+    // (이전 부양가족이나 경력 DAO처럼, 저장 시 기존 데이터를 싹 지우고 새로 엎어치기 위한 용도)
+    // 特定社員の学歴データを丸ごと飛ばす
+    // （前の扶養家族や経歴DAOと同様に、保存時に既存データを全消しして新しく洗い替え（上書き）するための用途）
     public void deleteByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -43,6 +51,8 @@ public class EducationDao {
         }
     }
 
+    // 사원 ID로 해당 사원의 전체 학력 내역을 쫙 긁어옴 (화면 표에 뿌려줄 때 씀)
+    // 社員IDで該当社員の全学歴履歴をざっとかき集める（画面の表に描画する時に使う）
     public List<EmployeeEducation> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;

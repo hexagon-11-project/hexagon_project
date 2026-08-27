@@ -1,7 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<% request.setAttribute("activeKey", "pay-slip"); %>
+<%
+request.setAttribute("activeKey", "pay-slip");
+// ★ 공통 상단(app-start.jspf)이 pageSection/pageTitle/pageDescription을 그대로 출력하는데,
+//   이 값들을 안 채워두면 화면 위쪽에 "null"이 그대로 보이므로 미리 채워둔다.
+// ★共通ヘッダー（app-start.jspf）がpageSection/pageTitle/pageDescriptionをそのまま出力するため、
+//   これらの値を埋めておかないと画面上部に「null」がそのまま表示されるため、あらかじめ設定しておく。
+request.setAttribute("pageSection", "給与管理");
+request.setAttribute("pageTitle", "給与明細書");
+request.setAttribute("pageDescription", "社員を選択すると、該当社員の給与明細書が自動で作成されます。");
+%>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -10,6 +19,10 @@
 <title>給与明細書 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
+/* ★ 공통 상단(app-start.jspf)의 제목 영역은 이 화면 자체의 아이콘 제목과 중복되므로 숨긴다 / ★共通ヘッダー（app-start.jspf）のタイトル領域はこの画面自体のアイコン付きタイトルと重複するため非表示にする */
+.page-heading {
+	display: none;
+}
 body { min-width: 1200px; background: #fff; }
 .content-area { background: #fff; }
 
