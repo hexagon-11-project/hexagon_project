@@ -7,6 +7,8 @@ import command.CommandHandler;
 import config.model.LeaveType;
 import config.dnLItemSet.service.LeaveTypeInsertService;
 
+// 휴가항목 추가 저장
+// / 休暇項目新規登録
 public class LeaveTypeInsertHandler implements CommandHandler {
 
 	private LeaveTypeInsertService insertService = new LeaveTypeInsertService();

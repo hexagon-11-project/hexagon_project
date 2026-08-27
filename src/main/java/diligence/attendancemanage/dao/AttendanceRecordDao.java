@@ -12,9 +12,12 @@ import config.model.AttendanceRecord;
 import config.model.EmployeeLeave;
 import jdbc.JdbcUtil;
 
+// 사원별 근태 기록(휴가, 출장, 연장근무 등) 데이터와 근태 관리 화면용 사원 목록을 다루는 DAO
+// 社員別勤怠記録（休暇、出張、残業など）データおよび勤怠管理画面用の社員リストを処理する DAO
 public class AttendanceRecordDao {
 
 	// 왼쪽 목록에 뿌릴 사원 목록 (재직/퇴직 상관없이 회사 전체)
+	// 左側のリストに描画する社員リスト（在職／退職に関わらず会社全体）
 	public List<EmployeeLeave> selectEmployeesByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -32,6 +35,7 @@ public class AttendanceRecordDao {
 
 			while (rs.next()) {
 				// 사원 기본정보만 필요해서, 이미 만들어둔 EmployeeLeave 모델을 재사용 (사원정보 필드가 그대로 있음)
+				// 社員基本情報のみが必要なため、すでに作成済みのEmployeeLeaveモデルを再利用（社員情報フィールドがそのまま存在）
 				EmployeeLeave row = new EmployeeLeave();
 				row.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
 				row.setEmploymentType(rs.getString("EMPLOYMENT_TYPE"));
@@ -40,7 +44,7 @@ public class AttendanceRecordDao {
 				row.setDepartment(rs.getString("DEPARTMENT"));
 				row.setPosition(rs.getString("POSITION"));
 				row.setHireDate(rs.getDate("HIRE_DATE"));
-				row.setEmploymentStatus(rs.getDate("RESIGN_DATE") == null ? "재직" : "퇴직");
+				row.setEmploymentStatus(rs.getDate("RESIGN_DATE") == null ? "재직" : "퇴직"); // 퇴사일 유무로 재직/퇴직 판별 (退職日の有無で在職/退職を判別)
 				result.add(row);
 			}
 
@@ -52,6 +56,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// 새로운 근태 기록을 DB에 밀어 넣는(인서트 치는) 메서드
+	// 新しい勤怠記録をDBに押し込む（インサートをかける）メソッド
 	public void insert(Connection conn, AttendanceRecord item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -84,6 +90,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// 특정 근태 기록 건을 PK로 삭제하는 메서드
+	// 特定の勤怠記録案件をPKで削除するメソッド
 	public void delete(Connection conn, int attendanceId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -97,7 +105,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
-	// 선택된 사원의 근태기록 이력 (최근순)
+	// 선택된 사원의 근태기록 이력 (최근순 정렬)
+	// 選択された社員の勤怠記録履歴（直近順に並び替え）
 	public List<AttendanceRecord> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -127,6 +136,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// 특정 근태 기록 단건 조회 (수정 폼 진입 시 데이터 로드용 등)
+	// 特定の勤怠記録単件照会（修正フォーム進入時のデータロード用など）
 	public AttendanceRecord selectById(Connection conn, int attendanceId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -154,6 +165,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// 기존 근태 기록 내용을 수정(UPDATE)하는 메서드
+	// 既存の勤怠記録内容を修正（UPDATE）するメソッド
 	public void update(Connection conn, AttendanceRecord item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -181,6 +194,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// 숫자(BigDecimal) 값이 null일 경우 DB에 SQL NULL로 안전하게 세팅해 주는 헬퍼 메서드
+	// 数値（BigDecimal）値がnullの場合、DBにSQL NULLとして安全にセットしてくれるヘルパーメソッド
 	private void setBigDecimalOrNull(PreparedStatement pstmt, int index, BigDecimal value) throws SQLException {
 		if (value == null) {
 			pstmt.setNull(index, java.sql.Types.NUMERIC);
@@ -189,6 +204,8 @@ public class AttendanceRecordDao {
 		}
 	}
 
+	// ResultSet 결과를 AttendanceRecord 모델 객체에 매핑(포장)해 주는 공통 메서드
+	// ResultSetの結果をAttendanceRecordモデルオブジェクトにマッピング（パッケージング）する共通メソッド
 	private AttendanceRecord mapRow(ResultSet rs) throws SQLException {
 
 		AttendanceRecord item = new AttendanceRecord();
@@ -208,6 +225,8 @@ public class AttendanceRecordDao {
 		item.setAttendanceName(rs.getString("ATTENDANCE_NAME"));
 		item.setUnitCode(rs.getString("UNIT_CODE"));
 
+		// 외래키(FK)가 null일 수 있는 필드는 wasNull() 체크를 통해 안전하게 처리
+		// 外部キー（FK）がnullになり得るフィールドはwasNull()チェックを通じて安全に処理
 		int leaveTypeId = rs.getInt("LEAVE_TYPE_ID");
 		if (!rs.wasNull()) {
 			item.setLeaveTypeId(leaveTypeId);

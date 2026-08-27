@@ -10,7 +10,8 @@ import command.CommandHandler;
 import config.model.DailyWorkRecord;
 import diligence.dailyworkrecord.service.DailyWorkRecordService;
 
-// [수정] - 팝업에서 [수정] 눌러서 입력폼에 채워진 내용을 [저장]했을 때 처리 (dailyWorkRecordId가 있으면 이쪽으로 옴)
+// 일용직 근무기록 수정 - dailyWorkRecordId 있을 때 이쪽으로 옴
+// / 日雇労働者の勤務記録修正 - dailyWorkRecordIdがある場合にここへ
 public class DayWorkerMntUpdateHandler implements CommandHandler {
 
 	private DailyWorkRecordService dailyWorkRecordService = new DailyWorkRecordService();

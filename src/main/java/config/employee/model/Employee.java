@@ -38,7 +38,6 @@ public class Employee {
 	// Getters and Setters
 	// ==========================================
 
-	// [수정 완료] String -> int 로 변경!
 	public int getBaseWageAmount() {
 		return baseWageAmount;
 	}

@@ -4,15 +4,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-/**
- * [선택삭제] 처리 전용 헬퍼.
- *
- * 예: family1~family4 중 2번을 삭제하면, 화면은 다시 1~3번으로 채워져야 한다.
- * 근데 실제로 지워진 건 없고 "3번 자리에 원래 4번 데이터를 보여준다"는 매핑만 있으면 되므로,
- * request.getParameter()를 가로채서 새 번호(newIndex)로 물어보면 원래 번호(originalIndex)의
- * 값을 대신 돌려주는 방식으로 처리한다. 이렇게 하면 JSP 쪽 코드는 家 손댈 필요가 없다
- * (항상 그냥 1..N번으로 물어보기만 하면 됨).
- */
+// 파라미터 가로채서 인덱스 바꿔치기 해주는 래퍼 클래스
+// JSP 화면 코드는 전혀 손 안 대고, 중간에서 번호만 싹 당겨서 맞춰줌
+// パラメータを横取りしてインデックスをすり替えるラッパークラス
+// JSPの画面コードには全く手を出さず、中間で番号だけを前に詰めて合わせてあげる
 public class RowShiftRequestWrapper extends HttpServletRequestWrapper {
 
     private final String keyPrefix;               // 예: "family"
@@ -24,6 +19,10 @@ public class RowShiftRequestWrapper extends HttpServletRequestWrapper {
         this.indexMap = indexMap;
     }
 
+    // JSP에서 request.getParameter("familyName3") 하고 꺼낼 때 여기를 탐.
+    // 끝에 붙은 숫자(새 인덱스)만 똑 떼서 맵에서 원래 번호를 찾은 다음, "진짜" 파라미터 값으로 바꿔치기해서 던져줌
+    // JSPで request.getParameter("familyName3") と取得する時にここを走る。
+    // 末尾の数字（新しいインデックス）だけを切り取ってマップから元の番号を探し、「本当の」パラメータ値にすり替えて返す
     @Override
     public String getParameter(String name) {
         if (name.startsWith(keyPrefix)) {
@@ -36,12 +35,17 @@ public class RowShiftRequestWrapper extends HttpServletRequestWrapper {
                 String fieldPart = rest.substring(0, cut);
                 int newIndex = Integer.parseInt(rest.substring(cut));
                 Integer originalIndex = indexMap.get(newIndex);
+                
+                // 맵에 없으면 남는 줄이니까 그냥 쿨하게 null 뱉음
+                // マップになければ余った行なので、クールにnullを返す
                 if (originalIndex == null) {
                     return null; // 남은 행 개수보다 뒤쪽 번호는 빈 값
                 }
                 return super.getParameter(keyPrefix + fieldPart + originalIndex);
             }
         }
+        // 내가 관심 없는 파라미터면 얌전히 부모(원래 request)한테 토스함
+        // 自分が関心のないパラメータなら、大人しく親（元のrequest）にトスする
         return super.getParameter(name);
     }
 }

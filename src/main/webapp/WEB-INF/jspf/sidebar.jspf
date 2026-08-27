@@ -8,16 +8,15 @@
 			href="<%=ctx%>/pages/main.jsp"><span class="nav-icon">□</span><span>메인</span></a>
 	</div>
 	<div class="nav-group">
-		<div class="nav-label">기본환경</div>
+		<div class="nav-label">基本環境</div>
 		<a class="nav-item <%="user-info".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/membersInfo.do"><span
 			class="nav-icon">□</span><span>사용자 정보</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>사원
-				등록1</span></a><a
+			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>社員登録</span></a><a
 			class="nav-item <%="leave-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/leavesettingslist.do"><span
-			class="nav-icon">□</span><span>휴가/근태 설정</span></a><a
+			class="nav-icon">□</span><span>休暇・勤怠設定</span></a><a
 			class="nav-item <%="pay-item-settings".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/payitemsetlist.do"><span
 			class="nav-icon">□</span><span>給与項目設定</span></a>
@@ -38,22 +37,21 @@
 			class="nav-icon">□</span><span>제 증명서 발급 대장</span></a>
 	</div>
 	<div class="nav-group">
-		<div class="nav-label">근태관리</div>
+		<div class="nav-label">勤怠管理</div>
 		<a
 			class="nav-item <%="attendance-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Diligence/diligenceMnt.do"><span class="nav-icon">□</span><span>근태기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/diligenceMnt.do"><span class="nav-icon">□</span><span>勤怠・記録管理</span></a><a
 			class="nav-item <%="attendance-search".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Diligence/diligenceSearchMonth.do"><span
-			class="nav-icon">□</span><span>근태조회</span></a><a
+			class="nav-icon">□</span><span>勤怠照会</span></a><a
 			class="nav-item <%="leave-search".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Diligence/holidaysSearchResult.do"><span
-			class="nav-icon">□</span><span>휴가조회</span></a><a
+			class="nav-icon">□</span><span>休暇照会</span></a><a
 			class="nav-item <%="daily-work-manage".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span class="nav-icon">□</span><span>일용직
-				근무기록/관리</span></a><a
+			href="<%=ctx%>/Diligence/dayWorkerMnt.do"><span class="nav-icon">□</span><span>日雇い勤務記録・管理</span></a><a
 			class="nav-item <%="daily-work-search".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Diligence/dayWorkerSearchMonth.do"><span
-			class="nav-icon">□</span><span>일용직 근무 조회</span></a>
+			class="nav-icon">□</span><span>日雇い勤務照会</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">급여관리</div>

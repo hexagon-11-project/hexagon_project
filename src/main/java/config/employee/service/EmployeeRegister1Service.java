@@ -21,6 +21,8 @@ import config.employee.model.Employee;
 import connection.ConnectionProvider;
 import jdbc.JdbcUtil;
 
+// 사원 등록 1페이지의 비즈니스 로직(채번, 등록, 트랜잭션 관리, 수정, 조회 데이터 세팅)을 총괄하는 Service
+// 社員登録1ページ目のビジネスロジック（採番、登録、トランザクション管理、修正、照会データのセット）を総括する Service
 public class EmployeeRegister1Service {
 
     private static final String EMP_NO_PREFIX = "No-";
@@ -34,6 +36,7 @@ public class EmployeeRegister1Service {
     private EmployeeMilitaryDao militaryDao = new EmployeeMilitaryDao();
 
     // 화면에 보여줄 "다음 사원번호"를 미리 계산한다 (등록 폼 진입 시 GET에서 호출)
+    // 画面に表示する「次の社員番号」をあらかじめ計算する（登録フォーム進入時のGETで呼び出し）
     public String generateNextEmpNo() {
         Connection conn = null;
         try {
@@ -49,19 +52,23 @@ public class EmployeeRegister1Service {
     /**
      * 사원 기본정보 + 부양가족/학력/경력을 한 트랜잭션으로 저장한다.
      * (하나라도 실패하면 사원 자체도 저장되지 않도록 묶어서 처리)
+     * 社員基本情報 ＋ 扶養家族／学歴／経歴を1つのトランザクションで保存する。
+     * （一つでも失敗すれば社員自体も保存されないようにまとめて処理）
      */
     public void registerEmployee(Employee emp, HttpServletRequest request) {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
-            conn.setAutoCommit(false); // 트랜잭션 시작
+            conn.setAutoCommit(false); // 트랜잭션 시작 (トランザクション開始)
 
             // 폼에서 넘어온 empNo는 화면 표시용일 뿐, 실제로 저장할 번호는
             // 저장 시점에 DB를 다시 조회해서 여기서 최종 확정한다.
+            // フォームから渡されたempNoは画面表示用であり、実際に保存する番号は
+            // 保存時点でDBを再照会し、ここで最終確定する。
             String nextEmpNo = calcNextEmpNo(employeeDao.selectMaxEmpNo(conn));
             emp.setEmployeeNo(nextEmpNo);
 
-            employeeDao.insert(conn, emp); // 이 안에서 emp.setEmployeeId(...)까지 채워짐
+            employeeDao.insert(conn, emp); // 이 안에서 emp.setEmployeeId(...)까지 채워짐 (この中でemp.setEmployeeId(...)まで埋められる)
             int employeeId = emp.getEmployeeId();
 
             saveDependents(conn, employeeId, request);
@@ -70,20 +77,22 @@ public class EmployeeRegister1Service {
             saveInsurances(conn, employeeId, request);
             saveMilitary(conn, employeeId, request);
 
-            conn.commit(); // 성공 시 한번에 커밋
+            conn.commit(); // 성공 시 한번에 커밋 (成功時に一括コミット)
         } catch (SQLException e) {
-            JdbcUtil.rollback(conn);
+            JdbcUtil.rollback(conn); // 예외 발생 시 롤백 (例外発生時にロールバック)
             throw new RuntimeException("사원 등록 실패", e);
         } finally {
             JdbcUtil.close(conn);
         }
     }
 
+    // 화면에서 넘어온 부양가족 동적 행 개수만큼 반복해서 인서트 치는 메서드
+    // 画面から渡された扶養家族の動的行数分、繰り返しインサートをかけるメソッド
     private void saveDependents(Connection conn, int employeeId, HttpServletRequest request) throws SQLException {
         int count = RowFormUtil.parseIntOrDefault(request.getParameter("familyRowCount"), 0);
         for (int i = 1; i <= count; i++) {
             String name = request.getParameter("familyName" + i);
-            if (isBlank(name)) continue; // 이름이 없는 빈 줄은 저장하지 않는다
+            if (isBlank(name)) continue; // 이름이 없는 빈 줄은 저장하지 않는다 (名前のない空行は保存しない)
 
             EmployeeDependent v = new EmployeeDependent();
             v.setDependentName(name);
@@ -94,12 +103,14 @@ public class EmployeeRegister1Service {
             v.setPersonalDeductionYn(checkboxToYn(request.getParameter("familyDeduction" + i)));
             v.setHealthInsuranceYn(checkboxToYn(request.getParameter("familyHealthIns" + i)));
             v.setCohabitationYn(checkboxToYn(request.getParameter("familyCohab" + i)));
-            v.setWageIncomeTaxYn("N"); // 화면에 해당 입력칸이 아직 없어 기본값
+            v.setWageIncomeTaxYn("N"); // 화면에 해당 입력칸이 아직 없어 기본값 (画面に対応する入力欄がまだないためデフォルト値)
             v.setChildUnder20Yn(checkboxToYn(request.getParameter("familyMultiChild" + i)));
             dependentDao.insert(conn, employeeId, v);
         }
     }
 
+    // 학력 데이터 동적 행 반복 저장 로직
+    // 学歴データの動的行の繰り返し保存ロジック
     private void saveEducations(Connection conn, int employeeId, HttpServletRequest request) throws SQLException {
         int count = RowFormUtil.parseIntOrDefault(request.getParameter("educationRowCount"), 0);
         for (int i = 1; i <= count; i++) {
@@ -118,6 +129,8 @@ public class EmployeeRegister1Service {
 
     // 4대보험(국민연금/건강보험/고용보험/산재보험)은 표 형태가 아니라 4줄 고정이라
     // familyRowCount 같은 반복 처리 대신 종류별로 하나씩 확인해서 저장한다.
+    // 4大保険（国民年金／健康保険／雇用保険／労災保険）はテーブル形式ではなく4行固定のため、
+    // familyRowCountのような繰り返し処理の代わりに種類別に1つずつ確認して保存する。
     private void saveInsurances(Connection conn, int employeeId, HttpServletRequest request) throws SQLException {
         saveOneInsurance(conn, employeeId, request, "국민연금", "insuranceNoNP", "acquisitionDateNP", "lossDateNP");
         saveOneInsurance(conn, employeeId, request, "건강보험", "insuranceNoHI", "acquisitionDateHI", "lossDateHI");
@@ -131,6 +144,7 @@ public class EmployeeRegister1Service {
         String acq = request.getParameter(acqParam);
         String loss = request.getParameter(lossParam);
         // 기호번호/취득일/상실일 셋 다 비어있으면(=아예 입력 안 한 줄) 저장하지 않는다
+        // 記号番号／取得日／喪失日の3つとも空であれば（＝全く入力していない行）保存しない
         if (isBlank(no) && isBlank(acq) && isBlank(loss)) {
             return;
         }
@@ -143,14 +157,15 @@ public class EmployeeRegister1Service {
     }
 
     // 병역 - 아무것도 입력 안 했으면 저장하지 않는다
+    // 兵役 - 何も入力されていなければ保存しない
     private void saveMilitary(Connection conn, int employeeId, HttpServletRequest request) throws SQLException {
         String status = request.getParameter("militaryStatus");
-        String branchCode = request.getParameter("militaryBranchCode"); // 군별
+        String branchCode = request.getParameter("militaryBranchCode"); // 군별 (軍種)
         String start = request.getParameter("militaryStartDate");
         String end = request.getParameter("militaryEndDate");
-        String grade = request.getParameter("militaryGrade");           // 계급
-        String branch = request.getParameter("militaryBranch");         // 병과
-        String specialty = request.getParameter("militarySpecialty");   // 특기
+        String grade = request.getParameter("militaryGrade");            // 계급 (階級)
+        String branch = request.getParameter("militaryBranch");         // 병과 (兵科)
+        String specialty = request.getParameter("militarySpecialty");   // 특기 (特技)
         String exemptReason = request.getParameter("militaryExemptReason");
 
         if (isBlank(status) && isBlank(branchCode) && isBlank(start) && isBlank(end)
@@ -167,9 +182,11 @@ public class EmployeeRegister1Service {
         v.setMilitaryBranch(branch);
         v.setMilitarySpecialty(specialty);
         v.setMilitaryExemptReason(exemptReason);
-        militaryDao.save(conn, employeeId, v);
+        militaryDao.save(conn, employeeId, v); // 업서트(Upsert) 메서드 호출 (アップサートメソッド呼び出し)
     }
 
+    // 경력 데이터 동적 행 반복 저장 로직 + 근무 기간(년/월) 자동 계산 연동
+    // 経歴データの動的行の繰り返し保存ロジック ＋ 勤務期間（年／月）の自動計算連携
     private void saveCareers(Connection conn, int employeeId, HttpServletRequest request) throws SQLException {
         int count = RowFormUtil.parseIntOrDefault(request.getParameter("careerRowCount"), 0);
         for (int i = 1; i <= count; i++) {
@@ -193,6 +210,7 @@ public class EmployeeRegister1Service {
     }
 
     // 근무기간(년/월)을 입사일~퇴사일로 대략 계산 (퇴사일 없으면 0/0)
+    // 勤務期間（年／月）を入社日〜退社日で大まかに計算（退社日がなければ0/0）
     private int[] calcDutyYyMm(java.sql.Date start, java.sql.Date end) {
         if (start == null || end == null) {
             return new int[] { 0, 0 };
@@ -203,6 +221,8 @@ public class EmployeeRegister1Service {
         return new int[] { p.getYears(), p.getMonths() };
     }
 
+    // 문자열 날짜를 SQL Date 타입으로 안전하게 변환 (실패 시 null 리턴)
+    // 文字列の付箋（日付）をSQL Date型に安全に変換（失敗時はnullを返す）
     private java.sql.Date toSqlDate(String value) {
         if (value == null || value.isEmpty()) {
             return null;
@@ -214,6 +234,8 @@ public class EmployeeRegister1Service {
         }
     }
 
+    // 체크박스 값("on" 또는 null)을 "Y" 또는 "N"으로 변환
+    // チェックボックスの値（"on"またはnull）を"Y"または"N"に変換
     private String checkboxToYn(String value) {
         return "on".equals(value) ? "Y" : "N";
     }
@@ -222,7 +244,8 @@ public class EmployeeRegister1Service {
         return (value == null || value.isEmpty()) ? defaultValue : value;
     }
 
-    // 사원현황에서 불러온 기존 사원 수정 - 기본정보 UPDATE + 서브 테이블 delete-insert
+    // 사원현황에서 불러온 기존 사원 수정 - 기본정보 UPDATE + 서브 테이블 delete-insert (아라이가예 방식)
+    // 社員状況から呼び出した既存社員の修正 - 基本情報UPDATE ＋ サブテーブルのdelete-insert（洗い替え方式）
     public void updateEmployee(Employee emp, HttpServletRequest request) {
         Connection conn = null;
         try {
@@ -233,6 +256,7 @@ public class EmployeeRegister1Service {
             int employeeId = emp.getEmployeeId();
 
             // 서브 테이블은 기존 데이터 전부 삭제 후 재삽입
+            // サブテーブルは既存データを全削除した後に再挿入
             dependentDao.deleteByEmployeeId(conn, employeeId);
             educationDao.deleteByEmployeeId(conn, employeeId);
             careerDao.deleteByEmployeeId(conn, employeeId);
@@ -254,6 +278,7 @@ public class EmployeeRegister1Service {
     }
 
     // 사원현황에서 이름 클릭 시 사원등록1 폼에 기존 데이터를 불러오기 위한 조회
+    // 社員状況で名前をクリックした際、社員登録1フォームに既存データを呼び出すための照会
     public Employee getEmployeeById(int employeeId) {
         Connection conn = null;
         try {
@@ -268,12 +293,14 @@ public class EmployeeRegister1Service {
 
     // 부양가족/학력/경력/4대보험/병역 등 별도 테이블 데이터까지 전부 request에 세팅
     // JSP가 request.getParameter("familyName1") 등으로 읽으므로, 동일한 키로 setAttribute 해줌
+    // 扶養家族／学歴／経歴／4大保険／兵役など、別テーブルのデータまで全てrequestにセット
+    // JSPがrequest.getParameter("familyName1")などで読み込むため、同一のキーでsetAttributeする
     public void loadAllSubTableData(int employeeId, HttpServletRequest request) {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
 
-            // 부양가족
+            // 부양가족 (扶養家族)
             java.util.List<EmployeeDependent> dependents = dependentDao.selectByEmployeeId(conn, employeeId);
             int familyCount = dependents.size() > 0 ? dependents.size() : 1;
             request.setAttribute("familyRowCount", familyCount);
@@ -291,7 +318,7 @@ public class EmployeeRegister1Service {
                 request.setAttribute("familyMultiChild" + n, "Y".equals(d.getChildUnder20Yn()) ? "on" : "");
             }
 
-            // 학력
+            // 학력 (学歴)
             java.util.List<EmployeeEducation> educations = educationDao.selectByEmployeeId(conn, employeeId);
             int eduCount = educations.size() > 0 ? educations.size() : 1;
             request.setAttribute("educationRowCount", eduCount);
@@ -305,7 +332,7 @@ public class EmployeeRegister1Service {
                 request.setAttribute("educationStatus" + n, nz(e.getGraduationStatus()));
             }
 
-            // 경력
+            // 경력 (経歴)
             java.util.List<EmployeeCareer> careers = careerDao.selectByEmployeeId(conn, employeeId);
             int carCount = careers.size() > 0 ? careers.size() : 1;
             request.setAttribute("careerRowCount", carCount);
@@ -319,7 +346,7 @@ public class EmployeeRegister1Service {
                 request.setAttribute("careerEnd" + n, c.getEndDate() != null ? c.getEndDate().toString() : "");
             }
 
-            // 4대보험
+            // 4대보험 (4大保険)
             java.util.List<EmployeeInsurance> insurances = insuranceDao.selectByEmployeeId(conn, employeeId);
             for (EmployeeInsurance ins : insurances) {
                 String code = nz(ins.getInsuranceTypeCode());
@@ -345,7 +372,7 @@ public class EmployeeRegister1Service {
                 }
             }
 
-            // 병역
+            // 병역 (兵役)
             EmployeeMilitary military = militaryDao.selectByEmployeeId(conn, employeeId);
             if (military != null) {
                 request.setAttribute("militaryStatus", nz(military.getMilitaryStatusCode()));
@@ -372,6 +399,7 @@ public class EmployeeRegister1Service {
     }
 
     // "No-260001" -> "No-260002" 처럼 다음 번호를 계산. 기존 값이 없으면 최초값부터 시작.
+    // "No-260001" -> "No-260002"のように次の番号を計算。既存値がなければ初期値からスタート。
     private String calcNextEmpNo(String maxEmpNo) {
         if (maxEmpNo == null || maxEmpNo.isEmpty()) {
             return EMP_NO_PREFIX + EMP_NO_START;

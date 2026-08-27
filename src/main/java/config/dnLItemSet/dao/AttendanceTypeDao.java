@@ -10,9 +10,12 @@ import java.util.List;
 import config.model.AttendanceType;
 import jdbc.JdbcUtil;
 
+// 근태 항목 DAO
+// 勤怠項目 DAO
 public class AttendanceTypeDao {
 
-	// 사용중(Y)인 것만 - 다른 화면(급여항목설정 드롭다운 등)에서 그대로 쓰고 있어서 필터 유지
+	// 사용중(Y)인 근태항목만 가져옴 (급여항목 드롭다운 등에서 씀)
+	// 使用中(Y)の勤怠項目のみ取得（給与項目のドロップダウン等で使用）
 	public List<AttendanceType> selectByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -39,7 +42,8 @@ public class AttendanceTypeDao {
 		}
 	}
 
-	// 휴가/근태설정 관리화면 목록용 - 사용여부 상관없이 전부 조회
+	// 근태설정 관리화면 목록용 (사용여부 상관없이 싹 다 가져옴)
+	// 勤怠設定の管理画面リスト用（使用有無に関係なく全て取得）
 	public List<AttendanceType> selectAllByCompanyId(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -65,7 +69,8 @@ public class AttendanceTypeDao {
 		}
 	}
 
-	// 특정 휴가항목(LEAVE_TYPE)에 이미 연결된 근태항목이 있는지 조회 (없으면 null)
+	// 특정 휴가(LEAVE_TYPE)에 물려있는 근태항목 있는지 체크 (없으면 null)
+	// 特定の休暇(LEAVE_TYPE)に紐づいている勤怠項目があるかチェック（なければnull）
 	public AttendanceType selectByLeaveTypeId(Connection conn, int companyId, int leaveTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -114,6 +119,8 @@ public class AttendanceTypeDao {
 		}
 	}
 
+	// 근태항목 신규 등록
+	// 勤怠項目の新規登録
 	public void insert(Connection conn, AttendanceType item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -150,6 +157,8 @@ public class AttendanceTypeDao {
 		}
 	}
 
+	// 근태항목 수정
+	// 勤怠項目の修正
 	public void update(Connection conn, AttendanceType item) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -184,6 +193,8 @@ public class AttendanceTypeDao {
 		}
 	}
 
+	// 근태항목 삭제
+	// 勤怠項目の削除
 	public void delete(Connection conn, int attendanceTypeId) throws SQLException {
 
 		PreparedStatement pstmt = null;

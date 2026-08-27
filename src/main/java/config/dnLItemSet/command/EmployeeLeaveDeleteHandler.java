@@ -6,7 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import config.dnLItemSet.service.EmployeeLeaveManageService;
 
-// [휴가일수 삭제] - 체크된 사원들의 부과기록을 통째로 지움
+// 체크된 사원의 휴가 부여기록 전체 삭제
+// / チェックした社員の付与記録を全件削除
 public class EmployeeLeaveDeleteHandler implements CommandHandler {
 
 	private EmployeeLeaveManageService employeeLeaveManageService = new EmployeeLeaveManageService();

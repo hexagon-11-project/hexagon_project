@@ -10,8 +10,12 @@ import java.util.List;
 import config.employee.model.EmployeeLanguage;
 import jdbc.JdbcUtil;
 
+// 사원 어학능력(어학시험, 공인점수, 회화 수준 등) 데이터를 처리하는 DAO
+// 社員の語学能力（語学試験、公認スコア、会話レベルなど）データを処理する DAO
 public class EmployeeLanguageDao {
 
+    // 어학 데이터 한 줄을 DB에 밀어 넣는(인서트 치는) 메서드
+    // 語学データを1行DBに押し込む（インサートをかける）メソッド
     public void insert(Connection conn, int employeeId, EmployeeLanguage v) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -35,6 +39,10 @@ public class EmployeeLanguageDao {
         }
     }
 
+    // 특정 사원의 어학 데이터를 통째로 날림
+    // (화면에서 수정할 때 부분 업데이트 안 하고, 기존 데이터를 싹 지운 다음 새로 엎어치기 하려는 용도)
+    // 特定社員の語学データを丸ごと飛ばす
+    // （画面での修正時、部分アップデートを行わず既存データを全消しして新しく洗い替えするための用途）
     public void deleteByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         try {
@@ -46,6 +54,8 @@ public class EmployeeLanguageDao {
         }
     }
 
+    // 특정 사원의 전체 어학/시험 내역을 쫙 긁어옴 (화면 표에 뿌려줄 때 씀)
+    // 特定社員の全語学・試験履歴をざっとかき集める（画面の表に描画する時に使う）
     public List<EmployeeLanguage> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;

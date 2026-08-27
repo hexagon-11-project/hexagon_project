@@ -12,9 +12,12 @@ import config.model.DailyWorkRecord;
 import config.model.EmployeeLeave;
 import jdbc.JdbcUtil;
 
+// 일용직 사원 목록 조회 및 일용직 근무 기록(단가, 지급액, 세금 등)을 DB에 처리하고 급여 시스템과 연동하는 DAO
+// 日雇い社員リストの照会、および日雇い勤務記録（単価、支給額、税金など）をDBで処理し給与システムと連携する DAO
 public class DailyWorkRecordDao {
 
 	// 왼쪽 목록에 뿌릴 일용직 사원 목록만 (EMPLOYMENT_TYPE이 '일용직'/'DAILY' 두 가지로 섞여 있음)
+	// 左側のリストに描画する日雇い社員リストのみ（EMPLOYMENT_TYPEが「日雇い」／「DAILY」の2種類で混在しているため）
 	public List<EmployeeLeave> selectDailyWorkerEmployees(Connection conn, int companyId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -31,6 +34,7 @@ public class DailyWorkRecordDao {
 
 			while (rs.next()) {
 				// 사원 기본정보만 필요해서, 이미 만들어둔 EmployeeLeave 모델을 재사용
+				// 社員基本情報のみが必要なため、すでに作成済みのEmployeeLeaveモデルを再利用
 				EmployeeLeave row = new EmployeeLeave();
 				row.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
 				row.setEmploymentType(rs.getString("EMPLOYMENT_TYPE"));
@@ -49,8 +53,12 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 새로운 일용직 근무 기록을 인서트 치기 전, 급여 귀속 ID를 먼저 확보한 뒤 저장하는 메서드
+	// 新しい日雇い勤務記録をインサートする前に、給与帰属IDを先に確保してから保存するメソッド
 	public void insert(Connection conn, DailyWorkRecord item) throws SQLException {
 
+		// 근무일자를 바탕으로 해당 월의 급여 마스터 및 사원별 급여 귀속 ID를 자동 해결(조회 또는 생성)
+		// 勤務日を基に該当月の給与マスターおよび社員別給与帰属IDを自動解決（照会または生成）
 		Long payrollEmployeeId = resolvePayrollEmployeeId(conn, item.getEmployeeId(), item.getWorkDate());
 
 		PreparedStatement pstmt = null;
@@ -83,9 +91,12 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 기존 일용직 근무 기록을 수정(UPDATE)하는 메서드
+	// 既存の日雇い勤務記録を修正（UPDATE）するメソッド
 	public void update(Connection conn, DailyWorkRecord item) throws SQLException {
 
 		// 근무일자를 다른 달로 옮겨 수정할 수도 있으므로, 매번 현재 근무일자 기준으로 다시 계산해서 갱신한다.
+		// 勤務日を別の月に変更して修正する場合もあるため、毎回現在の勤務日を基準に再計算して更新する。
 		Long payrollEmployeeId = resolvePayrollEmployeeId(conn, item.getEmployeeId(), item.getWorkDate());
 
 		PreparedStatement pstmt = null;
@@ -117,7 +128,10 @@ public class DailyWorkRecordDao {
 
 	/** 근무일자가 속한 귀속연월 + 급여-01차의 PAYROLL_EMPLOYEE_ID를 반환한다.
 	 *  (payment.paymentMntDayWorker 급여입력관리 화면이 이 ID로 근무기록을 조회하므로, 근태관리에서
-	 *  근무기록을 저장하는 시점에 미리 연결해둬야 그 화면에 바로 반영된다) */
+	 *  근무기록을 저장하는 시점에 미리 연결해둬야 그 화면에 바로 반영된다) 
+	 * 勤務日が属する帰属年月 ＋ 給与-第1次のPAYROLL_EMPLOYEE_IDを返却する。
+	 * （payment.paymentMntDayWorker 給与入力管理画面がこのIDで勤務記録を照会するため、勤怠管理で
+	 * 勤務記録を保存する時点で事前に紐づけておく必要がある） */
 	private Long resolvePayrollEmployeeId(Connection conn, int employeeId, java.sql.Date workDate) throws SQLException {
 		LocalDate date = workDate.toLocalDate();
 		String payYearMonth = String.format("%04d%02d", date.getYear(), date.getMonthValue());
@@ -127,6 +141,8 @@ public class DailyWorkRecordDao {
 		return ensurePayrollEmployeeExists(conn, payrollId, employeeId);
 	}
 
+	// 해당 귀속연월/차수의 급여 마스터가 없으면 자동 생성하고, 있으면 ID를 리턴하는 내부 헬퍼
+	// 該当帰属年月・次数の給与マスターがなければ自動生成し、あればIDをリターンする内部ヘルパー
 	private Long ensurePayrollExists(Connection conn, String payYearMonth, int paySequence) throws SQLException {
 		String selectSql = "SELECT PAYROLL_ID FROM PAYROLL WHERE PAY_YEAR_MONTH = ? AND PAY_SEQUENCE = ?";
 		try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
@@ -158,6 +174,8 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 해당 급여 마스터에 사원별 급여 정보가 없으면 자동 생성하고, 있으면 ID를 리턴하는 내부 헬퍼
+	// 該当給与マスターに社員別給与情報がなければ自動生成し、あればIDをリターンする内部ヘルパー
 	private Long ensurePayrollEmployeeExists(Connection conn, Long payrollId, int employeeId) throws SQLException {
 		String selectSql = "SELECT PAYROLL_EMPLOYEE_ID FROM PAYROLL_EMPLOYEE WHERE PAYROLL_ID = ? AND EMPLOYEE_ID = ?";
 		try (PreparedStatement pstmt = conn.prepareStatement(selectSql)) {
@@ -191,6 +209,8 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 특정 일용직 근무 기록 건을 PK로 삭제하는 메서드
+	// 特定の日雇い勤務記録案件をPKで削除するメソッド
 	public void deleteById(Connection conn, int dailyWorkRecordId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -204,6 +224,8 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 특정 사원의 일용직 근무 기록 목록을 최근 근무일순으로 조회
+	// 該当社員の日雇い勤務記録リストを最近の勤務日順に照会
 	public List<DailyWorkRecord> selectByEmployeeId(Connection conn, int employeeId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -231,6 +253,8 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// 특정 일용직 근무 기록 단건 조회
+	// 特定の日雇い勤務記録単件照会
 	public DailyWorkRecord selectById(Connection conn, int dailyWorkRecordId) throws SQLException {
 
 		PreparedStatement pstmt = null;
@@ -255,6 +279,8 @@ public class DailyWorkRecordDao {
 		}
 	}
 
+	// ResultSet 결과를 DailyWorkRecord 모델 객체에 매핑(포장)해 주는 공통 헬퍼 메서드
+	// ResultSetの結果をDailyWorkRecordモデルオブジェクトにマッピング（パッケージング）する共通ヘルパーメソッド
 	private DailyWorkRecord mapRow(ResultSet rs) throws SQLException {
 
 		DailyWorkRecord item = new DailyWorkRecord();

@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import command.CommandHandler;
 import config.dnLItemSet.service.AttendanceTypeDeleteService;
 
+// 근태항목 삭제
+// / 勤怠項目削除
 public class AttendanceTypeDeleteHandler implements CommandHandler {
 
 	private AttendanceTypeDeleteService deleteService = new AttendanceTypeDeleteService();

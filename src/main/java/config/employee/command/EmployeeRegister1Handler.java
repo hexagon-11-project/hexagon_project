@@ -7,9 +7,11 @@ import command.CommandHandler;
 import config.employee.model.Employee;
 import config.employee.service.EmployeeRegister1Service;
 
+// 사원등록 1페이지 - GET: 폼 표시, POST: 저장 처리
+// / 社員登録1ページ - GET: フォーム表示、POST: 保存処理
 public class EmployeeRegister1Handler implements CommandHandler {
 
-    // JSP 뷰 파일 경로 설정 (WEB-INF/view 디렉터리 기준)
+    // JSP 뷰 경로 / JSPビューのパス
     private static final String FORM_VIEW = "/WEB-INF/pages/config/employee-register1.jsp";
 
     private EmployeeRegister1Service registerService = new EmployeeRegister1Service();
@@ -26,12 +28,14 @@ public class EmployeeRegister1Handler implements CommandHandler {
         }
     }
 
-    // 1. GET 요청: 사원 등록 폼 화면을 보여줄 때 처리
+    // GET - 폼 초기 표시, employeeId 있으면 기존 사원 데이터 로드
+    // / GET - フォーム初期表示、employeeIdがあれば既存社員データをロード
     private String processForm(HttpServletRequest request, HttpServletResponse response) {
         String employeeIdParam = request.getParameter("employeeId");
 
         if (employeeIdParam != null && !employeeIdParam.isBlank()) {
-            // 사원현황에서 이름 클릭 - 기존 사원 데이터를 폼에 채워서 보여줌
+            // 사원현황에서 이름 클릭 - 기존 사원 데이터를 폼에 채워서 표시
+            // / 社員一覧から名前クリック - 既存社員データをフォームに表示
             int employeeId = Integer.parseInt(employeeIdParam);
             Employee emp = registerService.getEmployeeById(employeeId);
             if (emp != null) {
@@ -44,6 +48,7 @@ public class EmployeeRegister1Handler implements CommandHandler {
             }
         } else {
             // 신규 등록 - 새 사원번호 채번
+            // / 新規登録 - 社員番号を新規採番
             String nextEmpNo = registerService.generateNextEmpNo();
             request.setAttribute("defaultEmpNo", nextEmpNo);
         }
@@ -51,16 +56,15 @@ public class EmployeeRegister1Handler implements CommandHandler {
         return FORM_VIEW;
     }
 
-    // 2. POST 요청: 사용자가 [저장하기] 등을 눌러 데이터를 서버로 전송했을 때 처리
+    // POST - 저장하기 또는 행 추가/삭제 버튼 처리
+    // / POST - 保存ボタンまたは行追加/削除ボタンの処理
     private String processSubmit(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 한글 인코딩 설정
         request.setCharacterEncoding("UTF-8");
 
         String formAction = request.getParameter("formAction");
 
-        // ===== 부양가족 / 학력 / 경력 표의 [추가] [선택삭제] 처리 =====
-        // "저장하기"가 아니라 이 버튼들 중 하나가 눌린 거라면, 실제 사원 저장은 하지 않고
-        // 표 내용만 갱신해서 같은 폼을 다시 보여준다.
+        // 부양가족/학력/경력 [추가][선택삭제] 버튼 - 저장 안 하고 행 수만 조정해서 폼 다시 표시
+        // / 扶養家族/学歴/経歴の[追加][選択削除]ボタン - 保存せず行数のみ調整してフォーム再表示
         if (formAction != null) {
             switch (formAction) {
                 case "addFamilyRow":
@@ -91,20 +95,21 @@ public class EmployeeRegister1Handler implements CommandHandler {
                             "career", "careerRowCount", "careerDel", 1);
                     return null;
                 default:
-                    // "저장하기"는 formAction 파라미터가 없으므로 여기로 안 들어옴 - 아래로 계속 진행
+                    // [저장하기]는 formAction 없음 - 아래로 진행
+                    // / [保存]はformActionなし - 下に進む
                     break;
             }
         }
 
         Employee emp = new Employee();
 
-        // 1. 기본 텍스트 정보 매핑 (JSP의 name 속성 -> VO의 Setter)
+        // 기본 텍스트 필드 매핑 / 基本テキストフィールドのマッピング
         emp.setEmploymentType(request.getParameter("employmentType"));
         emp.setEmployeeName(request.getParameter("employeeName"));
         emp.setEmployeeNameEn(request.getParameter("employeeNameEn"));
         emp.setDepartment(request.getParameter("department"));
         emp.setPosition(request.getParameter("position"));
-        emp.setDomForYn(request.getParameter("domForYn")); // 내/외국인 여부 (Y/N)
+        emp.setDomForYn(request.getParameter("domForYn")); // 내/외국인 여부 / 日本国籍/外国籍
         emp.setEmail(request.getParameter("email"));
         emp.setSns(request.getParameter("sns"));
         emp.setBankName(request.getParameter("bankName"));
@@ -116,7 +121,7 @@ public class EmployeeRegister1Handler implements CommandHandler {
         emp.setEmploymentInsuranceAmount(RowFormUtil.parseIntOrDefault(request.getParameter("employmentInsuranceAmount"), 0));
         emp.setPhotoPath(request.getParameter("photoPath"));
 
-        // 2. 날짜 데이터 변환 (빈 문자열이 넘어오면 에러가 나므로 예외 방지 처리)
+        // 날짜 변환 - 빈 문자열이면 skip / 日付変換 - 空文字はスキップ
         String hireDateStr = request.getParameter("hireDate");
         if (hireDateStr != null && !hireDateStr.isEmpty()) {
             emp.setHireDate(java.sql.Date.valueOf(hireDateStr));
@@ -127,14 +132,14 @@ public class EmployeeRegister1Handler implements CommandHandler {
             emp.setResignDate(java.sql.Date.valueOf(resignDateStr));
         }
 
-        // 3. 쪼개진 데이터 합치기 (주민번호)
+        // 주민번호 앞뒤 합치기 / マイナンバー前後を結合
         String rrnFront = request.getParameter("residentRegNoFront");
         String rrnBack = request.getParameter("residentRegNoBack");
         if (rrnFront != null && !rrnFront.isEmpty() && rrnBack != null) {
             emp.setResidentRegNo(rrnFront + "-" + rrnBack);
         }
 
-        // 4. 쪼개진 데이터 합치기 (일반 전화번호)
+        // 전화번호 합치기 / 電話番号を結合
         String phone1 = request.getParameter("phone1");
         String phone2 = request.getParameter("phone2");
         String phone3 = request.getParameter("phone3");
@@ -142,7 +147,7 @@ public class EmployeeRegister1Handler implements CommandHandler {
             emp.setPhone(phone1 + "-" + phone2 + "-" + phone3);
         }
 
-        // 5. 쪼개진 데이터 합치기 (휴대폰 번호)
+        // 휴대폰 합치기 / 携帯電話番号を結合
         String mobile1 = request.getParameter("mobile1");
         String mobile2 = request.getParameter("mobile2");
         String mobile3 = request.getParameter("mobile3");
@@ -150,29 +155,25 @@ public class EmployeeRegister1Handler implements CommandHandler {
             emp.setMobile(mobile1 + "-" + mobile2 + "-" + mobile3);
         }
 
-        // 6. 서비스 호출하여 DB 저장 (기존 사원이면 UPDATE, 신규이면 INSERT)
+        // 기존 사원이면 UPDATE, 신규면 INSERT / 既存社員はUPDATE、新規はINSERT
         String existingEmployeeIdParam = request.getParameter("existingEmployeeId");
         if (existingEmployeeIdParam != null && !existingEmployeeIdParam.isBlank()) {
-            // 사원현황에서 불러온 기존 사원 수정 - UPDATE
             emp.setEmployeeId(Integer.parseInt(existingEmployeeIdParam));
-            // 기존 사원번호 그대로 유지 (새로 채번 안 함) - existingEmployeeNo 파라미터 우선 사용
             String existingEmployeeNo = request.getParameter("existingEmployeeNo");
             emp.setEmployeeNo((existingEmployeeNo != null && !existingEmployeeNo.isBlank())
                 ? existingEmployeeNo
                 : request.getParameter("employeeNo"));
             registerService.updateEmployee(emp, request);
         } else {
-            // 신규 등록 - INSERT
             registerService.registerEmployee(emp, request);
         }
 
-        // 7. 어느 버튼으로 눌렀는지에 따라 이동할 곳이 다름
+        // 버튼에 따라 이동 위치 다름 / ボタンによって遷移先が異なる
         if ("saveAndStay".equals(formAction)) {
-            // [신규사원등록] 버튼: DB엔 저장하되, 2페이지로 넘어가지 않고 1페이지에 그대로 머무른다.
-            // (다음 사람을 새로 등록할 수 있게 사원번호만 새로 채번해서 빈 폼으로 되돌아감)
+            // [신규사원등록] - 저장 후 1페이지 빈 폼으로 / [新規社員登録] - 保存後に1ページ初期フォームへ
             response.sendRedirect(request.getContextPath() + "/Config/employeeIns1.do");
         } else {
-            // [저장하기] 버튼: 2페이지로 이어서 넘어감
+            // [저장하기] - 저장 후 2페이지로 / [保存] - 保存後に2ページへ
             String encodedEmpNo = java.net.URLEncoder.encode(emp.getEmployeeNo(), "UTF-8");
             response.sendRedirect(request.getContextPath() + "/Config/employeeIns2.do?employeeNo=" + encodedEmpNo);
         }
