@@ -25,6 +25,7 @@ public class CertificatePrintWorkingDao {
 	                   + "FROM employee ";
 	        
 	        // 검색어가 넘어온 경우 WHERE 조건 추가
+	        // 検索キーワードが渡された場合、WHERE条件を追加
 	        if (searchName != null && !searchName.trim().isEmpty()) {
 	            sql += "WHERE employee_name LIKE ? ";
 	        }
@@ -34,6 +35,7 @@ public class CertificatePrintWorkingDao {
 	        pstmt = conn.prepareStatement(sql);
 	        
 	        // 검색어가 있을 때만 파라미터 세팅
+	        // 検索キーワードがある場合のみパラメータをセット
 	        if (searchName != null && !searchName.trim().isEmpty()) {
 	            pstmt.setString(1, "%" + searchName.trim() + "%");
 	        }
@@ -78,7 +80,7 @@ public class CertificatePrintWorkingDao {
                 emp.setPosition(rs.getString("position"));
                 emp.setResidentRegNo(rs.getString("resident_reg_no"));
                 emp.setHireDate(rs.getDate("hire_date"));     // 근속기간 계산용
-                emp.setResignDate(rs.getDate("resign_date")); // 근속기간 계산용
+                emp.setResignDate(rs.getDate("resign_date")); // 勤続期間計算用
                 emp.setRetirementYn(rs.getString("retirement_yn"));
             }
             return emp;
@@ -104,8 +106,7 @@ public class CertificatePrintWorkingDao {
                        + "    e.employee_id, "               
                        + "    ?, "                            
                        + "    TO_CHAR(SYSDATE, 'YYYY'), "     
-                       + "    (SELECT NVL(MAX(issue_sequence), 0) + 1 FROM certificate_issue WHERE issue_year = TO_CHAR(SYSDATE, 'YYYY')), " // 6. 순번
-                       // 7. 발급번호: 4자리 연도(YYYY) || '-' || 6자리 순번(000001) 자동 생성
+                       + "    (SELECT NVL(MAX(issue_sequence), 0) + 1 FROM certificate_issue WHERE issue_year = TO_CHAR(SYSDATE, 'YYYY')), " 
                        + "    TO_CHAR(SYSDATE, 'YYYY') || '-' || LPAD((SELECT NVL(MAX(issue_sequence), 0) + 1 FROM certificate_issue WHERE issue_year = TO_CHAR(SYSDATE, 'YYYY')), 6, '0'), "
                        + "    SYSDATE, "                       
                        + "    ?, "                             

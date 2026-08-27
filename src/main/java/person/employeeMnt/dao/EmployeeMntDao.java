@@ -21,6 +21,7 @@ public class EmployeeMntDao {
 			String sql = "SELECT * FROM employee WHERE employee_id = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, employeeId); // ? 에 들어갈 파라미터 세팅
+										 // // ? に入るパラメータをセット
 		
 			rs = pstmt.executeQuery();
 
@@ -48,6 +49,7 @@ public class EmployeeMntDao {
 	}
 	
 	// 사원 전체 리스트를 조회하는 메서드
+	// 社員の全リストを照会するメソッド
 	public List<Employee> selectList(Connection conn) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -84,7 +86,8 @@ public class EmployeeMntDao {
 		}
 	}
 
-	// 한글 기준 고용형태 및 재직상태 카운트를 한 번에 가져오는 통합 쿼리 메서드
+	// 고용형태 및 재직상태 카운트를 한 번에 가져오는 통합 쿼리 메서드
+	// 雇用形態および在職ステータスのカウントを一度に取得する統合クエリメソッド
 	public Map<String, Integer> getAllCounts(Connection conn) throws SQLException {
 		String sql = "SELECT " +
 				"  SUM(CASE WHEN employment_type = '정규직' THEN 1 ELSE 0 END) AS regular, " +
@@ -113,6 +116,7 @@ public class EmployeeMntDao {
 		return countMap;
 	}
 	// 지정한 범위만큼 사원 리스트를 잘라서 조회하는 페이징 쿼리 
+	// 指定した範囲だけ社員リストを切り取って照会するページングクエリ
 	public List<Employee> selectListByPaging(Connection conn, int firstRow, int endRow, String searchType, String keyword) throws SQLException {
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
@@ -128,6 +132,7 @@ public class EmployeeMntDao {
 	            int paramIndex = 1;
 	            
 	            // 검색어가 있을 경우 ? 위치에 값 바인딩
+	            // 検索キーワードがある場合、? の位置に値をバインディング
 	            if (!where.isEmpty()) {
 	                pstmt.setString(paramIndex++, "%" + keyword.trim() + "%");
 	            }
@@ -163,6 +168,7 @@ public class EmployeeMntDao {
 		}
 		
 		// 특정 사번을 받아 DB에서 삭제하는 메서드
+		// 特定の社員番号を受け取り、DBから削除するメソッド
 		public int deleteEmployeeMnt(Connection conn, int employeeId) throws SQLException {
 			String sql = "DELETE FROM employee WHERE employee_id = ?";
 			
@@ -172,6 +178,7 @@ public class EmployeeMntDao {
 			}
 		}
 		// 공통 검색 조건 메소드
+		// 共通の検索条件メソッド
 		private String searchCondition(String searchType, String keyword) {
 	        if (keyword == null || keyword.trim().isEmpty()) {
 	            return "";
@@ -186,6 +193,7 @@ public class EmployeeMntDao {
 	        return "";
 	    }
 		// 검색된 데이터의 총 개수 카운트 메서드 
+		// 検索されたデータの総件数をカウントするメソッド
 		public int getSearchCount(Connection conn, String searchType, String keyword) throws SQLException {
 	        String where = searchCondition(searchType, keyword); 
 	        String sql = "SELECT COUNT(*) FROM employee" + where;

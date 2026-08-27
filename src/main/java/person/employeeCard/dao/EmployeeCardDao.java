@@ -28,7 +28,8 @@ public class EmployeeCardDao {
 		ResultSet rs = null;
 
 		try {
-			//  인적사항 및 퇴직정보를 메인 테이블(EMPLOYEE)에서 한 번에 조회
+			//  인적사항 및 퇴직정보를 테이블(EMPLOYEE)에서 한 번에 조회
+			// 人的事項および退職情報をテーブル(EMPLOYEE)から一度に照会
 			String empSql = "SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID = ?";
 			pstmt = conn.prepareStatement(empSql);
 			pstmt.setInt(1, employeeId);
@@ -37,7 +38,8 @@ public class EmployeeCardDao {
 			if (rs.next()) {
 				card = new EmployeeCard();
 
-				// [1] 기본 인적사항
+				// 기본 인적사항
+				// 基本人的事項
 				card.setEmployeeNo(rs.getString("EMPLOYEE_NO"));
 				card.setHireDate(rs.getDate("HIRE_DATE"));
 				card.setPhotoPath(rs.getString("PHOTO_PATH"));
@@ -49,7 +51,8 @@ public class EmployeeCardDao {
 				card.setPhone(rs.getString("PHONE"));
 				card.setMobile(rs.getString("MOBILE"));
 
-				// [2] 퇴직사항 다이렉트 세팅
+				// 퇴직사항 다이렉트 세팅
+				// 退職事項をダイレクトセッティング
 				card.setRetireType(rs.getString("RETIREMENT_TYPE_CODE"));
 				card.setRetireDate(rs.getDate("RESIGN_DATE"));
 				card.setRetireReason(rs.getString("RETIREMENT_REASON"));
@@ -58,7 +61,8 @@ public class EmployeeCardDao {
 				JdbcUtil.close(rs);
 				JdbcUtil.close(pstmt);
 
-				// [3] 하위 1:N 테이블 리스트 조회 후 세팅
+				// 하위 1:N 테이블 리스트 조회 후 세팅
+				// 下位1:Nテーブルのリストを照会後、セッティング
 				card.setDependentList(selectDependents(conn, employeeId));
 				card.setInsuranceList(selectInsurances(conn, employeeId));
 				card.setEducationList(selectEducations(conn, employeeId));
@@ -77,7 +81,8 @@ public class EmployeeCardDao {
 		}
 	}
 
-	// 1. 가족사항
+	// 가족사항
+	// 家族事項
 	private List<EmployeeDependent> selectDependents(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeDependent> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_DEPENDENT WHERE EMPLOYEE_ID = ?";
@@ -97,7 +102,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 2. 4대보험
+	// 4대보험
+	// 4大社会保険
 	private List<EmployeeInsurance> selectInsurances(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeInsurance> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_INSURANCE WHERE EMPLOYEE_ID = ?";
@@ -117,7 +123,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 3. 학력
+	// 학력
+	// 学歴
 	private List<EmployeeEducation> selectEducations(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeEducation> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_EDUCATION WHERE EMPLOYEE_ID = ? ORDER BY START_DATE ASC";
@@ -138,7 +145,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 4. 병역
+	// 병역
+	// 兵役
 	private EmployeeMilitary selectMilitary(Connection conn, int employeeId) throws SQLException {
 		EmployeeMilitary mil = null;
 		String sql = "SELECT * FROM EMPLOYEE_MILITARY WHERE EMPLOYEE_ID = ?";
@@ -162,7 +170,8 @@ public class EmployeeCardDao {
 		return mil;
 	}
 
-	// 5. 경력
+	// 경력
+	// 経歴
 	private List<EmployeeCareer> selectCareers(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeCareer> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_CAREER WHERE EMPLOYEE_ID = ? ORDER BY START_DATE ASC";
@@ -183,7 +192,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 6. 자격/면허
+	// 자격/면허
+	// 資格/免許
 	private List<EmployeeQualification> selectQualifications(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeQualification> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_QUALIFICATION WHERE EMPLOYEE_ID = ? ORDER BY ACQUISITION_DATE";
@@ -204,6 +214,7 @@ public class EmployeeCardDao {
 	}
 
 	// 7. 어학능력
+	// 語学能力
 	private List<EmployeeLanguage> selectLanguages(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeLanguage> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_LANGUAGE WHERE EMPLOYEE_ID = ? ORDER BY ACQUISITION_DATE";
@@ -226,7 +237,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 8. 교육사항
+	// 교육사항
+	// 教育事項
 	private List<EmployeeTraining> selectTrainings(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeTraining> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_TRAINING WHERE EMPLOYEE_ID = ? ORDER BY TRAINING_START_DATE";
@@ -249,7 +261,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 9. 상벌사항
+	// 상벌사항
+	// 賞罰事項
 	private List<EmployeeRewardPunishment> selectRewardPunishments(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeRewardPunishment> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_REWARD_PUNISHMENT WHERE EMPLOYEE_ID = ? ORDER BY REWARD_PUNISHMENT_DATE";
@@ -271,7 +284,8 @@ public class EmployeeCardDao {
 		return list;
 	}
 
-	// 10. 인사발령
+	// 인사발령
+	// 人事発令
 	private List<EmployeeAppointment> selectAppointments(Connection conn, int employeeId) throws SQLException {
 		List<EmployeeAppointment> list = new ArrayList<>();
 		String sql = "SELECT * FROM EMPLOYEE_APPOINTMENT WHERE EMPLOYEE_ID = ? ORDER BY APPOINTMENT_DATE";
@@ -294,7 +308,8 @@ public class EmployeeCardDao {
 	}
 
 	
-	// 새로 추가된 전체 사원 목록 조회 메서드 
+	// 전체 사원 목록 조회 메서드 
+	// 全社員リストを照会するメソッド
 	
 	public List<EmployeeCard> selectAllEmployees(Connection conn) throws SQLException {
 		List<EmployeeCard> list = new ArrayList<>();
@@ -306,6 +321,7 @@ public class EmployeeCardDao {
 			while (rs.next()) {
 				EmployeeCard card = new EmployeeCard();
 				// JSP의 <option value="${emp.employeeId}"> 에 들어갈 핵심 값 세팅
+				//JSPの <option value="${emp.employeeId}"> に入るコア値をセッティング		
 				card.setEmployeeId(rs.getInt("EMPLOYEE_ID")); 
 				card.setEmployeeNo(rs.getString("EMPLOYEE_NO"));
 				card.setEmployeeName(rs.getString("EMPLOYEE_NAME"));

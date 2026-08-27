@@ -30,26 +30,30 @@ public class CertificateRegisterDao {
 					   + "WHERE TO_CHAR(certificate_issue.issue_date, 'yyyy-mm-dd') BETWEEN ? AND ? ";
 
 			// 증명서별 선택 검색 조건 추가
-			if (certType != null && !certType.equals("전체")) {
+			// 証明書別の選択検索条件を追加
+			if (certType != null && !certType.equals("전체") && !certType.equals("全体")) {
 				sql += "AND certificate_issue.certificate_type_code = ? ";
 			}
 			
 			// 사원명 검색 조건 추가
+			// 社員名検索条件を追加
 			if (empName != null && !empName.trim().isEmpty()) {
 				sql += "AND employee.employee_name LIKE ? ";
 			}
 			
 			// 정렬 조건 추가
+			// ソート条件を追加
 			sql += "ORDER BY certificate_issue.issue_date DESC, certificate_issue.issue_no DESC";
 
 			pstmt = conn.prepareStatement(sql);
 			
 			// 파라미터 세팅
+			// パラメータセッティング
 			int paramIndex = 1;
 			pstmt.setString(paramIndex++, startDate);
 			pstmt.setString(paramIndex++, endDate);
 			
-			if (certType != null && !certType.equals("전체")) {
+			if (certType != null && !certType.equals("全体")) {
 				pstmt.setString(paramIndex++, certType);
 			}
 			
@@ -68,7 +72,6 @@ public class CertificateRegisterDao {
 				model.setRegId(rs.getString("reg_id"));
 				model.setCertificateYn(rs.getString("certificate_yn"));
 
-				// JSP 출력을 위해 필요한 변수들 
 				 model.setIssueDate(rs.getString("issue_date"));
 				 model.setEmployeeName(rs.getString("employee_name"));
 
@@ -87,10 +90,12 @@ public class CertificateRegisterDao {
         
         try {
             // 상태를 'N'으로 변경하는 쿼리
+        	// ステータスを「N」に変更するクエリ
             String sql = "UPDATE certificate_issue SET certificate_yn = 'N' WHERE issue_no = ?";
             pstmt = conn.prepareStatement(sql);
             
             // 배열로 넘어온 발급번호를 하나씩 꺼내서 즉시 업데이트 실행
+            // 配列として渡された発行番号を1つずつ取り出して即時アップデートを実行
             for (String issueNo : issueNos) {
                 pstmt.setString(1, issueNo);
                 

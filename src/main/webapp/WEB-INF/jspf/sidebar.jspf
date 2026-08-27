@@ -8,10 +8,10 @@
 			href="<%=ctx%>/pages/main.jsp"><span class="nav-icon">□</span><span>메인</span></a>
 	</div>
 	<div class="nav-group">
-		<div class="nav-label">기본환경</div>
+		<div class="nav-label">基本設定</div>
 		<a class="nav-item <%="user-info".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/membersInfo.do"><span
-			class="nav-icon">□</span><span>사용자 정보</span></a><a
+			class="nav-icon">□</span><span>ユーザー情報</span></a><a
 			class="nav-item <%="employee-register1".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Config/employeeIns1.do"><span class="nav-icon">□</span><span>사원
 				등록1</span></a><a
@@ -23,19 +23,19 @@
 			class="nav-icon">□</span><span>給与項目設定</span></a>
 	</div>
 	<div class="nav-group">
-		<div class="nav-label">인사관리</div>
+		<div class="nav-label">人事管理</div>
 		<a
 			class="nav-item <%="employee-list".equals(activeKey) ? "active" : ""%>"
-			href="<%=ctx%>/Person/employeeMnt.do"><span class="nav-icon">□</span><span>사원현황/관리</span></a><a
+			href="<%=ctx%>/Person/employeeMnt.do"><span class="nav-icon">□</span><span>社員現況/管理</span></a><a
 			class="nav-item <%="personnel-card".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Person/employeeCard.do"><span
-			class="nav-icon">□</span><span>인사기록 카드</span></a><a
+			class="nav-icon">□</span><span>人事記録カード</span></a><a
 			class="nav-item <%="certificate-issue".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Person/certificatePrintWorking.do"><span
-			class="nav-icon">□</span><span>제 증명서 발급</span></a><a
+			class="nav-icon">□</span><span>諸証明書発行</span></a><a
 			class="nav-item <%="certificate-ledger".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Person/certificateRegister.do"><span
-			class="nav-icon">□</span><span>제 증명서 발급 대장</span></a>
+			class="nav-icon">□</span><span>諸証明書発行台帳</span></a>
 	</div>
 	<div class="nav-group">
 		<div class="nav-label">근태관리</div>
@@ -105,16 +105,16 @@
 			class="nav-icon">□</span><span>給与項目構成統計</span></a>
 	</div>
 	<div class="nav-group">
-		<div class="nav-label">퇴직관리</div>
+		<div class="nav-label">退職管理</div>
 		<a
 			class="nav-item <%="retirement-process".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Retire/retireProcess.do"><span
-			class="nav-icon">□</span><span>사원 퇴직처리</span></a><a
+			class="nav-icon">□</span><span>社員退職処理</span></a><a
 			class="nav-item <%="retirement-pay".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Retire/retirementMnt.do"><span
-			class="nav-icon">□</span><span>퇴직급여 입력/관리</span></a><a
+			class="nav-icon">□</span><span>退職給与入力/管理</span></a><a
 			class="nav-item <%="retirement-slip".equals(activeKey) ? "active" : ""%>"
 			href="<%=ctx%>/Retire/retirePayslip.do"><span
-			class="nav-icon">□</span><span>퇴직급여 명세서</span></a>
+			class="nav-icon">□</span><span>退職給与明細書</span></a>
 	</div>
 </aside>

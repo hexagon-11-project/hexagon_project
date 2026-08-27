@@ -17,18 +17,21 @@ public class EmployeeCardReadHandler implements CommandHandler {
 	public String process(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		
 		// 전체 사원 목록을 조회 후 List에 담기
+		// 全社員リストを照会し、Listに格納
 		List<EmployeeCard> empList = employeeCardService.getAllEmployeeList();
 		
 		
 		req.setAttribute("empList", empList);
 
 		// '조회' 버튼을 눌렀을 때
+		// 「照会」ボタンをクリックした時
 		String empIdVal = req.getParameter("employeeId");
 		
 		if (empIdVal != null && !empIdVal.trim().isEmpty()) {
 			int employeeId = Integer.parseInt(empIdVal);
 			
 			//  상세 인사기록카드 조회
+			// 詳細人事記録カードの照会
 			EmployeeCard card = employeeCardService.getEmployeeCard(employeeId);
 			req.setAttribute("card", card);
 		}

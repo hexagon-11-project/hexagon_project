@@ -13,7 +13,8 @@ import retirement.model.RetirementMntModel.MonthlyWage;
 
 public class RetirementMntDao {
 
-    //  퇴직급여 대상 목록 조회 
+    //  퇴직급여 대상 목록 조회
+	// 退職給与対象リストを照会
     public List<RetirementMntModel> getRetirementMntList(Connection conn, String retirementYear, String employeeId) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -76,6 +77,7 @@ public class RetirementMntDao {
     }
 
     // 기준일 바탕으로 최근 3개월 급여 내역 조회
+    // 基準日を基に直近3ヶ月の給与履歴を照会
     public List<MonthlyWage> getRecent3MonthsPayroll(Connection conn, String employeeId, String baseDate) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -119,6 +121,7 @@ public class RetirementMntDao {
         }
     }
  // 퇴직급여 계산 결과 저장 (필수 컬럼 전체 반영)
+ // 退職給与の計算結果を保存 (必須カラムを全体反映)
     public int RetirementMntInsert(Connection conn, RetirementMntModel model) throws SQLException {
         PreparedStatement pstmt = null;
 

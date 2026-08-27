@@ -15,14 +15,14 @@ public class RetirementProcessUpdateService {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
-            conn.setAutoCommit(false); // 트랜잭션 시작
+            conn.setAutoCommit(false); 
 
             updateDao.updateRetirementProcess(conn, model);
 
-            conn.commit(); // 성공 시 커밋
+            conn.commit(); 
         } catch (SQLException e) {
-            JdbcUtil.rollback(conn); // 실패 시 롤백
-            throw new RuntimeException("퇴직 처리 중 오류가 발생했습니다.", e);
+            JdbcUtil.rollback(conn); 
+            throw new RuntimeException("退職処理中にエラーが発生しました。", e);
         } finally {
             JdbcUtil.close(conn);
         }

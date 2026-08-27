@@ -19,6 +19,7 @@ public class EmployeeMntDeleteService {
                 for (String idStr : empIds) {
                     try {
                         // 공백 제거 후 숫자로 변환 (오류 방지)
+                    	// 空白除去後に数値へ変換 (エラー防止)
                         int empId = Integer.parseInt(idStr.trim());
                         employeeDao.deleteEmployeeMnt(conn, empId);
                     } catch (NumberFormatException e) {
@@ -33,7 +34,7 @@ public class EmployeeMntDeleteService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("사원 선택 삭제 에러", e);
+            throw new RuntimeException("社員選択削除エラー", e);
         }
     }
 }

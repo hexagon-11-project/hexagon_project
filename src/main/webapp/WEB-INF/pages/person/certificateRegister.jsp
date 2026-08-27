@@ -1,9 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
-request.setAttribute("pageTitle", "제 증명서 발급 대장");
-request.setAttribute("pageSection", "인사관리");
-request.setAttribute("pageDescription", "증명서 발급 이력을 기간·증명서·사원 기준으로 조회하고 인쇄합니다.");
+request.setAttribute("pageTitle", "諸証明書発行台帳");
+request.setAttribute("pageSection", "人事管理");
+request.setAttribute("pageDescription", "証明書の発行履歴を期間・証明書・社員基準で照会し、印刷します。");
 request.setAttribute("activeKey", "certificate-ledger");
 request.setAttribute("pageCss", "employee.css");
 request.setAttribute("pageJs", null);
@@ -14,7 +14,7 @@ request.setAttribute("pageJs", null);
 <form action="${pageContext.request.contextPath}/Person/certificateRegister.do" method="GET">
 	<section class="filter-bar">
 		<div class="field ">
-			<label>발급기간</label>
+			<label>発行期間</label>
 			<div class="range">
 				<input type="date" name="startDate" class="input" value="${startDate}"> 
 				<span>~</span> 
@@ -22,27 +22,27 @@ request.setAttribute("pageJs", null);
 			</div>
 		</div>
 		<div class="field ">
-			<label>증명서</label>
+			<label>証明書</label>
 			<select class="select" name="certType">
-				<option value="전체" ${certType == '전체' ? 'selected' : ''}>전체</option>
-				<option value="재직증명서" ${certType == '재직증명서' ? 'selected' : ''}>재직증명서</option>
-				<option value="경력증명서" ${certType == '경력증명서' ? 'selected' : ''}>경력증명서</option>
-				<option value="퇴직증명서" ${certType == '퇴직증명서' ? 'selected' : ''}>퇴직증명서</option>
+				<option value="전체" ${certType == '全体' ? 'selected' : ''}>全体</option>
+				<option value="在職証明書" ${certType == '在職証明書' ? 'selected' : ''}>在職証明書</option>
+				<option value="経歴証明書" ${certType == '経歴証明書' ? 'selected' : ''}>経歴証明書</option>
+				<option value="退職証明書" ${certType == '退職証明書' ? 'selected' : ''}>退職証明書</option>
 			</select>
 		</div>
 		<div class="field ">
-			<label>사원명</label>
+			<label>社員名</label>
 			<input type="text" name="empName" class="input" value="${empName}">
 		</div>
 		<div class="actions">
-			<button type="submit" class="btn btn-primary">조회</button>
+			<button type="submit" class="btn btn-primary">照会</button>
 		</div>
 	</section>
 </form>
 
 <section class="card ">
 	<div class="card-header">
-		<h2 class="section-title">증명서 발급 대장</h2>
+		<h2 class="section-title">諸証明書発行台帳</h2>
 	</div>
 	<div class="card-body">
 		
@@ -50,9 +50,9 @@ request.setAttribute("pageJs", null);
 		<form id="deleteForm" action="${pageContext.request.contextPath}/Person/certificateRegisterUpdate.do" method="POST">
 			<div class="table-toolbar">
 				
-				<span class="table-count">총 ${certList.size()}건</span>
+				<span class="table-count">計 ${certList.size()}件</span>
 				<div class="actions">
-					<button type="submit" class="btn btn-danger">선택 삭제</button>
+					<button type="submit" class="btn btn-danger">選択削除</button>
 				</div>
 			</div>
 			
@@ -60,14 +60,14 @@ request.setAttribute("pageJs", null);
 				<table class="data-table ">
 					<thead>
 						<tr>
-							<th>선택</th>
-							<th>발급번호</th>
-							<th>발급일</th>
-							<th>성명</th>
-							<th>증명서</th>
-							<th>용도</th>
-							<th>발급자</th>
-							<th>상태</th>
+							<th>選択</th>
+							<th>発行番号</th>
+							<th>発行日</th>
+							<th>氏名</th>
+							<th>証明書</th>
+							<th>用途</th>
+							<th>発行者</th>
+							<th>ステータス</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -84,10 +84,10 @@ request.setAttribute("pageJs", null);
 								<td>
 									<c:choose>
 										<c:when test="${cert.certificateYn == 'Y'}">
-											<span style="color: green;">발급</span>
+											<span style="color: green;">発行</span>
 										</c:when>
 										<c:otherwise>
-											<span style="color: red; font-weight: bold;">취소</span>
+											<span style="color: red; font-weight: bold;">取消</span>
 										</c:otherwise>
 									</c:choose>
 								</td>
@@ -102,35 +102,41 @@ request.setAttribute("pageJs", null);
 </section>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. "삭제 하시겠습니까?" 확인 창 로직
+        // "삭제 하시겠습니까?" 확인 창 로직
+        // 「削除しますか？」確認ウィンドウのロジック
         const deleteForm = document.getElementById('deleteForm');
         
         if (deleteForm) {
             deleteForm.addEventListener('submit', function(event) {
                 // 체크된 항목이 있는지 검사
+                // チェックされた項目があるか検査
                 const checkedBoxes = deleteForm.querySelectorAll('input[name="issueNo"]:checked');
                 
                 if (checkedBoxes.length === 0) {
-                    alert('삭제(취소)할 증명서를 먼저 선택해주세요.');
+                    alert('削除(取消)する証明書を先に選択してください。');
                     event.preventDefault(); 
                     return;
                 }
 
                 // 사용자가 '취소'를 누르면 폼 전송을 중단
-                if (!confirm('삭제 하시겠습니까?')) {
+                // ユーザーが「キャンセル」を押すとフォーム送信を中断
+                if (!confirm('削除しますか？')) {
                     event.preventDefault();
                 }
             });
         }
 
-        // 2. "삭제 되었습니다." 알림창 로직
+        // "삭제 되었습니다." 알림창 로직
+        //「削除されました。」アラートウィンドウのロジック
         const urlParams = new URLSearchParams(window.location.search);
         
         // URL에 delete=success 파라미터가 있으면 알림창을 띄웁니다.
+        // URLにdelete=successパラメータがあればアラートウィンドウを表示します。
         if (urlParams.get('delete') === 'success') {
-            alert('삭제 되었습니다.');
+            alert('削除されました。');
             
             // 알림창이 뜬 후, 새로고침 시 다시 뜨지 않도록 URL 파라미터 정리
+            // アラートウィンドウが表示された後、更新時に再び表示されないようURLパラメータを整理
             const url = new URL(window.location);
             url.searchParams.delete('delete');
             window.history.replaceState({}, document.title, url);

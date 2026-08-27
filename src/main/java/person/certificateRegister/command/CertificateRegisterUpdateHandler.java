@@ -14,6 +14,7 @@ public class CertificateRegisterUpdateHandler implements CommandHandler {
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
         //  GET 방식 접근 차단 
+    	//  GET方式のアクセスをブロック
         if (request.getMethod().equalsIgnoreCase("GET")) {
             
             response.sendRedirect(request.getContextPath() + "/Person/certificateRegister.do");
@@ -23,6 +24,7 @@ public class CertificateRegisterUpdateHandler implements CommandHandler {
         String[] issueNos = request.getParameterValues("issueNo");
 
         //  Service 호출하여 상태 업데이트 (Y -> N)
+        // Serviceを呼び出してステータスを更新 (Y -> N)
         if (issueNos != null && issueNos.length > 0) {
             updateService.softDeleteCertificates(issueNos);
         }

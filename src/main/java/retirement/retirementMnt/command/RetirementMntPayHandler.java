@@ -19,18 +19,21 @@ public class RetirementMntPayHandler implements CommandHandler {
 
         List<MonthlyWage> recent3MonthsWages = retirementService.getRecent3MonthsPayroll(employeeId, resignDate);
 
-        // 순수 문자열 텍스트로 응답 세팅 (JSON 사용 안 함)
+        // 순수 문자열 텍스트로 응답 세팅
+        // 純粋な文字列テキストでレスポンスを設定
         res.setContentType("text/plain");
         res.setCharacterEncoding("UTF-8");
         PrintWriter out = res.getWriter();
         
         // 데이터를 "월,금액|월,금액|월,금액" 형식의 문자열로 조립
+        // データを "月,金額|月,金額|月,金額" 形式の文字列で組み立て
         String resultString = "";
         for (int i = 0; i < recent3MonthsWages.size(); i++) {
             MonthlyWage wage = recent3MonthsWages.get(i);
             resultString += wage.getWageMonth() + "," + wage.getPaymentAmount();
             
             // 마지막 요소가 아니면 파이프(|)로 구분
+            // 最後の要素でなければパイプ(|)で区切る
             if (i < recent3MonthsWages.size() - 1) {
                 resultString += "|";
             }

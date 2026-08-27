@@ -26,7 +26,7 @@ public class RetirementMntInsertService {
                 try { conn.rollback(); } catch (SQLException ex) {} 
             }
             e.printStackTrace();
-            throw new RuntimeException("퇴직급여 저장 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("退職給与の保存中にエラーが発生しました。", e);
         } finally {
             if (conn != null) {
                 try { conn.close(); } catch (SQLException e) {}

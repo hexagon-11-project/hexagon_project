@@ -27,11 +27,13 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 	}
 
 	// 수정 폼을 보여줄 때 (GET)
+	//編集フォームを表示する際（GET）
 	private String processForm(HttpServletRequest request, HttpServletResponse response) {
 		return "/WEB-INF/page/Config/membersInfo.jsp";
 	}
 
 	// 저장 버튼을 눌러 제출했을 때 (POST)
+	//保存ボタンを押して送信する際（POST）
 	private String processSubmit(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		int companyId = Integer.parseInt(request.getParameter("companyId"));
@@ -42,6 +44,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		String corpNo = request.getParameter("corpNo");
 
 		// 날짜 데이터 처리
+		//日付データの処理
 		java.sql.Date estDate = parseDate(request.getParameter("estDate"));
 		
 		String webSite = request.getParameter("webSite");
@@ -90,6 +93,7 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		info.setSealPath(sealPath);
 		
 		// 담당자 정보
+		//担当者情報
 		info.setManagerName(managerName);
 		info.setManagerTel(managerTel);
 		info.setManagerMobile(managerMobile);
@@ -98,11 +102,13 @@ public class UpdateMembersInfoHandler implements CommandHandler {
 		updateService.update(info);
 
 		// 수정 완료 후 알림창을 띄우기 위해 파라미터 추가
+		//編集完了後にアラートを表示するため、パラメータを追加
 		response.sendRedirect(request.getContextPath() + "/Config/membersInfo.do?id=" + companyId + "&save=success");
 		return null;
 	}
 
 	// 화면에서 넘어온 날짜 문자열(yyyy-MM-dd 또는 yyyyMMdd)
+	//画面から送信された日付文字列（yyyy-MM-ddまたはyyyyMMdd）
 	private java.sql.Date parseDate(String value) {
 		if (value == null || value.trim().isEmpty()) {
 			return null; 

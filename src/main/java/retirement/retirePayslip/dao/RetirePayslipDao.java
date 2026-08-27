@@ -41,7 +41,6 @@ public class RetirePayslipDao {
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {
-// 1. 기존 RetirementMntModel에 데이터 세팅
 				statement.setEmployeeName(rs.getString("employeeName"));
 				statement.setHireDate(rs.getString("hireDate"));
 				statement.setResignDate(rs.getString("resignDate"));
@@ -49,13 +48,11 @@ public class RetirePayslipDao {
 				statement.setAverageDailyWage(rs.getDouble("averageDailyWage"));
 				statement.setRetirementPayAmount(rs.getLong("retirementPayAmount"));
 
-// 2. 기존 CompanyInfo에 회사 데이터 세팅
 				company.setCompanyName(rs.getString("companyName"));
 				company.setSealPath(rs.getString("sealPath"));
 			}
 
 		} catch (Exception e) {
-			System.out.println("명세서 조회 중 오류 발생: " + e.getMessage());
 			throw new SQLException(e);
 		} finally {
 			JdbcUtil.close(rs);
@@ -63,7 +60,8 @@ public class RetirePayslipDao {
 		}
 	}
 
-	// 2. 상단 콤보박스용 정산 완료(Y) 사원 목록 조회
+	//  정산 완료(Y) 사원 목록 조회
+	// 精算完了(Y)社員リストを照会
 	public List<Employee> selectSettledEmployeeList(Connection conn) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

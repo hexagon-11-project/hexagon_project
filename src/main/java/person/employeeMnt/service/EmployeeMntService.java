@@ -21,6 +21,7 @@ public class EmployeeMntService {
             
             
             // 반복문을 돌면서 주민등록번호를 생년월일로(비즈니스 로직)
+            // ループを回りながら住民番号を生年月日に変換 (ビジネスロジック)
             for (Employee emp : list) {
                 if (emp.getResidentRegNo() != null) {
                     String rrn = emp.getResidentRegNo().replace("-", "");
@@ -32,6 +33,7 @@ public class EmployeeMntService {
                         char century = rrn.charAt(6);
                         
                         // 2000년대생 판별
+                        // 2000年代生まれの判別
                         String yearPrefix = (century == '3' || century == '4' || century == '7' || century == '8') ? "20" : "19";
                         
                         
@@ -43,7 +45,7 @@ public class EmployeeMntService {
             
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("DB 조회 에러", e);
+            throw new RuntimeException("DB照会エラー", e);
         }
     }
 
@@ -52,26 +54,31 @@ public class EmployeeMntService {
             return employeeDao.getAllCounts(conn);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("카운트 조회 에러", e);
+            throw new RuntimeException("カウント照会エラー", e);
         }
     }
     private int size = 30; //  한 페이지에 보여줄 개수 (30개 고정)
+    					   //  1ページに表示する件数 (30件固定)
 
 	public EmployeePage getEmployeePage(int pageNum, String searchType, String keyword) {
 		try (Connection conn = connection.ConnectionProvider.getConnection()) {
 			
-			// 전체 사원 수 구하기 (기존 통합 카운트 메서드의 total 값 활용 또는 별도 count 쿼리)
+			// 전체 사원 수 구하기 
+			// 全社員数を取得
 			int total = employeeDao.getSearchCount(conn, searchType, keyword);
 			List<Employee> content = null;
 			if (total > 0) {
 				// 오라클 ROWNUM에 맞게 범위 계산
+				// オラクル(Oracle)のROWNUMに合わせて範囲を計算
 				int firstRow = (pageNum - 1) * size + 1;
 				int endRow = firstRow + size - 1;
 				
 				// 30개만 잘라오기
+				// 30件だけ切り出し
 				content = employeeDao.selectListByPaging(conn, firstRow, endRow, searchType, keyword);
 				
 				// 주민번호 -> 생년월일 가공 로직 적용
+				// 住民番号 -> 生年月日 加工ロジック適用
 				for (Employee emp : content) {
 					if (emp.getResidentRegNo() != null) {
 						String rrn = emp.getResidentRegNo().replace("-", "");
@@ -90,7 +97,7 @@ public class EmployeeMntService {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("페이징 조회 에러", e);
+			throw new RuntimeException("ページング照会エラー", e);
 		}
 	}
 }
