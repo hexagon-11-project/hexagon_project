@@ -1,6 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+// ★ 공통 상단(app-start.jspf)이 pageSection/pageTitle/pageDescription을 그대로 출력하는데,
+//   이 값들을 안 채워두면 화면 위쪽에 "null"이 그대로 보이므로 미리 채워둔다.
+// ★共通ヘッダー（app-start.jspf）がpageSection/pageTitle/pageDescriptionをそのまま出力するため、
+//   これらの値を埋めておかないと画面上部に「null」がそのまま表示されるため、あらかじめ設定しておく。
+request.setAttribute("pageSection", "給与管理");
+request.setAttribute("pageTitle", "給与入力・管理");
+request.setAttribute("pageDescription", "月別、社員別に給与および賞与情報を入力・保存・管理するメニューです。帰属年月、給与回をご確認ください！！");
+%>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -9,6 +18,10 @@
 <title>給与入力・管理 | HEXAGON PAY</title>
 <%@ include file="../../jspf/head.jspf"%>
 <style>
+/* ★ 공통 상단(app-start.jspf)의 제목 영역은 이 화면 자체의 아이콘 제목과 중복되므로 숨긴다 / ★共通ヘッダー（app-start.jspf）のタイトル領域はこの画面自体のアイコン付きタイトルと重複するため非表示にする */
+.page-heading {
+	display: none;
+}
 /* 화면이 좁아져도 좌우 영역이 찌그러지거나 아래로 떨어지지 않도록 고정하는 스타일 / 画面が狭くなっても左右の領域が崩れたり下に落ちたりしないように固定するスタイル */
 body {
 	min-width: 1200px; /* 화면 전체의 최소 가로폭을 강제로 잡아줍니다 / 画面全体の最小横幅を強制的に固定します */
